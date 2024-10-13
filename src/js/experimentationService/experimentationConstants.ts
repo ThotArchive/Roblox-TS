@@ -1,0 +1,18 @@
+export const DEFAULT_ROBLOX_PROJECT = 1;
+export const EXPOSED_EVENT_NAME = 'expExposed';
+export const EXPERIMENTATION_TARGET_NAME = 'experimentation';
+
+export const EXPOSURE_LOGGING_LAYER_NAME_KEY = 'layer';
+export const EXPOSURE_LOGGING_EXPERIMENT_NAME_KEY = 'experiment';
+export const EXPOSURE_LOGGING_IS_AUDIENCE_SPECIFIED_KEY = 'isAudienceSpecified';
+export const EXPOSURE_LOGGING_IS_AUDIENCE_MEMBER_KEY = 'isAudienceMember';
+export const EXPOSURE_LOGGING_USER_AGENT_KEY = 'userAgent';
+export const EXPOSURE_LOGGING_PLATFORM_TYPE_KEY = 'platformType';
+export const EXPOSURE_LOGGING_PLATFORM_TYPE_ID_KEY = 'ptid';
+export const EXPOSURE_LOGGING_ASSIGNED_SEGMENT_KEY = 'segment';
+export const EXPOSURE_LOGGING_ASSIGNED_EXPERIMENT_VARIABLES_VARIANT_KEY = 'experiment_variant';
+export const EXPOSURE_LOGGING_PRIMARY_UNIT_VARIABLE_KEY = 'hashUnit';
+export const EXPOSURE_LOGGING_PRIMARY_UNIT_VALUE_KEY = 'hashValue';
+export const EXPOSURE_LOGGING_PRIMARY_UNIT_ALLOC_VARIABLE_KEY = 'allocKey';
+export const EXPOSURE_LOGGING_PRIMARY_UNIT_ALLOC_VALUE_KEY = 'allocValue';
+export const EXPOSURE_LOGGING_HOLDOUT_GROUP_EXPERIMENT_NAME_KEY = 'holdout';

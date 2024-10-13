@@ -1,0 +1,203 @@
+import React, { useEffect, useState, Fragment } from 'react';
+import PropTypes from 'prop-types';
+import { numberFormat } from 'core-utilities';
+import { paymentFlowAnalyticsService } from 'core-roblox-utilities';
+import { Link } from 'react-style-guide';
+import links from '../../constants/linkConstants';
+import layoutConstant from '../../constants/layoutConstants';
+import navigationService from '../../services/navigationService';
+
+const { buyRobuxUrl, redeemUrl, buyGiftCardUrl } = links;
+
+const conversionMetadataCache = new Map();
+const expValueCache = new Map();
+
+function RobuxMenu({
+  creditAmount,
+  creditDisplayConfig,
+  creditError,
+  currencyCode,
+  isEligibleForVng,
+  robuxAmount,
+  robuxError,
+  openConvertCreditModal,
+  onBuyGiftCardClick,
+  onBuyRobuxExternalClick,
+  translate
+}) {
+  const [isWalletDisplayed, setIsWalletDisplayed] = useState(true);
+  const [isConvertCreditDisplayed, setIsConvertCreditDisplayed] = useState(false);
+  const [isBuyGiftCardDisplayed, setIsBuyGiftCardDisplayed] = useState(false);
+
+  const robuxAmountValue = robuxError
+    ? layoutConstant.robuxOnEconomySystemOutage
+    : numberFormat.getNumberFormat(robuxAmount);
+
+  const sendViewMessageEvent = viewMessage => {
+    paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
+      paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE,
+      false,
+      paymentFlowAnalyticsService.ENUM_VIEW_NAME.NAVIGATION_DROPDOWN_MENU,
+      paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+      viewMessage
+    );
+  };
+
+  const onBuyRobuxClicked = () =>
+    sendViewMessageEvent(paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.BUY_ROBUX);
+
+  useEffect(() => {
+    // if none of creditAmount or robuxAmount is truncated, then don't display wallet balance
+    // must display wallet if variant hideCreditAndRobux
+    if (
+      robuxAmount < layoutConstant.truncateThreshold.robuxTruncateThreshold &&
+      creditAmount < layoutConstant.truncateThreshold.creditTruncateThreshold &&
+      creditDisplayConfig !== layoutConstant.creditDisplayConfigVariants.hideCreditAndRobux
+    ) {
+      setIsWalletDisplayed(false);
+    }
+  }, [robuxAmount, creditAmount, creditDisplayConfig]);
+
+  useEffect(() => {
+    // Render PriceTag component
+    window.dispatchEvent(
+      new CustomEvent('price-tag:render', {
+        detail: {
+          targetSelector: '.dropdown-credit-balance'
+        }
+      })
+    );
+  }, [creditDisplayConfig]);
+
+  useEffect(() => {
+    // no conversion available if credit = 0
+    if (creditAmount === 0) {
+      setIsConvertCreditDisplayed(false);
+    } else if (conversionMetadataCache.has(creditAmount)) {
+      // cache the conversion metadata for credit amount
+      setIsConvertCreditDisplayed(conversionMetadataCache.get(creditAmount));
+    } else {
+      navigationService.getConversionMetadata().then(({ data: conversionData }) => {
+        if (conversionData.robuxConversionAmount > 0) {
+          conversionMetadataCache.set(creditAmount, true);
+          setIsConvertCreditDisplayed(true);
+        } else {
+          conversionMetadataCache.set(creditAmount, false);
+          setIsConvertCreditDisplayed(false);
+        }
+      });
+    }
+  }, [creditAmount]);
+
+  useEffect(() => {
+    if (expValueCache.has(buyGiftCardUrl.cacheKey)) {
+      setIsBuyGiftCardDisplayed(expValueCache.get(buyGiftCardUrl.cacheKey));
+    } else {
+      navigationService.getGiftCardVisibility().then(({ data: expData }) => {
+        setIsBuyGiftCardDisplayed(expData.displayBuyGiftCardOption);
+        expValueCache.set(buyGiftCardUrl.cacheKey, expData.displayBuyGiftCardOption);
+      });
+    }
+  }, []);
+
+  return (
+    <Fragment>
+      <div className={isWalletDisplayed ? '' : 'wallet-hidden'}>
+        <li className='dropdown-wallet'>
+          <Link className='dropdown-wallet-section'>
+            <span className='icon-robux-28x28' id='nav-robux' />
+            <span id='nav-robux-balance'>{robuxAmountValue}</span>
+          </Link>
+        </li>
+        {/* credit balance not displayed in control variant */}
+        {creditDisplayConfig !== layoutConstant.creditDisplayConfigVariants.control && (
+          <li className='dropdown-wallet'>
+            <Link className='dropdown-wallet-section'>
+              <span className='icon-menu-wallet' />
+              {!creditError ? (
+                <span
+                  className='dropdown-credit-balance'
+                  data-amount={creditAmount}
+                  data-currency-code={currencyCode}
+                />
+              ) : (
+                layoutConstant.robuxOnEconomySystemOutage
+              )}
+            </Link>
+          </li>
+        )}
+        <li className='rbx-divider' />
+      </div>
+      {isEligibleForVng ? (
+        <li>
+          <button type='button' cssClasses='rbx-menu-item' onClick={onBuyRobuxExternalClick}>
+            {translate(buyRobuxUrl.buyRobux.label)}
+          </button>
+        </li>
+      ) : (
+        <li>
+          <Link
+            cssClasses='rbx-menu-item'
+            url={buyRobuxUrl.buyRobux.url}
+            onClick={onBuyRobuxClicked}>
+            {translate(buyRobuxUrl.buyRobux.label)}
+          </Link>
+        </li>
+      )}
+
+      {isBuyGiftCardDisplayed && (
+        <li>
+          <button type='button' cssClasses='rbx-menu-item' onClick={onBuyGiftCardClick}>
+            {translate(buyGiftCardUrl.label) || 'Buy Gift Card'}
+          </button>
+        </li>
+      )}
+
+      <li>
+        <Link cssClasses='rbx-menu-item' url={buyRobuxUrl.myTransactions.url}>
+          {translate(buyRobuxUrl.myTransactions.label)}
+        </Link>
+      </li>
+
+      <li>
+        <Link cssClasses='rbx-menu-item' url={redeemUrl.url}>
+          {translate(redeemUrl.label)}
+        </Link>
+      </li>
+
+      {creditDisplayConfig !== layoutConstant.creditDisplayConfigVariants.control &&
+        isConvertCreditDisplayed && (
+          <li>
+            <Link cssClasses='rbx-menu-item' onClick={openConvertCreditModal}>
+              {translate('Label.ConvertCreditSuccess')}
+            </Link>
+          </li>
+        )}
+    </Fragment>
+  );
+}
+
+RobuxMenu.defaultProps = {
+  isEligibleForVng: false,
+  robuxAmount: 0,
+  robuxError: '',
+  creditAmount: 0,
+  currencyCode: '',
+  creditError: ''
+};
+
+RobuxMenu.propTypes = {
+  isEligibleForVng: PropTypes.bool,
+  translate: PropTypes.func.isRequired,
+  robuxAmount: PropTypes.number,
+  robuxError: PropTypes.string,
+  creditAmount: PropTypes.number,
+  currencyCode: PropTypes.string,
+  creditError: PropTypes.string,
+  creditDisplayConfig: PropTypes.string.isRequired,
+  openConvertCreditModal: PropTypes.func.isRequired,
+  onBuyGiftCardClick: PropTypes.func.isRequired,
+  onBuyRobuxExternalClick: PropTypes.func.isRequired
+};
+
+export default RobuxMenu;

@@ -1,0 +1,1 @@
+module.exports = "https://images.rbxcdn.com/51becc9e20f99dc4be7106264a364d58-voicechat_large@3x.png";
