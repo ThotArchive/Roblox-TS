@@ -100,7 +100,9 @@ const CaptchaV2: React.FC = () => {
       metricsService,
       onChallengeDisplayed,
       onModalChallengeAbandoned,
-      isModalVisible
+      isModalVisible,
+      onChallengeCompletedData,
+      onChallengeInvalidatedData
     },
     dispatch
   } = useCaptchaContext();
@@ -339,6 +341,8 @@ const CaptchaV2: React.FC = () => {
     </div>
   );
 
+  const challengeDone = onChallengeCompletedData || onChallengeInvalidatedData;
+
   /*
    * Component Markup
    */
@@ -355,7 +359,7 @@ const CaptchaV2: React.FC = () => {
   ) : (
     <Modal
       className='modal-modern modal-modern-challenge-captcha'
-      show={isModalVisible || !gotActiveCaptcha}
+      show={(isModalVisible || !gotActiveCaptcha) && !challengeDone}
       // Since we might have passive captcha, we use this CSS hack and the
       // backdrop setting to keep the modal invisible until we have confirmed
       // active captcha.

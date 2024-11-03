@@ -20,7 +20,7 @@ export const getResources = (translate: TranslateFunction) =>
     },
     Description: {
       SuspiciousActivityEmailVerification: translate(
-        'Description.SuspiciousActivityEmailVerification'
+        'Description.SuspiciousActivityEmailVerificationV1'
       ),
       EnterCode: translate('Description.EnterCode'),
       ConfirmAbandon: translate('Description.ConfirmAbandon')

@@ -1,4 +1,4 @@
-import { EnvironmentUrls, Endpoints } from 'Roblox';
+import { EnvironmentUrls, Endpoints, DeviceMeta } from 'Roblox';
 import { urlService, httpService } from 'core-utilities';
 import { upsellUtil } from 'core-roblox-utilities';
 import { GET_VNG_SHOP_URL_PATH } from '../../constants/upsellConstants';
@@ -45,7 +45,13 @@ async function getVngShopUrl(): Promise<string> {
 }
 
 export function redirectToVngShop(): void {
-  getVngShopUrl()
-    .then(signedVngUrl => window.open(signedVngUrl, '_blank'))
-    .catch(() => window.open(EnvironmentUrls.vngGamesShopUrl, '_blank'));
+  if (DeviceMeta().isDesktop && DeviceMeta().isUniversalApp) {
+    getVngShopUrl()
+      .then(signedVngUrl => window.open(signedVngUrl, '_self'))
+      .catch(() => window.open(EnvironmentUrls.vngGamesShopUrl, '_self'));
+  } else {
+    getVngShopUrl()
+      .then(signedVngUrl => window.open(signedVngUrl, '_blank'))
+      .catch(() => window.open(EnvironmentUrls.vngGamesShopUrl, '_blank'));
+  }
 }

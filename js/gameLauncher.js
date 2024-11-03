@@ -79,9 +79,15 @@ function joinMultiplayerGame(
   isMembershipLevelOk = true,
   isPlayTogetherGame,
   joinAttemptId,
-  joinAttemptOrigin
+  joinAttemptOrigin,
+  joinData,
 ) {
-  let params = { placeId, isPlayTogetherGame: isPlayTogetherGame === true };
+  let params = { 
+    placeId,
+    launchData: joinData?.launchData,
+    eventId: joinData?.eventId,
+    isPlayTogetherGame: isPlayTogetherGame === true,
+  };
 
   if (gameLauncher.gameLaunchInterface.isJoinAttemptIdEnabled) {
     params = generateGameLaunchParams(params, joinAttemptId, joinAttemptOrigin);

@@ -43,25 +43,22 @@ function EmailUpsellModal({
       /* eslint-enable */
       className={`${isAndroidApp ? 'verification-android-modal' : ''} verification-modal`}
       size='lg'
-      aria-labelledby='contained-modal-title-vcenter'
+      aria-labelledby='verification-upsell-modal-title'
       scrollable='true'
       centered='true'>
       <Modal.Header useBaseBootstrapComponent>
         <div className='verification-upsell-title-container'>
-          {pageName === verificationUpsellConstants.UpdatePassword ? (
-            <button
-              type='button'
-              className='verification-upsell-title-button'
-              onClick={onBackAction}>
-              <span className='icon-back' />
-            </button>
-          ) : (
-            <button type='button' className='verification-upsell-title-button' onClick={onHide}>
-              <span className='close icon-close' />
-            </button>
-          )}
-          <Modal.Title id='contained-modal-title-vcenter'>{translate(titleText)}</Modal.Title>
+          <Modal.Title id='verification-upsell-modal-title'>{translate(titleText)}</Modal.Title>
         </div>
+        {pageName === verificationUpsellConstants.UpdatePassword ? (
+          <button type='button' className='close close-button' onClick={onBackAction}>
+            <span className='icon-back' />
+          </button>
+        ) : (
+          <button type='button' className='close close-button' onClick={onHide}>
+            <span className='icon-close' />
+          </button>
+        )}
       </Modal.Header>
       <Modal.Body>
         <div className='email-verification-upsell-image' />

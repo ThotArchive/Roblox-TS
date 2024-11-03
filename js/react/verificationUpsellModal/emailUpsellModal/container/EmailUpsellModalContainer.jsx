@@ -73,7 +73,8 @@ function EmailUpsellModalContainer({ translate }) {
         dispatch({ type: SET_PAGENAME_STATE, pageName });
         dispatch({
           type: SET_MODAL_STATES,
-          experimentParameters: event.detail?.experimentParameters
+          experimentParameters: event.detail?.experimentParameters,
+          settingsUiPolicy: event.detail?.settingsUiPolicy
         });
       },
       false

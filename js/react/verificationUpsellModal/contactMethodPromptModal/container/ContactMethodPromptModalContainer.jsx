@@ -42,7 +42,7 @@ function ContactMethodPromptModalContainer({ translate, origin, section }) {
       className='verification-modal'
       backdrop='static' // prevent clicking on the backdrop to close the modal
       size='lg'
-      aria-labelledby='contained-modal-title-vcenter'
+      aria-labelledby='verification-upsell-modal-title'
       scrollable='true'
       centered='true'>
       {modalContent()}

@@ -10,6 +10,7 @@ import {
   ScreenshotInviteData,
   ExperienceDetailsData,
   ExperienceAffiliateData,
+  ExperienceEventData,
   ShareLinksType
 } from './shareLinksTypes';
 
@@ -30,6 +31,7 @@ export type ResolveShareLinksResponse = {
     screenshotInviteData?: ScreenshotInviteData;
     privateServerInviteData?: PrivateServerLinkData;
     experienceDetailsInviteData?: ExperienceDetailsData;
+    experienceEventData?: ExperienceEventData;
   };
 };
 

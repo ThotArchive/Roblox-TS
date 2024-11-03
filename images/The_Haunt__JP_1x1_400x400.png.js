@@ -1,0 +1,1 @@
+module.exports = "https://images.rbxcdn.com/9ea21db17c10cdb666c7816d5b82c565-The_Haunt__JP_1x1_400x400.png";

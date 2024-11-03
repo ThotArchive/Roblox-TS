@@ -39,7 +39,7 @@ const EmailVerificationContainer = ({
     if (emailVerificationState.isEmailAdded) {
       emailModalService.close();
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      setTimeout(() => dispatch(fetchFeatureAccess({ featureName, ampFeatureCheckData })), 500);
+      setTimeout(() => dispatch(fetchFeatureAccess({ featureName, ampFeatureCheckData })), 3000);
     }
   }, [emailVerificationState]);
   return <div>{emailModal}</div>;

@@ -7,6 +7,7 @@ import { ActionType } from '../twoStepVerification/interface';
 import { ChallengeType } from './interface';
 import * as Metadata from './interface/metadata/interface';
 import * as ProofOfSpace from '../proofOfSpace/interface';
+import { FrictionContext } from './interface/metadata/challenge';
 
 const SharedChallengeMetadataValidator = z.object({
   sharedParameters: z
@@ -97,11 +98,16 @@ const ProofOfSpaceValidator = z
   })
   .and(SharedChallengeMetadataValidator);
 
-const PhoneVerificationValidator = z.object({}).and(SharedChallengeMetadataValidator);
+const PhoneVerificationValidator = z
+  .object({
+    frictionContext: z.nativeEnum(FrictionContext).optional()
+  })
+  .and(SharedChallengeMetadataValidator);
 
 const EmailVerificationValidator = z
   .object({
-    otpSession: z.string()
+    otpSession: z.string(),
+    frictionContext: z.nativeEnum(FrictionContext).optional()
   })
   .and(SharedChallengeMetadataValidator);
 

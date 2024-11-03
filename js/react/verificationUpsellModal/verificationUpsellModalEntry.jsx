@@ -30,12 +30,14 @@ const renderPhoneUpsell = ({
   addPhoneDescriptionKey,
   addPhoneLegalTextKey,
   addPhoneButtonKey,
-  beforeSuccess
+  beforeSuccess,
+  containerId,
+  renderInWebview
 } = {}) => {
   ready(() => {
     // using phoneRootElement is a bridge solution before refactoring the email
     // upsell logic.
-    const element = document.getElementById(phoneRootElementId);
+    const element = document.getElementById(containerId ?? phoneRootElementId);
     if (element) {
       unmountComponentAtNode(element);
       render(
@@ -50,6 +52,7 @@ const renderPhoneUpsell = ({
           addPhoneLegalTextKey={addPhoneLegalTextKey}
           addPhoneButtonKey={addPhoneButtonKey}
           beforeSuccess={beforeSuccess}
+          renderInWebview={renderInWebview}
         />,
         element
       );

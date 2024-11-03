@@ -129,6 +129,9 @@ export const getItemPurchasable = (
   itemDetail: TDetailEntry,
   collectibleItemDetail?: TCollectibleDetailEntry
 ): boolean => {
+  if (itemDetail.isOffSale) {
+    return false;
+  }
   if (
     itemDetail.itemRestrictions.includes('Limited') ||
     itemDetail.itemRestrictions.includes('LimitedUnique')
@@ -197,6 +200,9 @@ export const getPurchasePrice = (
   itemDetail: TDetailEntry,
   collectibleItemDetail?: TCollectibleDetailEntry
 ): number | undefined => {
+  if (itemDetail.isOffSale) {
+    return undefined;
+  }
   if (
     itemDetail.itemRestrictions.includes('Limited') ||
     itemDetail.itemRestrictions.includes('LimitedUnique')

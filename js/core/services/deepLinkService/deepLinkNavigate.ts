@@ -27,7 +27,9 @@ import {
   ProfileShareFriendshipSourceType,
   ScreenshotInviteData,
   ShareLinksType,
-  ContentPostData
+  ContentPostData,
+  ExperienceEventData,
+  ExperienceJoinData
 } from './shareLinksTypes';
 import { ZendeskDeepLinkParams, getZendeskUrl } from './utils/externalWebUrlNavigationHelper';
 import ExperienceInviteStatus from './enums/ExperienceInviteStatus';
@@ -40,6 +42,7 @@ import ExternalWebUrlDomains from './enums/ExternalWebUrlDomains';
 import AvatarItemDetailsStatus from './enums/AvatarItemDetailsStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import ContentPostStatus from './enums/ContentPostStatus';
+import ExperienceEventStatus from './enums/ExperienceEventStatus';
 
 function isItemDeeplink(navigateSubPath: string, params: DeepLinkParams) {
   return navigateSubPath === PathPart.ItemDetails && params.itemType && params.itemId;
@@ -54,6 +57,20 @@ function getFriendshipSourceType(source: string | undefined): ProfileShareFriend
     default:
       return ProfileShareFriendshipSourceType.QR_CODE;
   }
+}
+
+function buildRedirectUrlWithJoinData(url: string, joinData: ExperienceJoinData): string {
+  const [baseUrl, queryString] = url.split('?');
+  const searchParams = new URLSearchParams(queryString);
+  if (joinData) {
+    if (joinData.launchData && joinData.launchData !== '') {
+      searchParams.append('launchData', encodeURIComponent(joinData.launchData));
+    }
+    if (joinData.experienceEventId && joinData.experienceEventId !== 0) {
+      searchParams.append('eventId', encodeURIComponent(joinData.experienceEventId));
+    }
+  }
+  return `${baseUrl}?${searchParams.toString()}`;
 }
 
 const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
@@ -357,8 +374,24 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
         return resolveShareLinks(params.code, ShareLinksType.EXPERIENCE_AFFILIATE)
           .then(response => {
             const data: ExperienceAffiliateData | null = response?.data?.experienceAffiliateData;
-            if (!data || !data.universeId || data.status !== ExperienceAffiliateStatus.VALID) {
+            if (data.status !== ExperienceAffiliateStatus.VALID) {
               return false;
+            }
+            if (!data || !data.universeId) {
+              const resolveLinkEvent = buildResolveLinkEvent(
+                data.status,
+                params.code,
+                ShareLinksType.EXPERIENCE_AFFILIATE
+              );
+              eventStreamService.sendEventWithTarget(
+                resolveLinkEvent.type,
+                resolveLinkEvent.context,
+                resolveLinkEvent.params
+              );
+
+              const referralUrl = `${window.location.protocol}/${window.location.hostname}${window.location.pathname}?type=${ShareLinksType.EXPERIENCE_AFFILIATE}&code=${params.code}`;
+              window.location.href = `/?referralUrl=${encodeURIComponent(referralUrl)}`;
+              return true;
             }
 
             return getPlaceIdFromUniverseId(data.universeId.toString())
@@ -379,9 +412,11 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
                 );
 
                 const referralUrl = `${window.location.protocol}//${window.location.hostname}${window.location.pathname}?type=${ShareLinksType.EXPERIENCE_AFFILIATE}&code=${params.code}`;
-                window.location.href = `${UrlPart.Games}/${rootPlaceId}?shareLinkSourceType=${
+                let redirectUrl = `${UrlPart.Games}/${rootPlaceId}?shareLinkSourceType=${
                   ShareLinksType.EXPERIENCE_AFFILIATE
                 }&referralUrl=${encodeURIComponent(referralUrl)}`;
+                redirectUrl = buildRedirectUrlWithJoinData(redirectUrl, data.joinData);
+                window.location.href = redirectUrl;
                 return true;
               })
               .catch(() => false);
@@ -505,6 +540,46 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
             return false;
           });
       }
+      case ShareLinksType.EXPERIENCE_EVENT: {
+        if (!params.code) {
+          break;
+        }
+
+        return resolveShareLinks(params.code, ShareLinksType.EXPERIENCE_EVENT)
+          .then(response => {
+            const data: ExperienceEventData | null = response?.data?.experienceEventData;
+
+            if (
+              !data ||
+              !data.universeId ||
+              !data.placeId ||
+              data.status !== ExperienceEventStatus.VALID
+            ) {
+              return false;
+            }
+
+            const resolveLinkEvent = buildResolveLinkEvent(
+              data.status,
+              params.code,
+              ShareLinksType.EXPERIENCE_EVENT
+            );
+            eventStreamService.sendEventWithTarget(
+              resolveLinkEvent.type,
+              resolveLinkEvent.context,
+              resolveLinkEvent.params
+            );
+
+            // TODO (xueyinwang): Support redirection with a separate Status when product needs come
+            let launchLink = `${UrlPart.ExperienceLauncher}placeId=${data.placeId}`;
+            launchLink = buildRedirectUrlWithJoinData(launchLink, data.joinData);
+            ProtocolHandlerClientInterface.startGameWithDeepLinkUrl(launchLink, data.placeId);
+            return true;
+          })
+          .catch(() => {
+            fireEvent(CounterEvents.ExperienceEventResolutionFailed);
+            return false;
+          });
+      }
       default: {
         break;
       }
@@ -523,6 +598,17 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
       }
     }
     return Promise.resolve(!!zendeskUrl);
+  } else if (navigateSubPath === PathPart.Avatar) {
+    // roblox://navigation/avatar
+    if (!Object.keys(params).length) {
+      // roblox://navigation/avatar
+      // Navigate to my avatar page
+      urlTarget = `${UrlPart.Avatar}`;
+    } else {
+      // roblox://navigation/avatar?itemId=<itemId>&itemType=<itemType>
+      // Navigate to avatar details UA
+      urlTarget = target.url;
+    }
   }
 
   if (urlTarget) {

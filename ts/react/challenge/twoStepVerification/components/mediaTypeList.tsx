@@ -173,6 +173,8 @@ const MediaTypeList: React.FC<Props> = ({
         return 'icon-menu-usb';
       case MediaType.CrossDevice:
         return 'icon-menu-mobile';
+      case MediaType.Passkey:
+        return 'icon-menu-fingerprint';
       default:
         return 'icon-brokenpage';
     }
@@ -192,6 +194,8 @@ const MediaTypeList: React.FC<Props> = ({
         return resources.Label.SecurityKeyMediaType;
       case MediaType.CrossDevice:
         return resources.Label.CrossDeviceMediaType;
+      case MediaType.Passkey:
+        return resources.Label.PasskeyMediaType;
       default:
         return null;
     }

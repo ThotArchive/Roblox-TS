@@ -16,7 +16,8 @@ function PhoneUpsellApp({
   addPhoneDescriptionKey,
   addPhoneLegalTextKey,
   addPhoneButtonKey,
-  beforeSuccess
+  beforeSuccess,
+  renderInWebview
 }) {
   return (
     <PhoneUpsellModalStateProvider>
@@ -32,6 +33,7 @@ function PhoneUpsellApp({
         addPhoneLegalTextKey={addPhoneLegalTextKey}
         addPhoneButtonKey={addPhoneButtonKey}
         beforeSuccess={beforeSuccess}
+        renderInWebview={renderInWebview}
       />
     </PhoneUpsellModalStateProvider>
   );
@@ -48,7 +50,8 @@ PhoneUpsellApp.propTypes = {
   addPhoneDescriptionKey: PropTypes.string,
   addPhoneLegalTextKey: PropTypes.string,
   addPhoneButtonKey: PropTypes.string,
-  beforeSuccess: PropTypes.func
+  beforeSuccess: PropTypes.func,
+  renderInWebview: PropTypes.bool
 };
 
 PhoneUpsellApp.defaultProps = {
@@ -61,7 +64,8 @@ PhoneUpsellApp.defaultProps = {
   addPhoneDescriptionKey: undefined,
   addPhoneLegalTextKey: undefined,
   addPhoneButtonKey: undefined,
-  beforeSuccess: undefined // default set in PhoneUpsellModalContainer.jsx
+  beforeSuccess: undefined, // default set in PhoneUpsellModalContainer.jsx
+  renderInWebview: undefined // default set in PhoneUpsellModalContainer.jsx
 };
 
 export default withTranslations(PhoneUpsellApp, translation);

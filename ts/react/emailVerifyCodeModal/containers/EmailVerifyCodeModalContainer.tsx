@@ -44,7 +44,8 @@ export const EmailVerifyCodeModalContainer = ({
   legalCheckboxLabel,
   origin,
   translate,
-  isChangeEmailEnabled = false
+  isChangeEmailEnabled = false,
+  renderInWebview
 }: EmailVerifyCodeModalParams): JSX.Element => {
   const {
     state: {
@@ -92,7 +93,9 @@ export const EmailVerifyCodeModalContainer = ({
       );
       sendOtpButtonClickEvent(EVENT_CONSTANTS.context.enterOTP, EVENT_CONSTANTS.btn.signup, origin);
       onComplete({ otpSessionToken: sessionToken, otpContactType: contactType });
-    } else if (onEmailCodeEntered) {
+    } else if (isCodeValid && onEmailCodeEntered) {
+      dispatch({ type: emailVerifyCodeModalActionType.CLOSE_MODAL });
+
       // handle OTP login case
       onEmailCodeEntered(sessionToken, debouncedCode);
     }
@@ -258,7 +261,7 @@ export const EmailVerifyCodeModalContainer = ({
 
   return (
     <Modal
-      className='email-verify-code-modal'
+      className={renderInWebview ? 'email-verify-code-webview' : 'email-verify-code-modal'}
       show={isModalOpen}
       size='lg'
       backdrop='static'

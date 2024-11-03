@@ -8,7 +8,7 @@ import {
 } from '../../common/constants/urlConstants';
 import verificationUpsellConstants from '../constants/verificationUpsellConstants';
 import getErrorCodeFromRequestError from '../../common/utils/requestUtils';
-import { sectionValues } from '../../common/constants/loggingConstants';
+import getSettingsUIPolicy from '../../common/services/universalAppConfigurationService';
 
 export const sendEmailVerification = () => {
   const urlConfig = getEmailVerificationUrlConfig();
@@ -34,7 +34,8 @@ export const updateEmailAddress = formData => {
   );
 };
 
-export const getUserEmailStatusAndOpenModal = params => {
+export const getUserEmailStatusAndOpenModal = async params => {
+  const settingsUiPolicy = await getSettingsUIPolicy();
   const urlConfig = getEmailUrlConfig();
   return httpService.get(urlConfig).then(
     ({ data }) => {
@@ -47,7 +48,8 @@ export const getUserEmailStatusAndOpenModal = params => {
             origin: params.origin,
             experimentParameters: params?.experimentParameters,
             requireVerification: params.requireVerification,
-            closeCallback: params.closeCallback
+            closeCallback: params.closeCallback,
+            settingsUiPolicy
           }
         });
         window.dispatchEvent(event);

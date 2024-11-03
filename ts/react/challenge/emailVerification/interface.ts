@@ -44,7 +44,7 @@ type ChallengeParametersWithNoModal = {
 };
 
 /**
- * The parameters required to render a device integrity challenge.
+ * The parameters required to render an email verification challenge.
  */
 export type ChallengeParameters = {
   containerId: string;

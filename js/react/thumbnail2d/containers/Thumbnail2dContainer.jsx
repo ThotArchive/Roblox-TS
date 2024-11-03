@@ -101,7 +101,8 @@ function Thumbnail2dContainer({
     if (getThumbnail) {
       requestThumbnail = customThumbnailRequester.processThumbnailBatchRequest(
         { targetId, type },
-        items => customHandler.handle(items)
+        items => customHandler.handle(items),
+        targetId
       );
     }
 

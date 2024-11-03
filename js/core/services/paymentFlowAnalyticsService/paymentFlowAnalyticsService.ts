@@ -106,6 +106,8 @@ export class PaymentFlowAnalyticsService {
   ) {
     if (assetType === ASSET_TYPE.GAME_PASS) {
       this.startPaymentFlow(TRIGGERING_CONTEXT.WEB_GAME_PASS_ROBUX_UPSELL);
+    } else if (assetType === ASSET_TYPE.DEVELOPER_PRODUCT) {
+      this.startPaymentFlow(TRIGGERING_CONTEXT.WEB_DEVELOPER_PRODUCT_ROBUX_UPSELL);
     } else if (assetType === ASSET_TYPE.PLACE) {
       this.startPaymentFlow(TRIGGERING_CONTEXT.WEB_PAID_GAME_ROBUX_UPSELL);
     } else if (assetType === ASSET_TYPE.PRIVATE_SERVER) {

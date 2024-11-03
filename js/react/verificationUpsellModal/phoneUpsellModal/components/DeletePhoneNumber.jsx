@@ -43,13 +43,13 @@ function DeletePhoneNumber({ translate, existingPhoneNumber, onHide }) {
     <div>
       <Modal.Header useBaseBootstrapComponent>
         <div className='verification-upsell-title-container'>
-          <button type='button' className='verification-upsell-title-button' onClick={onHide}>
-            <span className='close icon-close' />
-          </button>
-          <Modal.Title id='contained-modal-title-vcenter'>
+          <Modal.Title id='verification-upsell-modal-title'>
             {translate(HeadingDeletePhone)}
           </Modal.Title>
         </div>
+        <button type='button' className='close close-button' onClick={onHide}>
+          <span className='icon-close' />
+        </button>
       </Modal.Header>
       <Modal.Body>
         <div className='phone-number-verification-text-body text-description'>

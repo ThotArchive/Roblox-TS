@@ -1,4 +1,3 @@
-import { ActionNeededButton } from '../components/ActionNeededButton';
 import { TPlayabilityStatus, TPlayabilityStatuses } from '../types/playButtonTypes';
 
 export const PlayabilityStatus = {
@@ -79,7 +78,8 @@ const playButtonStatusTranslationMap: Record<
 };
 
 const playButtonTextTranslationMap = {
-  ActionNeeded: 'PlayButtonText.ActionNeeded'
+  ActionNeeded: 'PlayButtonText.ActionNeeded',
+  Unplayable: 'PlayButtonText.Unavailable'
 };
 
 const counterEvents = {
@@ -87,7 +87,7 @@ const counterEvents = {
   Unplayable: 'UnplayableErrorShown',
   SeventeenPlusInPlayable: 'ReachedSeventeenPlusCaseInPlayable',
   PlayButtonIXPError: 'PlayButtonIXPIssueCaught',
-  ActionNeededTreatment: 'ActionNeededTreatmentShown'
+  PlayButtonExposureError: 'PlayButtonExposureLoggingIssueCaught'
 };
 
 const avatarChatUpsellLayer = 'Voice.AvatarChat.Upsell';

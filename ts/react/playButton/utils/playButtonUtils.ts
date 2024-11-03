@@ -7,8 +7,9 @@ import Roblox, {
 } from 'Roblox';
 import { deviceMeta as DeviceMeta, jsClientDeviceIdentifier } from 'header-scripts';
 import { uuidService } from 'core-utilities';
-import { playGameService, eventStreamService } from 'core-roblox-utilities';
-import playButtonConstants from '../constants/playButtonConstants';
+import { playGameService, eventStreamService, TJoinDataProperties } from 'core-roblox-utilities';
+import playButtonConstants, { PlayabilityStatus } from '../constants/playButtonConstants';
+import { TPlayabilityStatus, TPlayabilityStatuses } from '../types/playButtonTypes';
 
 type TEventProperties = Record<string, string | number | undefined>;
 type TJoinAttemptProperties = {
@@ -30,12 +31,14 @@ function getJoinAttemptProperties(eventProperties: TEventProperties): TJoinAttem
 
 function sendPlayGameClickedEvent(
   eventProperties: TEventProperties,
-  placeId: string
+  placeId: string,
+  joinDataProperties: TJoinDataProperties
 ): TEventProperties {
   const mergedProperties = {
     placeId,
     ...eventProperties,
-    ...getJoinAttemptProperties(eventProperties)
+    ...getJoinAttemptProperties(eventProperties),
+    ...joinDataProperties
   };
 
   eventStreamService.sendEventWithTarget('playGameClicked', 'click', mergedProperties);
@@ -58,6 +61,15 @@ function getEncodedUniversalLink(placeId: string, eventProperties: TEventPropert
     }
   }
 
+  // append join data
+  const { launchData, eventId } = eventProperties;
+  if (typeof launchData === 'string' && launchData.length > 0) {
+    universalLink += `&launchData=${launchData}`;
+  }
+  if (typeof eventId === 'string' && eventId.length > 0) {
+    universalLink += `&eventId=${eventId}`;
+  }
+
   return encodeURIComponent(universalLink);
 }
 
@@ -66,7 +78,8 @@ export const launchGame = (
   rootPlaceId?: string,
   privateServerLinkCode?: string,
   gameInstanceId?: string,
-  eventProperties: TEventProperties = {}
+  eventProperties: TEventProperties = {},
+  joinData: TJoinDataProperties = {}
 ): void => {
   const deviceMeta = DeviceMeta.getDeviceMeta();
   if (
@@ -75,7 +88,11 @@ export const launchGame = (
     jsClientDeviceIdentifier.isIos13Ipad ||
     deviceMeta?.isChromeOs
   ) {
-    const playGameClickedEventProperties = sendPlayGameClickedEvent(eventProperties, placeId);
+    const playGameClickedEventProperties = sendPlayGameClickedEvent(
+      eventProperties,
+      placeId,
+      joinData
+    );
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
     window.open(
       `https://ro.blox.com/Ebh5?pid=experiencestart_mobileweb&is_retargeting=false&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
@@ -88,7 +105,9 @@ export const launchGame = (
         placeId,
         gameInstanceId,
         /* playerId= */ undefined,
-        privateServerLinkCode
+        privateServerLinkCode,
+        /* referredByPlayerId= */ undefined,
+        joinData
       ),
       playButtonConstants.eventStreamProperties(placeId, eventProperties)
     );
@@ -103,7 +122,7 @@ export const launchLogin = (placeId: string): void => {
     jsClientDeviceIdentifier.isIos13Ipad ||
     deviceMeta?.isChromeOs
   ) {
-    const playGameClickedEventProperties = sendPlayGameClickedEvent({}, placeId);
+    const playGameClickedEventProperties = sendPlayGameClickedEvent({}, placeId, {});
     const encodedUniversalLink = getEncodedUniversalLink(placeId, playGameClickedEventProperties);
     window.open(
       `https://ro.blox.com/Ebh5?pid=experiencestart_mobileweb&is_retargeting=false&af_dp=${encodedUniversalLink}&af_web_dp=${encodedUniversalLink}&deep_link_value=${encodedUniversalLink}`,
@@ -185,11 +204,30 @@ export const handleShareLinkEventLogging = (placeId: string, universeId: string)
   }
 };
 
+export const shouldShowUnplayableButton = (
+  playabilityStatus: TPlayabilityStatus | undefined
+): playabilityStatus is Exclude<
+  TPlayabilityStatus,
+  | TPlayabilityStatuses['Playable']
+  | TPlayabilityStatuses['GuestProhibited']
+  | TPlayabilityStatuses['PurchaseRequired']
+  | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
+> => {
+  return (
+    playabilityStatus !== PlayabilityStatus.Playable &&
+    playabilityStatus !== PlayabilityStatus.GuestProhibited &&
+    playabilityStatus !== PlayabilityStatus.PurchaseRequired &&
+    playabilityStatus !== PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser &&
+    playabilityStatus !== undefined
+  );
+};
+
 export default {
   handleShareLinkEventLogging,
   launchGame,
   launchLogin,
   startVerificationFlow,
   startVoiceOptInOverlayFlow,
-  startAccessManagementUpsellFlow
+  startAccessManagementUpsellFlow,
+  shouldShowUnplayableButton
 };

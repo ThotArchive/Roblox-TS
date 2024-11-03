@@ -27,7 +27,7 @@ function AddPhoneSuccess({ translate, onHide, headingKey, descriptionKey }) {
       <Modal.Body>
         <div className='phone-number-verification-upsell-image' />
         <div className='verification-upsell-title-container phone-number-verification-success-page-title page-title'>
-          <Modal.Title id='contained-modal-title-vcenter'>{translate(headingKey)}</Modal.Title>
+          <Modal.Title id='verification-upsell-modal-title'>{translate(headingKey)}</Modal.Title>
         </div>
         <div className='phone-number-verification-text-body text-description'>
           {translate(descriptionKey)}

@@ -266,11 +266,6 @@ export const VERIFY_SMS_CODE_CONFIG: (userId: string) => UrlConfig = userId => (
   timeout: TwoStepVerificationTimeout
 });
 
-export type GetSecurityKeyOptionsReturnType = {
-  authenticationOptions: string;
-  sessionId: string;
-};
-
 export type DisableSmsTwoStepVerificationReturnType = void;
 
 /**
@@ -306,6 +301,11 @@ export const ENABLE_VERIFY_SECURITY_KEY_CONFIG: (userId: string) => UrlConfig = 
   url: `${twoStepVerificationApiUrl}/v1/users/${userId}/configuration/security-key/enable-verify`,
   timeout: TwoStepVerificationTimeout
 });
+
+export type GetSecurityKeyOptionsReturnType = {
+  authenticationOptions: string;
+  sessionId: string;
+};
 
 /**
  * Request Type: `GET`.
@@ -353,6 +353,32 @@ export const LIST_SECURITY_KEY_CONFIG: (userId: string) => UrlConfig = userId =>
   timeout: TwoStepVerificationTimeout
 });
 
+export type GetPasskeyOptionsReturnType = {
+  authenticationOptions: string;
+  sessionId: string;
+};
+
+/**
+ * Request Type: `GET`.
+ */
+export const GET_PASSKEY_OPTIONS_CONFIG: (userId: string) => UrlConfig = userId => ({
+  withCredentials: true,
+  url: `${twoStepVerificationApiUrl}/v1/users/${userId}/challenges/passkey/verify-start`,
+  timeout: TwoStepVerificationTimeout
+});
+
+export type VerifyPasskeyCredentialReturnType = {
+  verificationToken: string;
+};
+
+/**
+ * Request Type: `POST`.
+ */
+export const VERIFY_PASSKEY_CREDENTIAL_CONFIG: (userId: string) => UrlConfig = userId => ({
+  withCredentials: true,
+  url: `${twoStepVerificationApiUrl}/v1/users/${userId}/challenges/passkey/verify-finish`,
+  timeout: TwoStepVerificationTimeout
+});
 /**
  * Request Type: `GET`.
  */

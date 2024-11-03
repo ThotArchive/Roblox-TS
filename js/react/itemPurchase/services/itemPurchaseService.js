@@ -5,7 +5,8 @@ const {
   getPurchaseItemUrl,
   getPurchaseCollectibleItemUrl,
   getPurchaseCollectibleItemInstanceUrl,
-  postBulkPurchaseUrl
+  postBulkPurchaseUrl,
+  postPurchaseDeveloperProductUrl
 } = urlConstants;
 
 export default {
@@ -24,6 +25,10 @@ export default {
       withCredentials: true
     };
     return httpService.post(urlConfig, params);
+  },
+  purchaseDeveloperProduct: (productId, request) => {
+    const urlConfig = postPurchaseDeveloperProductUrl(productId.toString());
+    return httpService.post(urlConfig, request);
   },
   purchaseItem: (productId, params) => {
     const urlConfig = {

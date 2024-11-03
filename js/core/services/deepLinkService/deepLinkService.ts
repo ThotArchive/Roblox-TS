@@ -12,6 +12,7 @@ import PrivateServerLinkStatus from './enums/PrivateServerLinkStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import { ShareLinksType } from './shareLinksTypes';
 import deepLinkGroup from './deepLinkGroup';
+import ExperienceEventStatus from './enums/ExperienceEventStatus';
 
 const firstUriSegmentToHandler: { [type: string]: (target: DeepLink) => Promise<boolean> } = {
   [PathPart.Navigation]: deepLinkNavigate,
@@ -30,6 +31,7 @@ const HYBRID_TARGET_PARAM_KEY = 'deepLinkUrlPath';
 const parseDeepLink = (deepLinkString: string): DeepLink => {
   const path: Array<PathPart> = [];
   const params: DeepLinkParams = {};
+  const url: string = deepLinkString;
 
   let pathPart = pathRegex.exec(deepLinkString);
   while (pathPart) {
@@ -47,7 +49,8 @@ const parseDeepLink = (deepLinkString: string): DeepLink => {
 
   return {
     path,
-    params
+    params,
+    url
   };
 };
 
@@ -83,7 +86,8 @@ const ShareLinks = {
   FriendInviteStatus,
   ProfileShareStatus,
   PrivateServerLinkStatus,
-  ExperienceAffiliateStatus
+  ExperienceAffiliateStatus,
+  ExperienceEventStatus
 };
 
 Object.assign(Roblox, {

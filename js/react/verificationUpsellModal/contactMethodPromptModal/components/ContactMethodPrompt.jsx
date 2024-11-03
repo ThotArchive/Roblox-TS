@@ -68,7 +68,7 @@ function ContactMethodPrompt({ translate, onHide }) {
     <div>
       <Modal.Header useBaseBootstrapComponent>
         <div className='verification-upsell-title-container'>
-          <Modal.Title id='contained-modal-title-vcenter'>
+          <Modal.Title id='verification-upsell-modal-title'>
             {translate(HeadingVerificationRequired)}
           </Modal.Title>
         </div>

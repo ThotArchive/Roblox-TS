@@ -15,26 +15,27 @@ import {
   SET_INPUT_CLEAR
 } from '../actions/actionTypes';
 import verificationUpsellConstants from '../constants/verificationUpsellConstants';
-import { verificationUpsellModalLogoutExperimentParameters } from '../../common/constants/urlConstants';
 
 const {
   ActionSendConfirmationEmail,
   ActionResendConfirmationEmail,
   ActionChangeEmail,
-  ActionLogoutSkip,
   ActionGenericSkip,
   ActionContinue,
+  ActionFinishSetup,
+  ActionLogoutWithRisk,
   DescriptionVerifyEmailBody,
   DescriptionAddEmailTextOver13,
   DescriptionAddEmailTextUnder13,
-  DescriptionLogoutTextOver13,
-  DescriptionLogoutTextUnder13,
+  DescriptionAddEmailTextStrongMessaging,
+  DescriptionAddEmailTextStrongMessagingU13,
   HeadingVerifyEmail,
   HeadingAddEmail,
   HeadingAddEmailHomePage,
-  HeadingVerifyOnLogout,
+  HeadingCompleteSetupOnLogout,
   LabelEmailInputPlaceholderOver13,
   LabelEmailInputPlaceholderUnder13,
+  LabelEmailInputPlaceholderUnder13V2,
   HomePageAddEmailTextOver13,
   HomePageAddEmailTextUnder13
 } = verificationUpsellConstants;
@@ -125,6 +126,14 @@ const reducer = (oldState, action) => {
       if (oldState.pageName === verificationUpsellConstants.UpdateEmail) {
         // Note that different texts are shown for users under 13.
         const isUserOver13 = CurrentUser && !CurrentUser.isUnder13;
+        let userEmailInputPlaceholderString;
+        if (isUserOver13) {
+          userEmailInputPlaceholderString = LabelEmailInputPlaceholderOver13;
+        } else if (action.settingsUiPolicy.isParentalControlsV2Enabled) {
+          userEmailInputPlaceholderString = LabelEmailInputPlaceholderUnder13V2;
+        } else {
+          userEmailInputPlaceholderString = LabelEmailInputPlaceholderUnder13;
+        }
         let primaryText = ActionSendConfirmationEmail;
         let secondaryText = '';
         let bodyString;
@@ -135,27 +144,16 @@ const reducer = (oldState, action) => {
         }
         switch (oldState.origin) {
           case verificationUpsellConstants.Logout:
-            headingString = HeadingVerifyOnLogout;
-            bodyString = isUserOver13 ? DescriptionLogoutTextOver13 : DescriptionLogoutTextUnder13;
-            secondaryText = ActionLogoutSkip;
-            if (action.experimentParameters) {
-              headingString =
-                action.experimentParameters[
-                  verificationUpsellModalLogoutExperimentParameters.header
-                ] ?? headingString;
-              bodyString =
-                action.experimentParameters[
-                  verificationUpsellModalLogoutExperimentParameters.body
-                ] ?? bodyString;
-              primaryText =
-                action.experimentParameters[
-                  verificationUpsellModalLogoutExperimentParameters.primaryButton
-                ] ?? primaryText;
-              secondaryText =
-                action.experimentParameters[
-                  verificationUpsellModalLogoutExperimentParameters.secondaryButton
-                ] ?? secondaryText;
+            headingString = HeadingCompleteSetupOnLogout;
+            if (isUserOver13) {
+              bodyString = DescriptionAddEmailTextStrongMessaging;
+            } else if (action.settingsUiPolicy.isParentalControlsV2Enabled) {
+              bodyString = DescriptionAddEmailTextStrongMessagingU13;
+            } else {
+              bodyString = DescriptionAddEmailTextStrongMessaging;
             }
+            primaryText = ActionFinishSetup;
+            secondaryText = ActionLogoutWithRisk;
             break;
           case verificationUpsellConstants.HomePage:
           case verificationUpsellConstants.NotApprovedPage:
@@ -178,9 +176,7 @@ const reducer = (oldState, action) => {
           primaryButtonText: primaryText,
           secondaryButtonText: secondaryText,
           errorMsg: '',
-          userEmailInputPlaceholder: isUserOver13
-            ? LabelEmailInputPlaceholderOver13
-            : LabelEmailInputPlaceholderUnder13
+          userEmailInputPlaceholder: userEmailInputPlaceholderString
         };
       }
       // oldState.pageName is verificationUpsellConstants.Verification)

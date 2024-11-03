@@ -36,8 +36,15 @@ const followPlayer = (playerId, joinAttemptId, joinAttemptOrigin) => {
   GameLauncher.followPlayerIntoGame(playerId, joinAttemptId, joinAttemptOrigin);
 };
 
-const joinMultiPlayer = (placeId, joinAttemptId, joinAttemptOrigin) => {
-  GameLauncher.joinMultiplayerGame(placeId, true, false, joinAttemptId, joinAttemptOrigin);
+const joinMultiPlayer = (placeId, joinAttemptId, joinAttemptOrigin, joinData) => {
+  GameLauncher.joinMultiplayerGame(
+    placeId,
+    true,
+    false,
+    joinAttemptId,
+    joinAttemptOrigin,
+    joinData
+  );
 };
 
 const joinPrivateGame = (placeId, privateServerLinkCode, joinAttemptId, joinAttemptOrigin) => {
@@ -57,7 +64,8 @@ const buildPlayGameProperties = (
   gameInstanceId,
   playerId,
   privateServerLinkCode,
-  referredByPlayerId
+  referredByPlayerId,
+  joinData
 ) => {
   return {
     rootPlaceId,
@@ -65,7 +73,8 @@ const buildPlayGameProperties = (
     gameInstanceId,
     playerId,
     privateServerLinkCode,
-    referredByPlayerId
+    referredByPlayerId,
+    joinData
   };
 };
 
@@ -83,6 +92,7 @@ const launchGame = (playGameProperties, eventStreamProperties) => {
     const { placeId } = playGameProperties;
     const { gameInstanceId } = playGameProperties;
     const { playerId } = playGameProperties;
+    const { joinData } = playGameProperties;
     const { privateServerLinkCode } = playGameProperties;
     const { referredByPlayerId } = playGameProperties;
     if (placeId === rootPlaceId && gameInstanceId) {
@@ -121,7 +131,7 @@ const launchGame = (playGameProperties, eventStreamProperties) => {
     } else {
       sendEventStream(currentESProperties);
       sendGamePlayIntentEvent(currentESProperties.gamePlayIntentEventCtx, placeId, joinAttemptId);
-      joinMultiPlayer(placeId, joinAttemptId, currentESProperties.gamePlayIntentEventCtx);
+      joinMultiPlayer(placeId, joinAttemptId, currentESProperties.gamePlayIntentEventCtx, joinData);
     }
   }
 };

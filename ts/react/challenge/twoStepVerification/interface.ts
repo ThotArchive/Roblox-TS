@@ -31,7 +31,9 @@ export enum MediaType {
   RecoveryCode = 'RecoveryCode',
   SMS = 'SMS',
   SecurityKey = 'SecurityKey',
-  CrossDevice = 'CrossDevice'
+  CrossDevice = 'CrossDevice',
+  Password = 'Password',
+  Passkey = 'Passkey'
 }
 
 /**

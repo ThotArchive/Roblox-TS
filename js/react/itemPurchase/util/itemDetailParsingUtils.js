@@ -38,7 +38,8 @@ const parseItemDetails = (originalItem, data) => {
   if (item.collectibleItemId !== undefined) {
     item.resellerAvailable = data.hasResellers;
     item.isPurchasable = data.lowestPrice !== undefined;
-    item.isMarketPlaceEnabled = data.saleLocationType === 'ShopAndAllExperiences';
+    item.isMarketPlaceEnabled =
+      data.saleLocationType === 'ShopAndAllExperiences' || data.saleLocationType === 'ShopOnly';
   }
 
   return item;

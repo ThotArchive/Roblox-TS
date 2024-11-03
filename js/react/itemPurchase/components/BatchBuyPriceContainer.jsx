@@ -9,12 +9,14 @@ import translationConfig from '../translation.config';
 
 function PriceContainer({
   items,
+  purchaseMetadata,
   onBuyButtonClick,
   systemFeedbackService,
   onConfirm,
   onCancel,
   onTransactionComplete,
   productSurface,
+  displayPriceOnButton,
   translate
 }) {
   const [currentUserBalance, setCurrentUserBalance] = useState(undefined);
@@ -42,12 +44,14 @@ function PriceContainer({
       currentUserBalance={currentUserBalance}
       items={items}
       itemDetails={itemDetails}
+      purchaseMetadata={purchaseMetadata}
       systemFeedbackService={systemFeedbackService}
       onBuyButtonClick={onBuyButtonClick}
       onConfirm={onConfirm}
       onCancel={onCancel}
       onTransactionComplete={onTransactionComplete}
       productSurface={productSurface}
+      displayPriceOnButton={displayPriceOnButton}
       translate={translate}
     />
   );
@@ -55,12 +59,14 @@ function PriceContainer({
 
 PriceContainer.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  purchaseMetadata: PropTypes.instanceOf(Map).isRequired,
   onBuyButtonClick: PropTypes.func,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
   onTransactionComplete: PropTypes.func,
   systemFeedbackService: PropTypes.func.isRequired,
   productSurface: PropTypes.string,
+  displayPriceOnButton: PropTypes.bool,
   translate: PropTypes.func.isRequired
 };
 
@@ -69,7 +75,8 @@ PriceContainer.defaultProps = {
   onConfirm: () => {},
   onCancel: () => {},
   onTransactionComplete: result => {},
-  productSurface: 'SHOPPING_CART_WEB'
+  productSurface: 'SHOPPING_CART_WEB',
+  displayPriceOnButton: false
 };
 
 export default withTranslations(PriceContainer, translationConfig.purchasingResources);

@@ -46,7 +46,9 @@ function LeftNavItem({
           <div>
             <span className={iconClass} />
           </div>
-          <span className='font-header-2 dynamic-ellipsis-item'>
+          <span
+            className='font-header-2 dynamic-ellipsis-item'
+            title={translate(labelTranslationKey)}>
             {translate(labelTranslationKey)}
           </span>
         </button>
@@ -62,7 +64,9 @@ function LeftNavItem({
         <div>
           <span className={iconClass} />
         </div>
-        <span className='font-header-2 dynamic-ellipsis-item'>
+        <span
+          className='font-header-2 dynamic-ellipsis-item'
+          title={translate(labelTranslationKey)}>
           {translate(labelTranslationKey)}
         </span>
         {notificationItem && notificationItem.count > 0 && (

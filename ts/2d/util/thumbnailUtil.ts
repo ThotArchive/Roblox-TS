@@ -28,7 +28,8 @@ const ThumbnailTypeMapping: ThumbnailTypeMapping = {
   [ThumbnailTypes.placeGameIcon]: RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum.PlaceIcon,
   [ThumbnailTypes.developerProductIcon]:
     RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum.DeveloperProduct,
-  [ThumbnailTypes.gameThumbnail]: RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum.GameThumbnail
+  [ThumbnailTypes.gameThumbnail]: RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum.GameThumbnail,
+  [ThumbnailTypes.lookThumbnail]: RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum.LookThumbnail
 };
 
 function transformThumbnailType(

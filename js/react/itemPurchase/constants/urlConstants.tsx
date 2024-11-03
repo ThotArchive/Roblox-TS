@@ -45,5 +45,10 @@ export default {
   getVngShopUrl: () => `${apiGatewayUrl}/vng-payments/v1/getVngShopUrl`,
   getVngShopFallbackUrl: () => vngGamesShopUrl,
   getVngBuyRobuxBehaviorUrl: () =>
-    `${universalAppConfigurationApi}/v1/behaviors/vng-buy-robux/content`
+    `${universalAppConfigurationApi}/v1/behaviors/vng-buy-robux/content`,
+  postPurchaseDeveloperProductUrl: (productIdString: string) => ({
+    // NOT developer product id
+    url: `${apiGatewayUrl}/developer-products/v1/developer-products/${productIdString}/purchase?requestLocationType=ExperienceDetailPage`,
+    withCredentials: true
+  })
 };

@@ -120,7 +120,9 @@ export default function createItemPurchase({
     collectibleItemId,
     collectibleItemInstanceId,
     collectibleProductId,
-    customProps
+    isLimited,
+    customProps,
+    saleLocationId = null
   }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -189,6 +191,7 @@ export default function createItemPurchase({
         itemDetail: {
           expectedItemPrice: price,
           assetName,
+          isLimited,
           buyButtonElementDataset: targetData
         },
         startOriginalFlowCallback: insufficientFundsModalServiceWrapper(shortfallPrice, targetData)
@@ -219,6 +222,69 @@ export default function createItemPurchase({
     const openConfirmation = data => {
       setConfirmData(data);
       purchaseConfirmationModalService.open();
+    };
+
+    const purchaseDeveloperProduct = price => {
+      const request = {
+        expectedPrice: price,
+        saleLocationType: 'Website',
+        saleLocationId
+      };
+      setLoading(true);
+      itemPurchaseService
+        .purchaseDeveloperProduct(productId, request)
+        .then(response => {
+          const { data } = response;
+          if (!data.purchased && data.reason === 'TwoStepVerificationRequired') {
+            startTwoStepVerification();
+          } else if (!data.purchased) {
+            handleError({
+              title: translate(resources.errorOccuredHeading),
+              errorMsg: translate(resources.generalPurchaseErrorMessage),
+              showDivId: errorTypeIds.transactionFailure
+            });
+          } else {
+            onPurchaseSuccess();
+            if (showSuccessBanner) {
+              systemFeedbackService.success(translate(resources.purchaseCompleteHeading));
+              return;
+            }
+            openConfirmation({
+              assetIsWearable: false,
+              transactionVerb: '',
+              onDecline: () => {
+                window.location.reload();
+              }
+            });
+          }
+        })
+        .catch(errorRes => {
+          console.debug(errorRes);
+          setLoading(false);
+          closeAll();
+          if (!errorRes || errorRes?.status === 400) {
+            // bad request
+            handleError({
+              title: translate(resources.errorOccuredHeading),
+              errorMsg: translate(resources.purchasingUnavailableMessage),
+              showDivId: errorTypeIds.transactionFailure
+            });
+          } else if (errorRes.status === 429) {
+            handleError({
+              title: translate(resources.errorOccuredHeading),
+              errorMsg: translate(resources.floodcheckFailureMessage, { throttleTime: 1 }),
+              showDivId: errorTypeIds.transactionFailure
+              // We dont reload here since it's already rate limited
+            });
+          } else {
+            // generic error
+            handleError({
+              title: translate(resources.errorOccuredHeading),
+              errorMsg: translate(resources.generalPurchaseErrorMessage),
+              showDivId: errorTypeIds.transactionFailure
+            });
+          }
+        });
     };
 
     const purchaseRegularItem = price => {
@@ -404,6 +470,8 @@ export default function createItemPurchase({
     const purchaseItem = price => {
       if (collectibleItemId) {
         purchaseCollectibleItem(price);
+      } else if (assetType === 'Product') {
+        purchaseDeveloperProduct(price);
       } else {
         purchaseRegularItem(price);
       }
@@ -516,7 +584,9 @@ export default function createItemPurchase({
     collectibleItemId: null,
     collectibleItemInstanceId: null,
     collectibleProductId: null,
-    sellerType: null
+    sellerType: null,
+    isLimited: false,
+    saleLocationId: null
   };
 
   ItemPurchase.propTypes = {
@@ -551,7 +621,9 @@ export default function createItemPurchase({
     customProps: PropTypes.func,
     collectibleItemId: PropTypes.string,
     collectibleItemInstanceId: PropTypes.string,
-    collectibleProductId: PropTypes.string
+    collectibleProductId: PropTypes.string,
+    isLimited: PropTypes.bool,
+    saleLocationId: PropTypes.number
   };
   return [
     withTranslations(ItemPurchase, translationConfig.purchasingResources),

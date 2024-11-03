@@ -482,6 +482,7 @@ export const renderChallenge: RenderChallenge = async ({
           challengeBaseProperties.onChallengeCompleted({
             challengeType,
             metadata: {
+              frictionContext: challengeMetadata.frictionContext,
               ...data
             }
           })
@@ -506,6 +507,7 @@ export const renderChallenge: RenderChallenge = async ({
           challengeBaseProperties.onChallengeCompleted({
             challengeType,
             metadata: {
+              frictionContext: challengeMetadata.frictionContext,
               ...data
             }
           })

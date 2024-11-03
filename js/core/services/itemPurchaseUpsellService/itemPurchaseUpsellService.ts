@@ -79,7 +79,7 @@ export default class ItemPurchaseUpsellService {
     const itemPurchaseAjaxData = itemPurchaseDataElementMap as
       | ItemPurchaseAjaxDataObject
       | undefined;
-    if (!itemPurchaseAjaxData) {
+    if (!itemPurchaseAjaxData || itemDetail.isLimited) {
       startOriginalFlowCallback(errorObject);
       return Promise.reject(errorObject);
     }

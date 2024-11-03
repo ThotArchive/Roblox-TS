@@ -70,7 +70,8 @@ const EmailVerification: React.FC = () => {
         enterCodeTitle: resources.Header.EnterCode,
         enterCodeDescription: resources.Description.EnterCode,
         origin: Otp.Origin.Challenge,
-        translate
+        translate,
+        renderInWebview: renderInline
       });
     }
   };

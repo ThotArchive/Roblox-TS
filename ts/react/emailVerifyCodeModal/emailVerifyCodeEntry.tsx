@@ -19,7 +19,8 @@ export const renderEmailVerifyCodeModal = ({
   legalCheckboxLabel,
   origin,
   translate,
-  isChangeEmailEnabled
+  isChangeEmailEnabled,
+  renderInWebview
 }: EmailVerifyCodeModalParams): boolean => {
   const container = document.getElementById(containerId);
   if (container != null) {
@@ -41,6 +42,7 @@ export const renderEmailVerifyCodeModal = ({
           origin={origin}
           translate={translate}
           isChangeEmailEnabled={isChangeEmailEnabled}
+          renderInWebview={renderInWebview}
         />
       </EmailVerifyCodeModalStateProvider>,
       container

@@ -26,6 +26,7 @@ import RecoveryCodeInput from './recoveryCodeInput';
 import SecurityKeyInput from './securityKeyInput';
 import SmsInput from './smsInput';
 import CD2SVInput from './cd2svInput';
+import PasskeyInput from './passkeyInput';
 
 /**
  * A container element for the 2SV UI.
@@ -164,6 +165,13 @@ const TwoStepVerification: React.FC = () => {
     let primaryMediaType =
       MediaType[resultUserConfiguration.value.primaryMediaType as keyof typeof MediaType] || null;
 
+    const newEnabledMediaTypes = resultUserConfiguration.value.methods
+      .filter(({ enabled }) => enabled)
+      .map(
+        ({ mediaType: enabledMediaType }) =>
+          MediaType[enabledMediaType as keyof typeof MediaType] || null
+      );
+
     const isInApp = DeviceMeta && DeviceMeta().isInApp;
     // Check if WebAuthn is supported or if we are allowing security keys on all platforms.
     let fido2SupportedViaBrowserApi = true;
@@ -206,17 +214,29 @@ const TwoStepVerification: React.FC = () => {
       primaryMediaType = MediaType.Authenticator;
     }
 
+    if (
+      primaryMediaType === MediaType.Passkey &&
+      !fido2SupportedViaBrowserApi &&
+      !fido2SupportedViaHybridApi
+    ) {
+      if (newEnabledMediaTypes.includes(MediaType.Passkey)) {
+        newEnabledMediaTypes.splice(newEnabledMediaTypes.indexOf(MediaType.Passkey), 1);
+      }
+      if (newEnabledMediaTypes.length === 0) {
+        eventService.sendNoEnabledMethodsReturnedEvent(
+          primaryMediaType,
+          resultUserConfiguration.value.methods.length
+        );
+      } else {
+        // eslint-disable-next-line prefer-destructuring
+        primaryMediaType = newEnabledMediaTypes[0];
+      }
+    }
+
     history.replace(mediaTypeToPath(primaryMediaType));
     if (primaryMediaType === MediaType.Email) {
       setHasSentEmailCode(true);
     }
-    const newEnabledMediaTypes = resultUserConfiguration.value.methods
-      .filter(({ enabled }) => enabled)
-      .map(
-        ({ mediaType: enabledMediaType }) =>
-          MediaType[enabledMediaType as keyof typeof MediaType] || null
-      );
-
     // Track unexpected event where no valid 2SV methods are returned for a user with 2SV enabled.
     if (newEnabledMediaTypes.length === 0 || !primaryMediaType) {
       eventService.sendNoEnabledMethodsReturnedEvent(
@@ -319,6 +339,11 @@ const TwoStepVerification: React.FC = () => {
             setShowChangeMediaType={setShowChangeMediaType}>
             {children}
           </CD2SVInput>
+        </Route>
+        <Route path={mediaTypeToPath(MediaType.Passkey)}>
+          <PasskeyInput requestInFlight={requestInFlight} setRequestInFlight={setRequestInFlight}>
+            {children}
+          </PasskeyInput>
         </Route>
         <Route>
           <MediaTypeList

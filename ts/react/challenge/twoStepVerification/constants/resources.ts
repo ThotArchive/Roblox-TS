@@ -70,6 +70,8 @@ export const getResources = (translate: TranslateFunction) =>
       NeedHelpContactSupport: (supportLinkHtml: string) =>
         translate('Label.NeedHelpContactSupport', { supportLink: supportLinkHtml }),
       NewLogin: translate('Label.NewLogin'),
+      PasskeyDirections: translate('Label.PasskeyDirections'),
+      PasskeyMediaType: translate('Label.PasskeyMediaType'),
       RecoveryCodeMediaType: translate('Label.RecoveryCodeMediaType'),
       RobloxSupport: translate('Label.RobloxSupport'),
       SecurityKeyDirections: translate('Label.SecurityKeyDirections'),
@@ -77,6 +79,7 @@ export const getResources = (translate: TranslateFunction) =>
       SmsMediaType: translate('Label.SmsMediaType'),
       TrustThisDevice: translate('Label.TrustThisDevice'),
       TwoStepVerification: translate('Label.TwoStepVerification'),
+      VerifyWithPasskey: translate('Label.VerifyWithPasskey'),
       VerifyWithSecurityKey: translate('Label.VerifyWithSecurityKey')
     },
     Response: {

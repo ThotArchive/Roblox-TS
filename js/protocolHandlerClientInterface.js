@@ -587,7 +587,7 @@ function editGameInStudio(placeId, universeId, allowUpload) {
   });
 }
 
-// placeLauncherParams has placeId, isPlayTogetherGame, joinAttemptId, joinAttemptOrigin
+// placeLauncherParams has placeId, isPlayTogetherGame, joinAttemptId, joinAttemptOrigin, launchData, eventId
 function joinMultiplayerGame(placeLauncherParams) {
   const protocol = ProtocolHandlerClientInterface.protocolNameForClient;
 
@@ -602,7 +602,9 @@ function joinMultiplayerGame(placeLauncherParams) {
     launchMode,
     otherParams,
     placeId: placeLauncherParams.placeId,
-    isPlayTogetherGame
+    isPlayTogetherGame,
+    launchData: placeLauncherParams.launchData,
+    eventId: placeLauncherParams.eventId,
   };
 
   return startGame(startGameParams);

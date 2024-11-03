@@ -8,6 +8,7 @@ import ExperienceDetailsStatus from './enums/ExperienceDetailsStatus';
 import AvatarItemDetailsStatus from './enums/AvatarItemDetailsStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import ContentPostStatus from './enums/ContentPostStatus';
+import ExperienceEventStatus from './enums/ExperienceEventStatus';
 
 enum ShareLinksType {
   AVATAR_ITEM_DETAILS = 'AvatarItemDetails',
@@ -19,7 +20,8 @@ enum ShareLinksType {
   PROFILE = 'Profile',
   SCREENSHOT_INVITE = 'ScreenshotInvite',
   SERVER = 'Server',
-  EXPERIENCE_DETAILS = 'ExperienceDetails'
+  EXPERIENCE_DETAILS = 'ExperienceDetails',
+  EXPERIENCE_EVENT = 'ExperienceEvent'
 }
 
 type ExperienceInviteData = {
@@ -71,12 +73,25 @@ type AvatarItemDetailsData = {
 type ExperienceAffiliateData = {
   status: ExperienceAffiliateStatus;
   universeId: number;
+  joinData?: ExperienceJoinData;
 };
 
 type ContentPostData = {
   status: ContentPostStatus;
   postId: number;
   postCreatorId: number;
+};
+
+type ExperienceEventData = {
+  status: ExperienceEventStatus;
+  universeId: number;
+  placeId: number;
+  joinData: ExperienceJoinData;
+};
+
+type ExperienceJoinData = {
+  experienceEventId?: number;
+  launchData?: string;
 };
 
 export {
@@ -90,5 +105,7 @@ export {
   ScreenshotInviteData,
   ExperienceDetailsData,
   ExperienceAffiliateData,
+  ExperienceEventData,
+  ExperienceJoinData,
   ShareLinksType
 };

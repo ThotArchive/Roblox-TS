@@ -198,10 +198,16 @@ export async function generateBoundAuthToken(
       });
     }
 
-    // step 4 payload to sign
-    const payloadToSign = [hashedRequestBody, clientEpochTimestamp].join(SEPARATOR);
+    // step 4 get the request url and method
+    const requestUrl = urlConfig.url;
+    const requestMethod = (urlConfig.method ?? '').toUpperCase();
 
-    // step 5 generate BAT signature
+    // step 5 payload to sign. The payload components follows the v1 signature schema
+    const payloadToSign = [hashedRequestBody, clientEpochTimestamp, requestUrl, requestMethod].join(
+      SEPARATOR
+    );
+
+    // step 6 generate BAT signature
     let batSignature = '';
     try {
       batSignature = await cryptoUtil.sign(clientCryptoKeyPair.privateKey, payloadToSign);
@@ -212,7 +218,11 @@ export async function generateBoundAuthToken(
       });
     }
 
-    return E.right([hashedRequestBody, clientEpochTimestamp, batSignature].join(SEPARATOR));
+    const batSignatureVersion = 'v1';
+
+    return E.right(
+      [batSignatureVersion, hashedRequestBody, clientEpochTimestamp, batSignature].join(SEPARATOR)
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn('BAT generation error:', e);

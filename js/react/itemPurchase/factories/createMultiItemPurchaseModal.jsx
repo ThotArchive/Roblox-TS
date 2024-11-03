@@ -27,6 +27,7 @@ const {
   resources,
   batchBuyMaxThumbnails,
   batchBuyPurchaseResults,
+  purchaseMetadataKeys,
   floodcheckTime
 } = itemPurchaseConstants;
 
@@ -211,6 +212,7 @@ export default function createMultiItemPurchaseModal() {
     expectedTotalPrice,
     itemDetails,
     currentRobuxBalance,
+    purchaseMetadata,
     onCancel,
     onTransactionComplete,
     onAction,
@@ -414,13 +416,19 @@ export default function createMultiItemPurchaseModal() {
 
       fulfillmentGroups.lineItems = lineItems;
 
+      const lookId = purchaseMetadata.has(purchaseMetadataKeys.LookId)
+        ? purchaseMetadata.get(purchaseMetadataKeys.LookId)
+        : '';
+      const guid = uuidService.generateRandomUuid();
+      const idempotencyKey =
+        lookId !== undefined && lookId !== '' ? `web_looks_purchase-${lookId}-${guid}` : guid;
       let result;
       try {
         result = await itemPurchaseService.bulkPurchaseItem(
           CurrentUser.userId,
           productSurface,
           fulfillmentGroups,
-          uuidService.generateRandomUuid()
+          idempotencyKey
         );
 
         let count = 0;
@@ -527,6 +535,7 @@ export default function createMultiItemPurchaseModal() {
     title: PropTypes.string,
     expectedTotalPrice: PropTypes.number.isRequired,
     currentRobuxBalance: PropTypes.number.isRequired,
+    purchaseMetadata: PropTypes.instanceOf(Map).isRequired,
     itemDetails: PropTypes.arrayOf(
       PropTypes.shape({
         productId: PropTypes.number.isRequired,

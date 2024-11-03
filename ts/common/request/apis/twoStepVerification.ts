@@ -381,6 +381,38 @@ export const listSecurityKey = (
     TwoStepVerification.TwoStepVerificationError
   );
 
+export const getPasskeyOptions = (
+  userId: string,
+  challengeParameters: ChallengeIdAndActionType
+): Promise<
+  Result<
+    TwoStepVerification.GetPasskeyOptionsReturnType,
+    TwoStepVerification.TwoStepVerificationError | null
+  >
+> =>
+  toResult(
+    httpService.post(TwoStepVerification.GET_PASSKEY_OPTIONS_CONFIG(userId), challengeParameters),
+    TwoStepVerification.TwoStepVerificationError
+  );
+
+// For security keys, the TwoStepVerification.Code is the JSON-encoded assertion response from the authenticator.
+export const verifyPasskeyCredential = (
+  userId: string,
+  verificationParameters: ChallengeIdAndActionType & TwoStepVerification.Code
+): Promise<
+  Result<
+    TwoStepVerification.VerifyPasskeyCredentialReturnType,
+    TwoStepVerification.TwoStepVerificationError | null
+  >
+> =>
+  toResult(
+    httpService.post(
+      TwoStepVerification.VERIFY_PASSKEY_CREDENTIAL_CONFIG(userId),
+      verificationParameters
+    ),
+    TwoStepVerification.TwoStepVerificationError
+  );
+
 export const getSpendFrictionStatus = (): Promise<
   Result<boolean, TwoStepVerification.TwoStepVerificationError | null>
 > =>

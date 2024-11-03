@@ -16,6 +16,7 @@ export enum TRIGGERING_CONTEXT {
   WEB_CATALOG_BUNDLE_ITEM_ROBUX_UPSELL = 'WebCatalogBundleItemRobuxUpsell',
   WEB_PAID_GAME_ROBUX_UPSELL = 'WebPaidGameRobuxUpsell',
   WEB_GAME_PASS_ROBUX_UPSELL = 'WebGamePassRobuxUpsell',
+  WEB_DEVELOPER_PRODUCT_ROBUX_UPSELL = 'WebDeveloperProductRobuxUpsell',
   WEB_PRIVATE_SERVER_ROBUX_UPSELL = 'WebPrivateServerRobuxUpsell',
   WEB_CATALOG_CART_ROBUX_UPSELL = 'WebCatalogCartRobuxUpsell',
   WEBVIEW_ROBUX_PURCHASE = 'WebViewRobuxPurchase',
@@ -54,7 +55,8 @@ export enum VIEW_NAME {
   TRANSACTION_PAGE = 'TransactionPage',
   CATALOG_LIST_PAGE = 'CatalogListPage',
   ROBLOX_CREDIT_SETTING_BILLING_PAGE = 'RobloxCreditBillingPage',
-  REDEEM_PAGE = 'RedeemPage'
+  REDEEM_PAGE = 'RedeemPage',
+  PURCHASE_VPC_MODAL = 'PurchaseVpcModal'
 }
 
 export enum PURCHASE_EVENT_TYPE {
@@ -99,7 +101,8 @@ export enum VIEW_MESSAGE {
   PAGE_LOADED_FROM_BACK_FORWARD_CACHE = 'Back/Forward Triggered & Loaded From Cache',
   GO_TO_ROBUX_PURCHASE_PAGE = 'Go to Robux Purchase Page',
   BILLING_EMAIL_NOT_PREFILLED = 'Billing Email Not Prefilled',
-  CREDIT_CONVERSION = 'Credit Conversion'
+  CREDIT_CONVERSION = 'Credit Conversion',
+  GO_TO_SETTINGS = 'Go to Settings'
 }
 
 export enum PURCHASE_STATUS {
@@ -120,7 +123,8 @@ export const enum ASSET_TYPE {
   PRIVATE_SERVER = 'Private Server',
   BUNDLE = 'Bundle',
   PACKAGE = 'Package',
-  PLACE = 'Place'
+  PLACE = 'Place',
+  DEVELOPER_PRODUCT = 'Product'
 }
 
 const COUNTER_PREFIX = 'UserPaymentFlow';

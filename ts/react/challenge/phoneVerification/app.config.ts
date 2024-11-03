@@ -2,8 +2,9 @@ import { TranslationConfig } from 'react-utilities';
 
 export const FEATURE_NAME = 'PhoneVerification' as const;
 export const LOG_PREFIX = 'PhoneVerification:' as const;
+export const UPSELL_ORIGIN = 'challenge' as const;
 
-export const PHONE_ROOT_ELEMENT_ID = 'phoneVerificationUpsell-container' as const;
+export const PHONE_ROOT_ELEMENT_ID = 'phoneverification-challenge-container' as const;
 
 /**
  * Language resource keys for the phone verification challenge that are requested
@@ -28,7 +29,8 @@ export const TRANSLATION_CONFIG: TranslationConfig = {
 
 export const VERIFICATION_UPSELL_TRASLATION_KEY = {
   Description: {
-    SuspiciousActivityPhoneVerification: 'Description.SuspiciousActivityPhoneVerification'
+    SuspiciousActivityPhoneVerification: 'Description.SuspiciousActivityPhoneVerificationV1',
+    LegalText: 'Description.ChallengeLegalDisclaimerV1'
   },
   Header: {
     VerifyYourAccountHeader: 'Header.VerifyYourAccountHeader'

@@ -3,7 +3,11 @@ import { Modal } from 'react-style-guide';
 import { UpsellService } from 'Roblox';
 import usePhoneVerificationContext from '../hooks/usePhoneVerificationContext';
 import { PhoneVerificationActionType } from '../store/action';
-import { VERIFICATION_UPSELL_TRASLATION_KEY, PHONE_ROOT_ELEMENT_ID } from '../app.config';
+import {
+  VERIFICATION_UPSELL_TRASLATION_KEY,
+  PHONE_ROOT_ELEMENT_ID,
+  UPSELL_ORIGIN
+} from '../app.config';
 
 import InlineChallenge from '../../../common/inlineChallenge';
 import InlineChallengeBody from '../../../common/inlineChallengeBody';
@@ -58,9 +62,13 @@ const PhoneVerification: React.FC = () => {
     if (isModalVisible) {
       UpsellService.renderPhoneUpsell({
         onClose: onModalAbandoned,
+        origin: UPSELL_ORIGIN,
         addPhoneHeadingKey: VERIFICATION_UPSELL_TRASLATION_KEY.Header.VerifyYourAccountHeader,
         addPhoneDescriptionKey:
-          VERIFICATION_UPSELL_TRASLATION_KEY.Description.SuspiciousActivityPhoneVerification
+          VERIFICATION_UPSELL_TRASLATION_KEY.Description.SuspiciousActivityPhoneVerification,
+        containerId: PHONE_ROOT_ELEMENT_ID,
+        addPhoneLegalTextKey: VERIFICATION_UPSELL_TRASLATION_KEY.Description.LegalText,
+        renderInWebview: renderInline
       });
     }
   }, [onModalAbandoned, isModalVisible]);

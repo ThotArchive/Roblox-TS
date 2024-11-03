@@ -31,15 +31,16 @@ import {
   startVoiceOptInOverlayFlow
 } from '../utils/playButtonUtils';
 import playButtonTranslationConfig from '../../../../translation.config';
-import { ActionNeededWrapper } from './ActionNeededButton';
+import ActionNeededButton from './ActionNeededButton';
+import UnplayableButton from './UnplayableButton';
 
 const [ItemPurchase, itemPurchaseService] = createItemPurchase();
 const {
   PlayabilityStatus,
-  playButtonStatusTranslationMap,
   counterEvents,
   avatarChatUpsellLayer,
-  avatarChatUpsellLayerU13
+  avatarChatUpsellLayerU13,
+  playButtonLayer
 } = playButtonConstants;
 
 type ValueOf<T> = T[keyof T];
@@ -51,6 +52,7 @@ export type TPurchaseButtonProps = {
   buttonWidth?: ValueOf<typeof Button.widths>;
   buttonClassName?: string;
   refetchPlayabilityStatus: () => void;
+  hideButtonText?: boolean;
 };
 
 export const PurchaseButton = ({
@@ -60,7 +62,8 @@ export const PurchaseButton = ({
   iconClassName = 'icon-robux-white',
   buttonWidth = Button.widths.full,
   buttonClassName = 'btn-common-play-game-lg',
-  refetchPlayabilityStatus
+  refetchPlayabilityStatus,
+  hideButtonText = false
 }: TPurchaseButtonProps & {
   translate: TranslateFunction;
 }): JSX.Element => {
@@ -108,7 +111,7 @@ export const PurchaseButton = ({
           itemPurchaseService.start();
         }}>
         <span className={iconClassName} />
-        <span className='btn-text'>{productInfo.price}</span>{' '}
+        {!hideButtonText && <span className='btn-text'>{productInfo.price}</span>}
       </Button>
       <ItemPurchase
         {...{
@@ -220,6 +223,15 @@ const getShowIdentityVerificationFlow = async (
     requireExplicitVoiceConsent,
     useCameraU13Design,
     useVoiceUpsellV2Design
+  };
+};
+
+const getJoindata = () => {
+  const launchData = new URLSearchParams(window.location.search).get('launchData') ?? undefined;
+  const eventId = new URLSearchParams(window.location.search).get('eventId') ?? undefined;
+  return {
+    launchData,
+    eventId
   };
 };
 
@@ -368,12 +380,15 @@ export const PlayButton = ({
 
             handleShareLinkEventLogging(placeId, universeId);
 
+            const joinData = getJoindata();
+
             launchGame(
               placeId,
               rootPlaceId,
               privateServerLinkCode,
               gameInstanceId,
-              eventProperties
+              eventProperties,
+              joinData
             );
           } else if (status === PlayabilityStatus.GuestProhibited) {
             // if it is vng, redirect user to login page directly
@@ -396,36 +411,10 @@ export const PlayButton = ({
         <span className={iconClassName} />
       </Button>
       <div id='id-verification-container' />
-      <div id='access-management-upsell-container' />
+      <div id='access-management-upsell-container-v1' />
     </React.Fragment>
   );
 };
-
-export type TErrorProps = {
-  playabilityStatus: Exclude<
-    TPlayabilityStatus,
-    | TPlayabilityStatuses['Playable']
-    | TPlayabilityStatuses['GuestProhibited']
-    | TPlayabilityStatuses['PurchaseRequired']
-    | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
-  >;
-};
-
-export const Error = ({
-  translate,
-  playabilityStatus
-}: TErrorProps & {
-  translate: TranslateFunction;
-}): JSX.Element => (
-  <span data-testid='play-error' className='error-message'>
-    {translate(playButtonStatusTranslationMap[playabilityStatus])}
-  </span>
-);
-
-export const WithTranslationError = withTranslations<TErrorProps>(
-  Error,
-  playButtonTranslationConfig
-);
 
 export type TDefaultPlayButtonProps = {
   placeId: string;
@@ -435,7 +424,23 @@ export type TDefaultPlayButtonProps = {
   gameInstanceId?: string;
   refetchPlayabilityStatus: () => Promise<void>;
   playabilityStatus: TPlayabilityStatus | undefined;
+  hideButtonText?: boolean;
+  showUnplayableError?: boolean;
   eventProperties?: Record<string, number | string | undefined>;
+  disableLoadingState?: boolean;
+  buttonClassName?: string;
+  hasUpdatedPlayButtonsIxp?: boolean;
+};
+
+const logPlayButtonExposure = () => {
+  if (ExperimentationService.getAllValuesForLayer) {
+    const ixpPromise = ExperimentationService.getAllValuesForLayer(playButtonLayer);
+    ixpPromise
+      .then(() => {
+        ExperimentationService.logLayerExposure(playButtonLayer);
+      })
+      .catch(() => fireEvent(counterEvents.PlayButtonExposureError));
+  }
 };
 
 export const DefaultPlayButton = ({
@@ -446,11 +451,31 @@ export const DefaultPlayButton = ({
   gameInstanceId,
   refetchPlayabilityStatus,
   playabilityStatus,
-  eventProperties = {}
+  hideButtonText,
+  eventProperties = {},
+  disableLoadingState,
+  buttonClassName,
+  hasUpdatedPlayButtonsIxp
 }: TDefaultPlayButtonProps): JSX.Element => {
   switch (playabilityStatus) {
     case undefined:
-      return <Loading />;
+      if (!disableLoadingState) {
+        return <Loading />;
+      }
+
+      return (
+        <PlayButton
+          universeId={universeId}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          status={PlayabilityStatus.Playable}
+          eventProperties={eventProperties}
+          disableLoadingState={disableLoadingState}
+          buttonClassName={buttonClassName}
+        />
+      );
     case PlayabilityStatus.Playable:
     case PlayabilityStatus.GuestProhibited:
       return (
@@ -462,12 +487,22 @@ export const DefaultPlayButton = ({
           gameInstanceId={gameInstanceId}
           status={playabilityStatus}
           eventProperties={eventProperties}
+          disableLoadingState={disableLoadingState}
+          buttonClassName={buttonClassName}
         />
       );
     case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
       fireEvent(counterEvents.ActionNeeded);
+      logPlayButtonExposure();
+
+      if (hasUpdatedPlayButtonsIxp) {
+        return (
+          <ActionNeededButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        );
+      }
+
       return (
-        <ActionNeededWrapper
+        <PlayButton
           universeId={universeId}
           placeId={placeId}
           rootPlaceId={rootPlaceId}
@@ -475,6 +510,8 @@ export const DefaultPlayButton = ({
           gameInstanceId={gameInstanceId}
           status={playabilityStatus}
           eventProperties={eventProperties}
+          disableLoadingState={disableLoadingState}
+          buttonClassName={buttonClassName}
         />
       );
     case PlayabilityStatus.PurchaseRequired:
@@ -483,10 +520,20 @@ export const DefaultPlayButton = ({
           refetchPlayabilityStatus={refetchPlayabilityStatus}
           universeId={universeId}
           placeId={placeId}
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
         />
       );
     default:
       fireEvent(counterEvents.Unplayable);
-      return <WithTranslationError playabilityStatus={playabilityStatus} />;
+      logPlayButtonExposure();
+
+      if (hasUpdatedPlayButtonsIxp) {
+        return (
+          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        );
+      }
+
+      return <React.Fragment />;
   }
 };

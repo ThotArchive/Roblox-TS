@@ -77,6 +77,7 @@ const environmentUrls = {
   legacyChatApi: `https://chat.${rootDomain}`,
   localeApi: `https://locale.${rootDomain}`,
   localizationTablesApi: `https://localizationtables.${rootDomain}`,
+  matchmakingApi: `https://apis.${rootDomain}/matchmaking-api`,
   metricsApi: `https://metrics.${rootDomain}`,
   midasApi: `https://midas.${rootDomain}`,
   notificationApi: `https://notifications.${rootDomain}`,

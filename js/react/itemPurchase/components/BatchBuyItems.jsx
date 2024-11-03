@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Loading } from 'react-style-guide';
 import { withTranslations } from 'react-utilities';
-import { urlService, httpService } from 'core-utilities';
+import { urlService, numberFormat, httpService } from 'core-utilities';
 import { authenticatedUser } from 'header-scripts';
 import createMultiItemPurchaseModal from '../factories/createMultiItemPurchaseModal';
 import createInsufficientFundsModal from '../factories/createInsufficientFundsModal';
@@ -12,20 +12,23 @@ import createLeaveRobloxWarningModal from '../factories/createLeaveRobloxWarning
 import urlConstants from '../constants/urlConstants';
 import universalAppConfigurationService from '../services/universalAppConfigurationService';
 
+const { resources } = itemPurchaseConstants;
+
 const [InsufficientFundsModal, InsufficientFundsModalService] = createInsufficientFundsModal();
 const [MultiItemPurchaseModal, MultiItemPurchaseModalService] = createMultiItemPurchaseModal();
 const [LeaveRobloxWarningModal, LeaveRobloxWarningModalService] = createLeaveRobloxWarningModal();
-const { resources } = itemPurchaseConstants;
 
 export function BatchBuyItems({
   currentUserBalance,
   items,
   itemDetails,
+  purchaseMetadata,
   onBuyButtonClick,
   onConfirm,
   onCancel,
   onTransactionComplete,
   productSurface,
+  displayPriceOnButton,
   systemFeedbackService,
   translate
 }) {
@@ -35,6 +38,8 @@ export function BatchBuyItems({
   const resaleItems = [];
   const [purchasePending, setPurchasePending] = useState(false);
   const [shouldRedirectToVng, setShouldRedirectToVng] = useState(false);
+  const [purchaseModal, setPurchaseModal] = useState(null);
+  const [insufficientFundsModal, setInsufficientFundsModal] = useState(null);
 
   const getLoginUrl = () => {
     const parsedParams = {
@@ -105,7 +110,16 @@ export function BatchBuyItems({
         variant={Button.variants.growth}
         size={Button.sizes.large}
         isDisabled>
-        {translate(resources.buyAction)}
+        {displayPriceOnButton ? (
+          <div className='purchase-price'>
+            <span className='icon-robux-white-28x28' />
+            <span className='purchase-price-text text-robux-lg'>
+              {numberFormat.getNumberFormat(price)}
+            </span>
+          </div>
+        ) : (
+          <div>{translate(resources.buyAction)}</div>
+        )}
       </Button>
     );
   }
@@ -139,13 +153,61 @@ export function BatchBuyItems({
 
   const handleButtonClick = () => {
     if (robuxNeeded > 0) {
+      const modal = (
+        <InsufficientFundsModal
+          robuxNeeded={robuxNeeded}
+          onAccept={handleInsufficientFundsButtonClick}
+        />
+      );
+      setInsufficientFundsModal(modal);
       InsufficientFundsModalService.open();
     } else {
+      const modal = (
+        <MultiItemPurchaseModal
+          title={translate(resources.buyNowAction)}
+          expectedTotalPrice={price + premiumPrice}
+          items={items}
+          purchaseMetadata={purchaseMetadata}
+          itemDetails={itemDetails}
+          resaleItems={resaleItems}
+          currentRobuxBalance={currentUserBalance}
+          onCancel={() => {
+            MultiItemPurchaseModalService?.close?.();
+            onCancel();
+          }}
+          onTransactionComplete={result => {
+            setPurchasePending(false);
+            onTransactionComplete(result);
+          }}
+          onAction={() => {
+            MultiItemPurchaseModalService?.close?.();
+            setPurchasePending(true);
+            onConfirm();
+          }}
+          loading={false}
+          productSurface={productSurface}
+          systemFeedbackService={systemFeedbackService}
+        />
+      );
+      setPurchaseModal(modal);
       MultiItemPurchaseModalService.open();
     }
     onBuyButtonClick();
   };
 
+  let innerButton = <Loading />;
+  if (!purchasePending) {
+    innerButton = displayPriceOnButton ? (
+      <div className='purchase-price'>
+        <span className='icon-robux-white-28x28' />
+        <span className='purchase-price-text text-robux-lg'>
+          {numberFormat.getNumberFormat(price)}
+        </span>
+      </div>
+    ) : (
+      <div>{translate(resources.buyAction)}</div>
+    );
+  }
   const handleInsufficientFundsButtonClick = () => {
     if (shouldRedirectToVng) {
       LeaveRobloxWarningModalService.open();
@@ -181,48 +243,16 @@ export function BatchBuyItems({
           size={Button.sizes.large}
           onClick={handleButtonClick}
           isDisabled={!shouldDisplayBuyButton}>
-          {purchasePending ? <Loading /> : translate(resources.buyAction)}
+          {innerButton}
         </Button>
       </div>
-      {robuxNeeded > 0 && (
-        <div id='insufficient-funds-modal'>
-          <InsufficientFundsModal
-            robuxNeeded={robuxNeeded}
-            onAccept={handleInsufficientFundsButtonClick}
-          />
-        </div>
-      )}
+      {robuxNeeded > 0 && <div id='insufficient-funds-modal'>{insufficientFundsModal}</div>}
       {shouldRedirectToVng && (
         <div id='leave-roblox-warning-modal'>
           <LeaveRobloxWarningModal onContinueToPayment={handleLeaveRobloxWarningButtonClick} />
         </div>
       )}
-      <div id='multi-item-purchase-modal'>
-        <MultiItemPurchaseModal
-          title={translate(resources.buyNowAction)}
-          expectedTotalPrice={price + premiumPrice}
-          items={items}
-          itemDetails={itemDetails}
-          resaleItems={resaleItems}
-          currentRobuxBalance={currentUserBalance}
-          onCancel={() => {
-            MultiItemPurchaseModalService?.close?.();
-            onCancel();
-          }}
-          onTransactionComplete={result => {
-            setPurchasePending(false);
-            onTransactionComplete(result);
-          }}
-          onAction={() => {
-            MultiItemPurchaseModalService?.close?.();
-            setPurchasePending(true);
-            onConfirm();
-          }}
-          loading={false}
-          productSurface={productSurface}
-          systemFeedbackService={systemFeedbackService}
-        />
-      </div>
+      <div id='multi-item-purchase-modal'>{purchaseModal}</div>
     </React.Fragment>
   );
 }
@@ -235,6 +265,7 @@ BatchBuyItems.propTypes = {
       itemType: PropTypes.string.isRequired
     })
   ).isRequired,
+  purchaseMetadata: PropTypes.instanceOf(Map).isRequired,
   itemDetails: PropTypes.arrayOf(
     PropTypes.shape({
       productId: PropTypes.number.isRequired,
@@ -269,6 +300,7 @@ BatchBuyItems.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onTransactionComplete: PropTypes.func.isRequired,
   productSurface: PropTypes.string.isRequired,
+  displayPriceOnButton: PropTypes.bool.isRequired,
   systemFeedbackService: PropTypes.func.isRequired,
   translate: PropTypes.func.isRequired
 };

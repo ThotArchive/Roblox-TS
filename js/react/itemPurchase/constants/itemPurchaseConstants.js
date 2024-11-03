@@ -111,6 +111,9 @@ export default {
     Catalog: 0,
     Library: 1
   },
+  purchaseMetadataKeys: {
+    LookId: 'lookId'
+  },
   errorMessages: {
     insufficientFunds: 'InsufficientFunds',
     retryErrorMessage: 'Failed to determine purchasability status. Please try again by refreshing.',

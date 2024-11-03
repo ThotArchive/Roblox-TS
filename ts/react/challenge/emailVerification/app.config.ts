@@ -12,7 +12,7 @@ export const OTP_CONTAINER_ID = 'otp-challenge-container' as const;
 export const EMAIL_VERIFICATION_LANGUAGE_RESOURCES = [
   'Message.Error.Default',
   'Header.VerifyYourAccount',
-  'Description.SuspiciousActivityEmailVerification',
+  'Description.SuspiciousActivityEmailVerificationV1',
   'Header.EnterCode',
   'Description.EnterCode',
   'Header.ConfirmAbandon',

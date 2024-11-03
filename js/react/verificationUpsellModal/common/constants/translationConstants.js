@@ -54,7 +54,8 @@ export const phoneUpsellStringLinkConstants = {
   linkTagWithSmsTos:
     '<a href="https://en.help.roblox.com/hc/articles/9483830673556-Roblox-SMS-Terms-of-Service">',
   linkTagWithPrivacyPolicy: '<a href="https://en.help.roblox.com/hc/articles/115004630823">',
-  linkTagEnd: '</a>'
+  linkTagEnd: '</a>',
+  linkTagBreak: '<br>'
 };
 
 export const phoneDiscoverabilityConsentPageStrings = {
@@ -76,23 +77,17 @@ export const emailUpsellStrings = {
   ActionResendConfirmationEmail: 'Action.ResendConfirmationEmail',
   ActionSendConfirmationEmail: 'Action.SendConfirmationEmail',
   ActionSent: 'Action.Sent',
-  ActionLogoutSkip: 'Action.Logout',
   ActionGenericSkip: 'Action.GenericSkip',
   ActionContinue: 'Action.Continue',
   HomePageAddEmailTextOver13: 'Description.PleaseEnterEmail',
   HomePageAddEmailTextUnder13: 'Description.PleaseEnterParentEmail',
   DescriptionAddEmailTextOver13: 'Description.AddEmailTextOver13',
   DescriptionAddEmailTextUnder13: 'Description.AddEmailTextUnder13',
-  DescriptionLogoutTextOver13: 'Description.LogoutAddEmailTextOver13',
-  DescriptionLogoutTextUnder13: 'Description.LogoutAddEmailTextUnder13',
   DescriptionEnterPassword: 'Description.EnterPassword',
   DescriptionVerifyEmailBody: 'Description.VerifyEmailBody',
-  DescriptionAddEmailTextStrongMessaging: 'Description.AddEmailTextStrongMessaging',
   HeadingAddEmailHomePage: 'Heading.PleaseAddEmail',
   HeadingAddEmail: 'Heading.AddEmail',
   HeadingVerifyEmail: 'Heading.VerifyEmail',
-  HeadingVerifyOnLogout: 'Heading.VerifyOnLogout',
-  HeadingCompleteSetupOnLogout: 'Heading.CompleteSetupOnLogout',
   LabelEmailInputPlaceholderOver13: 'Label.EmailInputPlaceholderOver13',
   LabelEmailInputPlaceholderUnder13: 'Label.EmailInputPlaceholderUnder13',
   LabelPasswordInputPlaceholder: 'Label.PasswordInputPlaceholder',

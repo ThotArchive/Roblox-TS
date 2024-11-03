@@ -23,7 +23,8 @@ export enum RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum {
   Outfit = 'Outfit',
   GroupIcon = 'GroupIcon',
   DeveloperProduct = 'DeveloperProduct',
-  PlaceIcon = 'PlaceIcon'
+  PlaceIcon = 'PlaceIcon',
+  LookThumbnail = 'Look'
 }
 
 export enum ThumbnailTypes {
@@ -40,7 +41,8 @@ export enum ThumbnailTypes {
   developerProductIcon = 'DeveloperProduct',
   universeThumbnail = 'UniverseThumbnail',
   universeThumbnails = 'UniverseThumbnails',
-  placeGameIcon = 'PlaceGameIcon'
+  placeGameIcon = 'PlaceGameIcon',
+  lookThumbnail = 'Look'
 }
 
 export const DefaultBatchSize = 100;

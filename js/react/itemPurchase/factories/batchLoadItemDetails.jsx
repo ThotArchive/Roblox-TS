@@ -117,7 +117,7 @@ function BatchLoadItemDetails(items) {
           id: item.id
         })
       );
-      result = await ItemDetailsHydrationService.getItemDetails(itemsToHydrate);
+      result = await ItemDetailsHydrationService.getItemDetails(itemsToHydrate, false, true);
     }
     const itemDetailsResult = [];
     items.forEach(item => {

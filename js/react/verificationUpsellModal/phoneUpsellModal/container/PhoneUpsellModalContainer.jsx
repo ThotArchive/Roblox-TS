@@ -40,7 +40,8 @@ function PhoneUpsellModalContainer({
   addPhoneDescriptionKey,
   addPhoneLegalTextKey,
   addPhoneButtonKey,
-  beforeSuccess
+  beforeSuccess,
+  renderInWebview
 }) {
   const { phoneUpsellState, dispatch } = usePhoneUpsellState();
   const [phoneVerificationSuccessPage, setPhoneVerificationSuccessPage] = useState(
@@ -158,9 +159,9 @@ function PhoneUpsellModalContainer({
       show={phoneUpsellState.isOpen}
       onHide={onHide}
       /* eslint-enable */
-      className='verification-modal'
+      className={renderInWebview ? 'phone-verification-webview' : 'verification-modal'}
       size='lg'
-      aria-labelledby='contained-modal-title-vcenter'
+      aria-labelledby='verification-upsell-modal-title'
       scrollable='true'
       centered='true'>
       {modalContent()}
@@ -179,7 +180,8 @@ PhoneUpsellModalContainer.propTypes = {
   addPhoneDescriptionKey: PropTypes.string,
   addPhoneLegalTextKey: PropTypes.string,
   addPhoneButtonKey: PropTypes.string,
-  beforeSuccess: PropTypes.func
+  beforeSuccess: PropTypes.func,
+  renderInWebview: PropTypes.bool
 };
 
 PhoneUpsellModalContainer.defaultProps = {
@@ -191,7 +193,8 @@ PhoneUpsellModalContainer.defaultProps = {
   addPhoneDescriptionKey: undefined,
   addPhoneLegalTextKey: undefined,
   addPhoneButtonKey: undefined,
-  beforeSuccess: null
+  beforeSuccess: null,
+  renderInWebview: false
 };
 
 export default PhoneUpsellModalContainer;

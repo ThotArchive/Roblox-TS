@@ -41,12 +41,12 @@ export const ItemTypePathMap: { [path: string]: string } = {
 export type DeepLink = {
   path: Array<PathPart>;
   params: DeepLinkParams;
+  url: string;
 };
 
 export const DeepLinkNavigationMap: { [path: string]: string } = {
   [PathPart.Home]: '/home',
   [PathPart.Games]: '/games',
-  [PathPart.Avatar]: '/my/avatar',
   [PathPart.Catalog]: '/catalog',
   [PathPart.Friends]: '/users/friends',
   [PathPart.GiftCards]: '/giftcards',
@@ -70,7 +70,8 @@ export const UrlPart = {
   Bundle: '/bundles',
   Look: '/looks',
   AppLauncher: 'roblox://navigation',
-  ContentPost: '/content_posts'
+  ContentPost: '/content_posts',
+  Avatar: '/my/avatar'
 };
 
 export const buildResolveLinkEvent = (
@@ -104,7 +105,8 @@ export const CounterEvents = {
   ExperienceDetailsResolutionFailed: 'DeeplinkParserExperienceDetailsResolutionFailed',
   AvatarItemDetailsResolutionFailed: 'DeeplinkParserAvatarItemDetailsResolutionFailed',
   ExperienceAffiliateResolutionFailed: 'DeeplinkParserExperienceAffiliateResolutionFailed',
-  ContentPostResolutionFailed: 'DeeplinkParserContentPostResolutionFailed'
+  ContentPostResolutionFailed: 'DeeplinkParserContentPostResolutionFailed',
+  ExperienceEventResolutionFailed: 'DeeplinkParserExperienceEventResolutionFailed'
 };
 
 export const buildDeepLinkLaunchGameEvent = (

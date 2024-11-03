@@ -14,7 +14,7 @@ const parentalRequestConstants = {
       unknownError: 'Message.SomethingWentWrong',
       invalidEmailError: 'Message.InvalidEmail',
       btnText: 'Action.SendEmail',
-      emailPlaceholder: 'Label.Email',
+      emailPlaceholder: 'Label.EmailCapitalized	',
       emailTooManyChildrenError: 'Message.EmailIneligible',
       childTooManyParentsError: 'Message.ExistAccountWithEmail',
       emailTooManyRequest: 'Message.TooManyAttempts',

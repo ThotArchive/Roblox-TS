@@ -19,7 +19,7 @@ import { getErrorMessageFromVerificationErrorCode } from '../utils/errorUtils';
 import getSectionValueForPage from '../utils/loggingUtils';
 import getCleanInputCode from '../utils/verificationCodeUtils';
 import InputFieldError from './InputFieldError';
-import getSettingsUIPolicy from '../services/universalAppConfigurationService';
+import getSettingsUIPolicy from '../../common/services/universalAppConfigurationService';
 
 function VerifyPhoneNumber({ translate, onHide, onVerify }) {
   const { phoneUpsellState, dispatch } = usePhoneUpsellState();
@@ -192,13 +192,13 @@ function VerifyPhoneNumber({ translate, onHide, onVerify }) {
     <div>
       <Modal.Header useBaseBootstrapComponent>
         <div className='verification-upsell-title-container'>
-          <button type='button' className='verification-upsell-title-button' onClick={onHide}>
-            <span className='close icon-close' />
-          </button>
-          <Modal.Title id='contained-modal-title-vcenter'>
+          <Modal.Title id='verification-upsell-modal-title'>
             {translate(HeadingVerifyYourPhone)}
           </Modal.Title>
         </div>
+        <button type='button' className='close close-button' onClick={onHide}>
+          <span className='icon-close' />
+        </button>
       </Modal.Header>
       <Modal.Body>
         <div className='phone-number-verification-upsell-image' />

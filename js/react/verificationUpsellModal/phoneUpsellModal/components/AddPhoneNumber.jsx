@@ -34,7 +34,12 @@ const {
   ActionEditPhoneSecondary
 } = phoneUpsellStrings;
 
-const { linkTagEnd, linkTagWithPrivacyPolicy, linkTagWithSmsTos } = phoneUpsellStringLinkConstants;
+const {
+  linkTagEnd,
+  linkTagWithPrivacyPolicy,
+  linkTagWithSmsTos,
+  linkTagBreak
+} = phoneUpsellStringLinkConstants;
 
 function AddPhoneNumber({
   translate,
@@ -71,7 +76,8 @@ function AddPhoneNumber({
   const shortCodeDisclaimerHtml = translate(legalTextKey, {
     linkTagWithSmsTos,
     linkTagWithPrivacyPolicy,
-    linkTagEnd
+    linkTagEnd,
+    linkTagBreak
   });
   const handleContinueClick = async () => {
     setIsSubmitting(true);
@@ -109,13 +115,13 @@ function AddPhoneNumber({
     <div>
       <Modal.Header useBaseBootstrapComponent>
         <div className='verification-upsell-title-container'>
-          <button type='button' className='verification-upsell-title-button' onClick={onHide}>
-            <span className='close icon-close' />
-          </button>
-          <Modal.Title id='contained-modal-title-vcenter'>
+          <Modal.Title id='verification-upsell-modal-title'>
             {existingPhoneNumber ? translate(ActionEditPhonePrimary) : translate(headingKey)}
           </Modal.Title>
         </div>
+        <button type='button' className='close close-button' onClick={onHide}>
+          <span className='icon-close' />
+        </button>
       </Modal.Header>
       <Modal.Body>
         <div className='phone-number-submission-container'>

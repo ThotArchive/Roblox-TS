@@ -1,1 +1,0 @@
-module.exports = "https://images.rbxcdn.com/a10a28689f8f0f4c81b3ac587e75e95d-PlatformEventLeftNav_PTBR.jpg";
