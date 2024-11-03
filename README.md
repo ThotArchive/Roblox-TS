@@ -3,3 +3,6 @@ This contains all the files that I dumped from the source-map files on roblox.co
 
 ## Last dump (M/D/Y)
 11/02/2024
+
+## TODO
+- [ ] grab the JS map files using github actions
