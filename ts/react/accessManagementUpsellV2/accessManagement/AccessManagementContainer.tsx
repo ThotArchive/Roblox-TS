@@ -37,9 +37,7 @@ function AccessManagementContainer({
   const [onHidecallback, setOnHideCallback] = useState<(access: Access) => string>(
     (access: Access) => access
   );
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const [recourseParameters, setRecourseParameters] = useState<any>({});
+  const [recourseParameters, setRecourseParameters] = useState<Record<string, string> | null>({});
 
   const [asyncExit, setAsyncExit] = useState<boolean>(false);
 
@@ -125,7 +123,6 @@ function AccessManagementContainer({
               recourse={verificationStageRecourse}
               translate={translate}
               onHidecallback={onHideFunction}
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               value={recourseParameters}
             />
           );
@@ -145,7 +142,13 @@ function AccessManagementContainer({
   switch (currentStage) {
     case UpsellStage.Prologue:
       if (featureAccess.data != null) {
-        displayContainer = <Prologue translate={translate} onHide={onHideFunction} />;
+        displayContainer = (
+          <Prologue
+            translate={translate}
+            onHide={onHideFunction}
+            recourseParameters={recourseParameters}
+          />
+        );
       }
       break;
     case UpsellStage.Verification:

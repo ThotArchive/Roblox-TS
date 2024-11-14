@@ -31,7 +31,8 @@ import {
   startVoiceOptInOverlayFlow
 } from '../utils/playButtonUtils';
 import playButtonTranslationConfig from '../../../../translation.config';
-import ActionNeededButton from './ActionNeededButton';
+import SeventeenPlusActionNeededButton from './SeventeenPlusActionNeededButton';
+import ParentalControlsActionNeededButton from './ParentalControlsActionNeededButton';
 import UnplayableButton from './UnplayableButton';
 
 const [ItemPurchase, itemPurchaseService] = createItemPurchase();
@@ -430,6 +431,7 @@ export type TDefaultPlayButtonProps = {
   disableLoadingState?: boolean;
   buttonClassName?: string;
   hasUpdatedPlayButtonsIxp?: boolean;
+  shouldShowVpcPlayButtonUpsells?: boolean;
 };
 
 const logPlayButtonExposure = () => {
@@ -455,7 +457,8 @@ export const DefaultPlayButton = ({
   eventProperties = {},
   disableLoadingState,
   buttonClassName,
-  hasUpdatedPlayButtonsIxp
+  hasUpdatedPlayButtonsIxp,
+  shouldShowVpcPlayButtonUpsells
 }: TDefaultPlayButtonProps): JSX.Element => {
   switch (playabilityStatus) {
     case undefined:
@@ -497,7 +500,11 @@ export const DefaultPlayButton = ({
 
       if (hasUpdatedPlayButtonsIxp) {
         return (
-          <ActionNeededButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+          <SeventeenPlusActionNeededButton
+            universeId={universeId}
+            hideButtonText={hideButtonText}
+            buttonClassName={buttonClassName}
+          />
         );
       }
 
@@ -524,6 +531,35 @@ export const DefaultPlayButton = ({
           buttonClassName={buttonClassName}
         />
       );
+    case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
+      if (shouldShowVpcPlayButtonUpsells) {
+        fireEvent(counterEvents.ActionNeeded);
+
+        return (
+          <ParentalControlsActionNeededButton
+            universeId={universeId}
+            hideButtonText={hideButtonText}
+            buttonClassName={buttonClassName}
+            placeId={placeId}
+            rootPlaceId={rootPlaceId}
+            privateServerLinkCode={privateServerLinkCode}
+            gameInstanceId={gameInstanceId}
+            eventProperties={eventProperties}
+            hasUpdatedPlayButtonsIxp={hasUpdatedPlayButtonsIxp}
+          />
+        );
+      }
+
+      // If policy is false, fallback to existing Unplayable behavior
+      fireEvent(counterEvents.Unplayable);
+
+      if (hasUpdatedPlayButtonsIxp) {
+        return (
+          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
+        );
+      }
+
+      return <React.Fragment />;
     default:
       fireEvent(counterEvents.Unplayable);
       logPlayButtonExposure();

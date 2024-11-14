@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import {
   getGameTilePillsPositionClass,
   TGameTilesPillsByPosition
-} from '../utils/gameTileBadgeUtils';
+} from '../utils/gameTileLayoutUtils';
 import GameTilePillWithAnimation from './GameTilePillWithAnimation';
 
 interface GameTilePillsContainerProps {

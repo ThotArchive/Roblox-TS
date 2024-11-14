@@ -34,11 +34,11 @@ export class PaymentFlowAnalyticsService {
 
   public readonly ENUM_CUSTOM_EVENT = CUSTOM_EVENT;
 
-  private isFlowAbandoned = true;
+  private viewName: string;
 
-  private isPageRefreshed = false;
+  private viewMessage: string;
 
-  private isReferrerValid = false;
+  private eventMetadata: Record<string, string> = {};
 
   /**
    * Only run when there is redirection, go back/forward might not trigger the constructor if page loaded from cache
@@ -71,22 +71,14 @@ export class PaymentFlowAnalyticsService {
   }
 
   private startPaymentFlowOrThrow(triggerContext: TRIGGERING_CONTEXT) {
-    const flowUuid = uuidService.generateRandomUuid();
-    if (this.purchaseFlowUuid) {
-      // should not check the referrer, because we want to record 2 connected flows for refresh/type
-      // this.triggerContext is pre-existing also being handle here
-      this.sendUserPurchaseStatusEvent(
-        triggerContext,
-        PURCHASE_STATUS.EXISTING_FLOW_OVERWRITTEN_BY,
-        flowUuid
-      );
-      fireEvent(COUNTER_EVENTS.EXISTING_FLOW_OVERWRITTEN_TRIGGERED);
+    if (!this.purchaseFlowUuid) {
+      // No existing flow Uuid, starting a new flow
+      this.purchaseFlowUuid = uuidService.generateRandomUuid();
+      this.triggerContext = triggerContext;
+      this.writePaymentFlowContextIntoCookie();
+      this.sendUserPurchaseStatusEvent(triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_STARTED);
+      fireEvent(COUNTER_EVENTS.NEW_FLOW_INITIATED_PREFIX + this.triggerContext);
     }
-    this.purchaseFlowUuid = flowUuid;
-    this.triggerContext = triggerContext;
-    this.writePaymentFlowContextIntoCookie();
-    this.sendUserPurchaseStatusEvent(triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_STARTED);
-    fireEvent(COUNTER_EVENTS.NEW_FLOW_INITIATED_PREFIX + this.triggerContext);
   }
 
   /**
@@ -102,8 +94,12 @@ export class PaymentFlowAnalyticsService {
     assetType: ASSET_TYPE | string,
     isReseller = false,
     isPrivateServer = false,
-    isPlace = false
+    isPlace = false,
+    itemId = ''
   ) {
+    this.eventMetadata.item_type = assetType;
+    this.eventMetadata.item_id = itemId;
+
     if (assetType === ASSET_TYPE.GAME_PASS) {
       this.startPaymentFlow(TRIGGERING_CONTEXT.WEB_GAME_PASS_ROBUX_UPSELL);
     } else if (assetType === ASSET_TYPE.DEVELOPER_PRODUCT) {
@@ -123,32 +119,13 @@ export class PaymentFlowAnalyticsService {
 
   /**
    * Send a user purchase flow event
-   * This method could used to generate a new flow and overwrite an old flow
+   * This method could used to generate a new flow, or continue the existing flow
    *
    * When user enter into 1 page, there are 2 possibilities:
    *    1. pre-existing:
-   *      We need to use the isMidPurchaseStep and referrer params to check if we need to start a new flow or not
+   *      We will resume from the existing flow
    *    2. not pre-existing
-   *      Create a new one flow.
-   *      For step in middle of purchase, we shall check if this is generally used cases, if so, we need to investigate why
-   *
-   * When use this method, for flow event, it could be:
-   *    1. starter-indicating event
-   *        For starter-indicating action, we will pass in a trigger context, and generate a new flow if it's not pre-exising,
-   *        or pre-existing but not the same trigger events
-   *    2. middle-purchase-step possible event
-   *        For a middle purchase step, if pre-existing && referrer valid, then use the pre-existing flow.
-   *        A step could be a starter also a middle purchase step
-   *           For example if the robux package list one is a starter if it's landing on that page.
-   *           But it's a middle purchase step for upsell and when click from Buy Robux button
-   *        If not, this should not happen if user use the payment system in sequence.
-   *        If not, the triggerContext is only serve as a fallback to create a new flow.
-   *         But we need to check this is generally used cases, if so, we need to investigate why
-   *
-   * For the state of referrer
-   *    1. normal click exists
-   *    2. go back/forward exists
-   *    3. after refresh, it becomes empty
+   *      Create a new one flow
    *
    * @param triggerContext
    * @param isMidPurchaseStep
@@ -161,22 +138,27 @@ export class PaymentFlowAnalyticsService {
    * @param viewName
    * @param purchaseEventType
    * @param viewMessage
+   * @param eventMetadata
+   * @param isTerminalView
    */
   public sendUserPurchaseFlowEvent(
     triggerContext: TRIGGERING_CONTEXT,
     isMidPurchaseStep = false,
     viewName?: VIEW_NAME,
     purchaseEventType?: PURCHASE_EVENT_TYPE,
-    viewMessage?: VIEW_MESSAGE | string
+    viewMessage?: VIEW_MESSAGE | string,
+    eventMetadata: Record<string, string> = {},
+    isTerminalView = false
   ) {
     try {
-      this.updateFlowContinueStatus(purchaseEventType);
+      this.eventMetadata = { ...this.eventMetadata, ...eventMetadata };
       this.sendUserPurchaseFlowEventOrThrow(
         triggerContext,
         isMidPurchaseStep,
         viewName,
         purchaseEventType,
-        viewMessage
+        viewMessage,
+        isTerminalView
       );
     } catch (e) {
       fireEvent(COUNTER_EVENTS.SEND_USER_EVENT_ERROR);
@@ -188,37 +170,23 @@ export class PaymentFlowAnalyticsService {
     isMidPurchaseStep = false,
     viewName?: VIEW_NAME,
     purchaseEventType?: PURCHASE_EVENT_TYPE,
-    viewMessage?: VIEW_MESSAGE | string
+    viewMessage?: VIEW_MESSAGE | string,
+    isTerminalView = false
   ) {
     if (!viewName && !purchaseEventType && !viewMessage) {
       fireEvent(COUNTER_EVENTS.WRONG_USAGE_OF_METHOD);
       return;
     }
-    if (!this.purchaseFlowUuid || !this.triggerContext) {
-      if (isMidPurchaseStep) {
-        fireEvent(COUNTER_EVENTS.MID_PURCHASE_STEP_TRIGGERED_WITHOUT_VALID_CTX);
-      }
-      this.startPaymentFlow(triggerContext);
-      this.sendEvent(EVENT_NAME.USER_PURCHASE_FLOW, viewName, purchaseEventType, viewMessage);
-      return;
+    if ((!this.purchaseFlowUuid || !this.triggerContext) && isMidPurchaseStep) {
+      fireEvent(COUNTER_EVENTS.MID_PURCHASE_STEP_TRIGGERED_WITHOUT_VALID_CTX);
     }
 
-    // when uuid and ctx exist, and it's possible a mid purchase step
-    //   1. if valid referrer exists, use the pre-existing uuid and ctx
-    //   2. if valid referrer doesn't exist, create a new flow using the new trigger context as fallback ctx
-    if (isMidPurchaseStep) {
-      if (!this.existsValidReferrer() && !this.isPageRefreshed) {
-        // refresh, type the url, from outside of our website
-        fireEvent(COUNTER_EVENTS.MID_PURCHASE_STEP_TRIGGERED_WITHOUT_VALID_REFERRER);
-        this.startPaymentFlow(triggerContext);
-      }
-      this.sendEvent(EVENT_NAME.USER_PURCHASE_FLOW, viewName, purchaseEventType, viewMessage);
-      return;
-    }
-
-    // the trigger context pre-exists, and it's not a middle purchase step, start a new flow
     this.startPaymentFlow(triggerContext);
     this.sendEvent(EVENT_NAME.USER_PURCHASE_FLOW, viewName, purchaseEventType, viewMessage);
+
+    if (isTerminalView) {
+      this.handleTerminalPage();
+    }
   }
 
   /**
@@ -259,6 +227,10 @@ export class PaymentFlowAnalyticsService {
     }
 
     this.sendEvent(EVENT_NAME.USER_PURCHASE_STATUS, viewName, undefined, viewMessage, status);
+
+    if (PaymentFlowAnalyticsService.isTerminalView(viewName)) {
+      this.handleTerminalPage();
+    }
   }
 
   private writePaymentFlowContextIntoCookie() {
@@ -283,15 +255,26 @@ export class PaymentFlowAnalyticsService {
       return;
     }
 
+    const referralUrl = window.document.referrer || window?.frames?.top?.document.referrer || '';
+    const previousView = PaymentFlowAnalyticsService.extractView(referralUrl);
+    const currentView = PaymentFlowAnalyticsService.extractView(window.location.href);
+    const metadata = JSON.stringify(this.eventMetadata);
+    this.viewName = viewName ?? this.viewName;
+    this.viewMessage = viewMessage ?? this.viewMessage;
+
     EventStream.SendEventWithTarget(
       eventName,
       this.triggerContext,
       {
         purchase_flow_uuid: this.purchaseFlowUuid,
-        view_name: viewName,
+        view_name: this.viewName,
         purchase_event_type: purchaseEventType,
-        view_message: viewMessage,
+        view_message: this.viewMessage,
         status,
+        refurl: referralUrl.substring(0, 200), // Max 200 should be sufficient for logging urls
+        prev_view_path: previousView,
+        current_view_path: currentView,
+        event_metadata: metadata,
         ...eventPros
       },
       EventStream.TargetTypes.WWW
@@ -312,62 +295,23 @@ export class PaymentFlowAnalyticsService {
     }
   }
 
-  private existsValidReferrer() {
-    const validReferrerRegex = new RegExp(`^https://[\\w.]*${EnvironmentUrls.domain}/`);
-    return (
-      (document.referrer && validReferrerRegex.test(document.referrer.toLowerCase())) ||
-      this.isReferrerValid
-    );
+  private static extractView(referralUrl: string): string {
+    if (!referralUrl) {
+      return '';
+    }
+
+    const url = new URL(referralUrl);
+    if (!url) {
+      return '';
+    }
+    if (url.hostname.endsWith(`.${EnvironmentUrls.domain}`)) {
+      return url.pathname;
+    }
+
+    return 'External';
   }
 
   /**
-   * Update isFlowAbandoned variable
-   *
-   * When a view shown (purchaseEventType == view shown), reset the page abandon status to true
-   * Because it's possible that multiple actions happens on one page.
-   * If a user input cause the redirect, then, we should not consider this is ABANDONED
-   *
-   * This is not 100% accurate, but it is accurate when browser is refresh or navigate
-   * using the click behavior.
-   *
-   * @param purchaseEventType
-   * @private
-   */
-  private updateFlowContinueStatus(purchaseEventType: PURCHASE_EVENT_TYPE) {
-    this.isFlowAbandoned = purchaseEventType === PURCHASE_EVENT_TYPE.VIEW_SHOWN;
-  }
-
-  /**
-   * Custom Event payment-user-journey:continue handler
-   * Use case:
-   *  When there is an auto-redirect transition like the post-payment-process page from paypal
-   *  before the checkout success page. There will be only a status event,
-   *  the success/failure page redirection shall not abandon a flow.
-   *
-   * @private
-   */
-  private handleManuallyContinueFlow() {
-    this.isFlowAbandoned = false;
-  }
-
-  /**
-   * Custom Event payment-user-journey:referrer-valid handler
-   * The basic use case would be the same as the payment-user-journey:continue handler
-   * But it has more wide and general for setting referrer is valid. For example:
-   *  The user is landing on a mid-purchase-step page, we could set this referral to be valid,
-   *  so that it will keep the flow.
-   *
-   * @private
-   */
-  private handleManuallySetReferrerValid() {
-    this.isReferrerValid = true;
-  }
-
-  /**
-   * Beware: the window.performance.navigation.type won't change after reaching the page there.
-   * Thus, we can use this to set isPageRefreshed variable for the current page,
-   * should not be used as how the user leaves the page
-   *
    * @param type
    * @private
    */
@@ -423,16 +367,13 @@ export class PaymentFlowAnalyticsService {
       return;
     }
     if (PaymentFlowAnalyticsService.wasPageLoadOfType(PAGE_LOAD_TYPE.RELOAD)) {
-      this.isPageRefreshed = true;
       this.sendUserPurchaseStatusEvent(
         this.triggerContext,
         PURCHASE_STATUS.BROWSER_PAGE_CHANGED,
         VIEW_MESSAGE.PAGE_REFRESHED
       );
       fireEvent(COUNTER_EVENTS.PAGE_REFRESHED);
-      return;
     }
-    this.isPageRefreshed = false;
   }
 
   /**
@@ -470,40 +411,28 @@ export class PaymentFlowAnalyticsService {
     }
   }
 
-  private handleLeavingThePage() {
+  private handleTerminalPage() {
     if (!this.purchaseFlowUuid) {
       return;
     }
-    // Without existsValidReferrer checking here it would be problematic.
-    // Because it might end a desired flow, when it's in the middle of the flow.
-    // Example: flow started, user enter the next desired page, and user refresh,
-    // the flow will be cleared instead of recorded as refresh.
-    //
-    // However, adding existsValidReferrer would also be a little bit problematic, but much less.
-    // Problem is that refresh won't clear the referral. Thus, refresh on a non related page, it won't clear
-    // the cookie as long as they have a valid referrer.
-    // However, this could used for the case, user went to a different page, but didn't dispatch event to continue
-    // the flow. then, it will abandon the flow when it leaves that page.
-    if (this.isFlowAbandoned && !this.existsValidReferrer()) {
-      PaymentFlowContext.stop();
-      this.sendUserPurchaseStatusEvent(this.triggerContext, PURCHASE_STATUS.ABANDONED);
-      fireEvent(COUNTER_EVENTS.FLOW_ABANDONED_DETECTED);
+
+    PaymentFlowContext.stop();
+    this.sendUserPurchaseStatusEvent(this.triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_ENDED);
+    fireEvent(COUNTER_EVENTS.FLOW_ENDED);
+  }
+
+  private static isTerminalView(viewName: VIEW_NAME | string) {
+    if (viewName && viewName === VIEW_NAME.CHECKOUT_SUCCESS) {
+      return true;
     }
+
+    return false;
   }
 
   private setupEventListeners() {
     try {
       window.addEventListener('load', this.handleRefresh.bind(this));
       window.addEventListener('pageshow', this.handleGoBackForward.bind(this));
-      window.addEventListener('beforeunload', this.handleLeavingThePage.bind(this));
-      window.addEventListener(
-        CUSTOM_EVENT.FLOW_CONTINUE,
-        this.handleManuallyContinueFlow.bind(this)
-      );
-      window.addEventListener(
-        CUSTOM_EVENT.FLOW_REFERRER_VALID,
-        this.handleManuallySetReferrerValid.bind(this)
-      );
     } catch (e) {
       fireEvent(COUNTER_EVENTS.EVENTS_REGISTER_ERROR);
     }

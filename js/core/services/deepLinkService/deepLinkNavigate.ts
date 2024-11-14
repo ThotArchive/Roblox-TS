@@ -66,7 +66,7 @@ function buildRedirectUrlWithJoinData(url: string, joinData: ExperienceJoinData)
     if (joinData.launchData && joinData.launchData !== '') {
       searchParams.append('launchData', encodeURIComponent(joinData.launchData));
     }
-    if (joinData.experienceEventId && joinData.experienceEventId !== 0) {
+    if (joinData.experienceEventId && joinData.experienceEventId !== '') {
       searchParams.append('eventId', encodeURIComponent(joinData.experienceEventId));
     }
   }

@@ -129,7 +129,13 @@ export function BatchBuyItems({
       shouldDisplayBuyButton = true;
     }
 
-    if (item.premiumPriceInRobux && authenticatedUser.isPremiumUser) {
+    if (item.collectibleItemDetails !== undefined) {
+      if (item.collectibleItemDetails.lowestPrice) {
+        price += item.collectibleItemDetails.lowestPrice;
+      } else if (item.collectibleItemId.price) {
+        price += item.collectibleItemDetails.price;
+      }
+    } else if (item.premiumPriceInRobux && authenticatedUser.isPremiumUser) {
       premiumPrice += item.premiumPriceInRobux;
     } else if (item.lowestPrice) {
       price += item.lowestPrice;

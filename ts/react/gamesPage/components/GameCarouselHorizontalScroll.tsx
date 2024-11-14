@@ -305,6 +305,14 @@ export const GameCarouselHorizontalScroll = ({
                     className='game-card-container'
                     translate={translate}
                     buildEventProperties={buildEventProperties}
+                    componentType={componentType}
+                    playerCountStyle={playerCountStyle}
+                    playButtonStyle={playButtonStyle}
+                    hoverStyle={hoverStyle}
+                    topicId={topicId}
+                    friendData={friendData}
+                    isSponsoredFooterAllowed={isSponsoredFooterAllowed}
+                    navigationRootPlaceId={navigationRootPlaceId}
                   />
                 </li>
               )

@@ -667,7 +667,7 @@ function chatController(
       );
   };
 
-  $scope.getUserConversationsFromCursor = function(cursor) {
+  $scope.getUserConversationsFromCursor = function(cursor, addToFront) {
     chatService
       .getUserConversations(
         cursor,
@@ -684,7 +684,7 @@ function chatController(
           const { friendsDict } = $scope.chatLibrary;
           if (data && data.length > 0) {
             userIds = conversationsUtility.getUserIdsNotInFriendsDict(data, friendsDict);
-            $scope.buildChatUserListByConversations(data, false);
+            $scope.buildChatUserListByConversations(data, addToFront);
             $scope.retrieveDialogStatus();
           }
 
@@ -1045,7 +1045,7 @@ function chatController(
             }
           );
           // refetch the first page of conversations in-case new friends conversation was created
-          $scope.getUserConversationsFromCursor('');
+          $scope.getUserConversationsFromCursor('', true);
           $document.triggerHandler('Roblox.Friends.CountChanged');
           break;
       }
@@ -1762,6 +1762,10 @@ function chatController(
       }
       $scope.$apply();
     }
+
+    if (!angular.equals($scope.chatUserDict, {})) {
+      $scope.chatLibrary.chatLayout.chatLandingEnabled = false;
+    }
     return unreadConversations;
   };
 
@@ -1882,6 +1886,9 @@ function chatController(
       }))
     );
     $scope.getPlaceDetailsForNewPlaceIds(conversations);
+    if (!angular.equals($scope.chatUserDict, {})) {
+      $scope.chatLibrary.chatLayout.chatLandingEnabled = false;
+    }
   };
 
   $scope.openConversation = function () {
@@ -2329,7 +2336,7 @@ function chatController(
   };
 
   $scope.parseChatSettingsResponsesForChatEnabled = function (data) {
-    const { metadataResponse, guacResponse } = data;
+    const { metadataResponse } = data;
     $scope.chatLibrary.isWebChatSettingsMigrationEnabled =
       metadataResponse.isWebChatSettingsMigrationEnabled;
     $scope.chatLibrary.isWebChatRegionalityEnabled = metadataResponse.isWebChatRegionalityEnabled;
@@ -2340,12 +2347,8 @@ function chatController(
     $scope.chatLibrary.chatLayout.isChatEnabledByPrivacySetting =
       metadataResponse.isChatEnabledByPrivacySetting === 'enabled';
     if ($scope.chatLibrary.isWebChatRegionalityEnabled) {
-      if (angular.isDefined(guacResponse.CanUsePlatformChat)) {
-        $scope.chatLibrary.chatLayout.isChatEnabledByRegion = guacResponse.CanUsePlatformChat;
-      } else {
-        $scope.chatLibrary.chatLayout.isChatEnabledByRegion =
-          metadataResponse.isChatEnabledByGlobalRules === 'enabled';
-      }
+      $scope.chatLibrary.chatLayout.isChatEnabledByRegion =
+        metadataResponse.isChatEnabledByGlobalRules === 'enabled';
     }
     if (metadataResponse.isChatVisible !== false) {
       angular.element("#chat-container").show();
@@ -2357,7 +2360,7 @@ function chatController(
 
   // need to combine this with setup function after we rollout chat app site
   $scope.initializeChatLibrary = function (data) {
-    const { metadataResponse, guacResponse } = data;
+    const { metadataResponse, chatUiPoliciesResponse } = data;
     const { domain } = EnvironmentUrls;
     $scope.parseChatSettingsResponsesForChatEnabled(data);
     $scope.chatLibrary.chatLayout.languageForPrivacySettingUnavailable =
@@ -2390,7 +2393,7 @@ function chatController(
 
     $scope.chatLibrary.userId = parseInt(CurrentUser.userId);
     $scope.chatLibrary.usePaginatedFriends =
-      $scope.chatLibrary.userId % 100 <= guacResponse.usePaginatedFriends;
+      $scope.chatLibrary.userId % 100 <= chatUiPoliciesResponse.usePaginatedFriends;
     $scope.chatLibrary.username = CurrentUser.name;
     let eventAction = googleAnalyticsEventsService.eventActions.Chat;
     eventAction += `: ${googleAnalyticsEventsService.getUserAgent()}`;
@@ -2469,10 +2472,10 @@ function chatController(
   $scope.fetchAllWebChatSettings = function () {
     const promises = [chatService.getMetaData(), guacService.getChatUiPolicies()];
 
-    return Promise.allSettled(promises).then(([metadataResult, guacResult]) => {
+    return Promise.allSettled(promises).then(([metadataResult, chatUiPoliciesResult]) => {
       return {
         metadataResponse: getPromiseResultOrEmptyObject(metadataResult),
-        guacResponse: getPromiseResultOrEmptyObject(guacResult)
+        chatUiPoliciesResponse: getPromiseResultOrEmptyObject(chatUiPoliciesResult)
       };
     });
   };

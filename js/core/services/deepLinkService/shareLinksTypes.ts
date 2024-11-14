@@ -90,7 +90,7 @@ type ExperienceEventData = {
 };
 
 type ExperienceJoinData = {
-  experienceEventId?: number;
+  experienceEventId?: string;
   launchData?: string;
 };
 

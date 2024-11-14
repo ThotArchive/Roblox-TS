@@ -244,12 +244,12 @@ export const getThumbnailForAsset = async (assetId: number): Promise<string> => 
 
 export const getDeveloperProductsByUniverseId = async (
   universeId: number,
-  pageNumber: number,
+  page: number,
   pageSize: number
 ): Promise<TDeveloperProduct[]> => {
   const urlConfig = bedev2Constants.url.getDeveloperProductsForStorePage(universeId.toString());
   const params: TListDeveloperProductParams = {
-    pageNumber,
+    page,
     pageSize,
     storePageEnabled: true
   };

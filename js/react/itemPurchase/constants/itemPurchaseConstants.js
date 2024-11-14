@@ -2,7 +2,8 @@ export default {
   errorTypeIds: {
     transactionFailure: 'TransactionFailureView',
     insufficientFunds: 'InsufficientFundsView',
-    priceChanged: 'PriceChangedView'
+    priceChanged: 'PriceChangedView',
+    pendingProductsLimitExceeded: 'PendingProductsLimitExceeded'
   },
   errorStatusText: {
     badRequest: 'Bad Request'
@@ -91,7 +92,9 @@ export default {
     inExperienceOnlyFailureMessage: 'Heading.InExperienceOnlyFailure',
     redirectToPartnerWebsiteMessage: 'Description.RedirectToPartnerWebsite',
     continueToPaymentAction: 'Action.ContinueToPayment',
-    leavingRobloxHeading: 'Heading.LeavingRoblox'
+    leavingRobloxHeading: 'Heading.LeavingRoblox',
+    pendingDeveloperProductLimitReachedMessage: 'Message.PendingDeveloperProductLimitReached',
+    pendingDeveloperProductLimitReachedHeading: 'Heading.PendingDeveloperProductLimitReached'
   },
   assetTypes: {
     // library catagory type

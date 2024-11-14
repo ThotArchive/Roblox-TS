@@ -83,7 +83,20 @@ const ParentalRequestContainer = ({
         const newBirthdateString = value?.newBirthdate;
         const newBirthdate = new Date(newBirthdateString);
         const state = changeBirthdayUtils.getAgeRange(newBirthdate);
-        sendClickRequestBroadcastConfirmEvent(RequestType.UpdateBirthdate, state, sessionId);
+        sendClickRequestBroadcastConfirmEvent({
+          requestType: RequestType.UpdateBirthdate,
+          extraState: state,
+          sessionId
+        });
+        break;
+      }
+      case RequestType.UpdateUserSetting: {
+        const settingName = Object.keys(value)[0];
+        sendClickRequestBroadcastConfirmEvent({
+          requestType: RequestType.UpdateUserSetting,
+          settingName,
+          sessionId
+        });
         break;
       }
       // TODO: Migrate other request type when we kill wizard VPC

@@ -17,15 +17,9 @@ const isEmailNotificationEnabled = (userCreatedDate, isEmailVerified) => {
 };
 
 const getAccountNotificationCount = () => {
-  const { created } = authenticatedUser;
-  return navigationService
-    .getEmailStatus()
-    .then(({ data: { verified: isEmailVerified } }) => {
-      return +isEmailNotificationEnabled(created, isEmailVerified);
-    })
-    .catch(error => {
-      console.debug(error);
-    });
+  // The last item that contributes to the setting notification counter was removed, but leaving this util in here for
+  // now in case we want to add a new counter in the future.
+  return Promise.resolve(0);
 };
 
 const sendClickEvent = eventName => {

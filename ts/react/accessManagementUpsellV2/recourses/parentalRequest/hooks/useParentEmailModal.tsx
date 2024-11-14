@@ -41,7 +41,12 @@ const useParentEmailModal = (
 
   const { gatherParentEmail } = translationKeys;
   const [errorTranslationKey, setErrorTranslationKey] = useState('');
-
+  const settingName = useMemo(() => {
+    if (consentType === RequestType.UpdateUserSetting) {
+      return Object.keys(value)[0];
+    }
+    return undefined;
+  }, [consentType, value]);
   const regex = new RegExp(emailRegex);
   const getSetEmailErrorMessage = () => {
     if (parentEmailInput.length > 0 && !regex.test(parentEmailInput)) {
@@ -65,7 +70,11 @@ const useParentEmailModal = (
         requestType: consentType,
         requestDetails: value
       });
-      sendParentEmailSubmitEvent(consentType, response.sessionId);
+      sendParentEmailSubmitEvent({
+        requestType: consentType,
+        sessionId: response.sessionId,
+        settingName
+      });
       setSendEmailBtnLoadingStatus(false);
       modalService.close();
       successCallBack(response.sessionId, parentEmailInput);
@@ -104,7 +113,9 @@ const useParentEmailModal = (
               setParentEmailInput(e.target.value);
               setErrorTranslationKey('');
             }}
-            onFocus={() => sendInteractParentEmailFormEvent(consentType)}
+            onFocus={() =>
+              sendInteractParentEmailFormEvent({ requestType: consentType, settingName })
+            }
           />
         </div>
         {/* <!-- Do not remove the two input hidden fields below. They are to prevent browsers from saving the email as your username in the autofill settings https://stackoverflow.com/questions/15738259/disabling-chrome-autofill --> */}

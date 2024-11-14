@@ -26,7 +26,7 @@ const apiParamsInitialization = {
     smallestPageSizeOfGetMessages: 3,
     getMessagesNextCursor: null,
     maxKeystrokeDataLength: 200,
-    keystrokeSampleRate: 0.1
+    keystrokeSampleRate: 1.0
   },
 
   gameUrls: {

@@ -270,6 +270,7 @@ export type TGetGameDetails = {
   isFavoritedByUser: boolean;
   sourceName?: string;
   sourceDescription?: string;
+  licenseDescription?: string;
 };
 
 // GetFriends

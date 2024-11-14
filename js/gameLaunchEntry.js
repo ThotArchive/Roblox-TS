@@ -10,6 +10,7 @@ import PrerollPlayer from './prerollPlayer';
 import VideoPreRollDFP from './videoPreRollDFP';
 import ProtocolHandlerClientInterface from './protocolHandlerClientInterface';
 import PlayButton from '../ts/react/playButton/playButtonEntry';
+import '../css/gameLaunch/gameLaunch.scss';
 
 // shim all the things that are available globally for backwards compatibility;
 if (!window.Roblox) {

@@ -262,7 +262,18 @@ export default function createItemPurchase({
           console.debug(errorRes);
           setLoading(false);
           closeAll();
-          if (!errorRes || errorRes?.status === 400) {
+          const errorCode = errorRes.data?.errorCode;
+          if (
+            errorRes &&
+            errorRes.status === 500 &&
+            errorCode === errorTypeIds.pendingProductsLimitExceeded
+          ) {
+            handleError({
+              title: translate(resources.pendingDeveloperProductLimitReachedHeading),
+              errorMsg: translate(resources.pendingDeveloperProductLimitReachedMessage),
+              showDivId: errorTypeIds.transactionFailure
+            });
+          } else if (!errorRes || errorRes?.status === 400) {
             // bad request
             handleError({
               title: translate(resources.errorOccuredHeading),

@@ -2,6 +2,8 @@ import { TileBadgePositionEnum } from '../constants/genericTileConstants';
 import {
   TGameTileBadgeType,
   TGameTilePillData,
+  TGameTileTextFooter,
+  TLayoutComponentType,
   TLayoutMetadata,
   TTileBadge
 } from '../types/bedev1Types';
@@ -61,9 +63,18 @@ export const getGameTilePillsData = (
   return null;
 };
 
+export const getGameTileTextFooterData = (
+  gameLayoutData: TLayoutMetadata | undefined
+): TGameTileTextFooter | null => {
+  return gameLayoutData?.footer?.type === TLayoutComponentType.TextLabel
+    ? gameLayoutData.footer
+    : null;
+};
+
 export default {
   getGameTilePillsData,
   getGameTilePillsIconClass,
   getGameTilePillsAnimationClass,
-  getGameTilePillsPositionClass
+  getGameTilePillsPositionClass,
+  getGameTileTextFooterData
 };

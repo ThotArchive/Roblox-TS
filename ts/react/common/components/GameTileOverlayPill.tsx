@@ -4,7 +4,7 @@ import { TLayoutMetadata } from '../types/bedev1Types';
 import { TPlayerCountStyle } from '../types/bedev2Types';
 import parsingUtils from '../utils/parsingUtils';
 import GameTilePillsContainer from './GameTilePillsContainer';
-import { getGameTilePillsData } from '../utils/gameTileBadgeUtils';
+import { getGameTilePillsData } from '../utils/gameTileLayoutUtils';
 
 const GameTilePlayerCount = ({ playerCount }: { playerCount: number }): JSX.Element => {
   const players = parsingUtils.getPlayerCount(playerCount);

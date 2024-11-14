@@ -18,8 +18,9 @@ const parentalRequestInlineErrorHandler = (errorReason: ParentalRequestErrorReas
     case ParentalRequestErrorReason.ReceiverFlooded:
       return gatherParentEmail.emailTooManyRequest;
     case ParentalRequestErrorReason.ConsentAlreadyApplied:
+      return gatherParentEmail.alreadyApplied;
     case ParentalRequestErrorReason.AlreadyLinked:
-      return gatherParentEmail.body;
+      return gatherParentEmail.alreadyLinked;
     case ParentalRequestErrorReason.InvalidEmailAddress:
       return gatherParentEmail.invalidEmailError;
     default:

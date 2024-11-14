@@ -19,7 +19,8 @@ const parentalRequestConstants = {
       childTooManyParentsError: 'Message.ExistAccountWithEmail',
       emailTooManyRequest: 'Message.TooManyAttempts',
       alreadyApplied: 'Description.AllSet',
-      seeRequestAfterLink: 'Message.RequestCreatedEmailNotSent'
+      seeRequestAfterLink: 'Message.RequestCreatedEmailNotSent',
+      alreadyLinked: 'Message.AlreadyLinked'
     },
     emailSentConfirmation: {
       title: 'Title.RequestSent',
@@ -50,6 +51,11 @@ const parentalRequestConstants = {
       parentalEntry: 'parentalEntryAgeChange',
       settingsAge: 'settingsAgeChangeBirthday',
       settingsRequestSent: 'settingsAgeChangeVerifyRequestSent'
+    },
+    updateUserSettingContext: {
+      parentalEntry: 'parentalEntrySettings',
+      settingsAge: 'settingsAgeSettings',
+      settingsRequestSent: 'settingsRequestSent'
     },
     eventName: {
       authPageLoad: 'authPageload',

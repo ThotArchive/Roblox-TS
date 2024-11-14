@@ -9,7 +9,13 @@ import { deviceMeta as DeviceMeta, jsClientDeviceIdentifier } from 'header-scrip
 import { uuidService } from 'core-utilities';
 import { playGameService, eventStreamService, TJoinDataProperties } from 'core-roblox-utilities';
 import playButtonConstants, { PlayabilityStatus } from '../constants/playButtonConstants';
-import { TPlayabilityStatus, TPlayabilityStatuses } from '../types/playButtonTypes';
+import {
+  TAgeGuidelinesResponse,
+  TPlayabilityStatus,
+  TPlayabilityStatuses
+} from '../types/playButtonTypes';
+
+const { unlockPlayIntentConstants } = playButtonConstants;
 
 type TEventProperties = Record<string, string | number | undefined>;
 type TJoinAttemptProperties = {
@@ -204,21 +210,68 @@ export const handleShareLinkEventLogging = (placeId: string, universeId: string)
   }
 };
 
+/**
+ * Extract minimumAge from the AgeRecommendation API response,
+ * with a special mapping for unrated games to -1.
+ */
+export const getMinimumAgeFromAgeRecommendationResponse = (
+  response: TAgeGuidelinesResponse
+): number | undefined => {
+  if (
+    response?.ageRecommendationDetails?.summary &&
+    !response.ageRecommendationDetails.summary.ageRecommendation
+  ) {
+    // The Age Recommendations data exists in the response,
+    // but the actual recommendation is empty.
+    // This means the game is unrated, and the user
+    // must have a setting of "Ages 13+" or higher to play
+    return -1;
+  }
+
+  return response?.ageRecommendationDetails?.summary?.ageRecommendation?.minimumAge;
+};
+
 export const shouldShowUnplayableButton = (
-  playabilityStatus: TPlayabilityStatus | undefined
+  playabilityStatus: TPlayabilityStatus | undefined,
+  shouldShowVpcPlayButtonUpsells?: boolean
 ): playabilityStatus is Exclude<
   TPlayabilityStatus,
   | TPlayabilityStatuses['Playable']
   | TPlayabilityStatuses['GuestProhibited']
   | TPlayabilityStatuses['PurchaseRequired']
   | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
+  | TPlayabilityStatuses['ContextualPlayabilityAgeRecommendationParentalControls']
 > => {
   return (
     playabilityStatus !== PlayabilityStatus.Playable &&
     playabilityStatus !== PlayabilityStatus.GuestProhibited &&
     playabilityStatus !== PlayabilityStatus.PurchaseRequired &&
     playabilityStatus !== PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser &&
+    (!shouldShowVpcPlayButtonUpsells ||
+      playabilityStatus !==
+        PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls) &&
     playabilityStatus !== undefined
+  );
+};
+
+export const sendUnlockPlayIntentEvent = (
+  universeId: string,
+  upsellName: string,
+  playabilityStatus: TPlayabilityStatus
+): void => {
+  const eventParams = {
+    universeId,
+    upsellName,
+    playabilityStatus
+  };
+
+  eventStreamService.sendEvent(
+    {
+      name: unlockPlayIntentConstants.eventName,
+      type: unlockPlayIntentConstants.eventName,
+      context: eventStreamService.eventTypes.formInteraction
+    },
+    eventParams
   );
 };
 
@@ -229,5 +282,6 @@ export default {
   startVerificationFlow,
   startVoiceOptInOverlayFlow,
   startAccessManagementUpsellFlow,
-  shouldShowUnplayableButton
+  shouldShowUnplayableButton,
+  sendUnlockPlayIntentEvent
 };

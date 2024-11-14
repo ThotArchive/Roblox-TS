@@ -3,10 +3,12 @@ import { TranslateFunction } from 'react-utilities';
 import '../../../../css/common/_gameTiles.scss';
 import '../../../../css/gameCarousel/_tooltip.scss';
 import useFocused from '../hooks/useFocused';
+import useGetGameLayoutData from '../hooks/useGetGameLayoutData';
 import bedev1Services from '../services/bedev1Services';
 import { TGetFriendsResponse, TGetPlaceDetails } from '../types/bedev1Types';
 import { THoverStyle } from '../types/bedev2Types';
 import { PageContext } from '../types/pageContext';
+import { getGameTileTextFooterData } from '../utils/gameTileLayoutUtils';
 import { useIconResolutionExperiment } from '../utils/IconResolutionExperimentContextProvider';
 import { getInGameFriends } from '../utils/parsingUtils';
 import {
@@ -15,6 +17,7 @@ import {
   GameTileFriendsInGame,
   GameTileSponsoredFooter,
   GameTileStats,
+  GameTileTextFooter,
   TSharedGameTileProps
 } from './GameTileUtils';
 
@@ -53,6 +56,7 @@ export const GameTile = forwardRef<HTMLDivElement, TGameTileProps>(
       friendData,
       gameData.universeId
     ]);
+    const gameLayoutData = useGetGameLayoutData(gameData, topicId);
 
     const { shouldUseHigherResolutionIcon } = useIconResolutionExperiment();
 
@@ -75,8 +79,13 @@ export const GameTile = forwardRef<HTMLDivElement, TGameTileProps>(
       if (!shouldShowMetadata) {
         return <React.Fragment />;
       }
+
       if (gameData?.isShowSponsoredLabel || (gameData?.isSponsored && isSponsoredFooterAllowed)) {
         return <GameTileSponsoredFooter translate={translate} />;
+      }
+      const gameLayoutFooterData = getGameTileTextFooterData(gameLayoutData);
+      if (gameLayoutFooterData) {
+        return <GameTileTextFooter footerData={gameLayoutFooterData} />;
       }
       if (friendsInGame.length > 0 && gameDetails) {
         return <GameTileFriendsInGame friendData={friendsInGame} gameData={gameDetails} />;

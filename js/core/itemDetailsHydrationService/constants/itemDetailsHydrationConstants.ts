@@ -40,6 +40,7 @@ export type TCollectibleDetailEntry = {
   owned: boolean;
   premiumPricing?: TPremiumPricing;
   price: number;
+  priceStatus: string | undefined;
   productId: number;
   totalQuantity?: number;
   unitsAvailableForConsumption?: number;

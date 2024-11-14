@@ -15,10 +15,12 @@ import IdvPrologue from './DefaultPrologue/IdvPrologue';
 
 const Prologue = ({
   translate,
-  onHide
+  onHide,
+  recourseParameters
 }: {
   translate: TranslateFunction;
   onHide: () => void;
+  recourseParameters?: Record<string, string> | null;
 }): JSX.Element => {
   // Trigger the opening of the error modal in response to a user action or effect
   const dispatch = useAppDispatch();
@@ -35,7 +37,8 @@ const Prologue = ({
       case Recourse.ParentLinkRequest:
         [prologueModal, prologueModelService] = VpcPrologue({
           translate,
-          onHide
+          onHide,
+          recourseParameters
         });
         break;
       case Recourse.GovernmentId:

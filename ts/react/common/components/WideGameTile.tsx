@@ -33,6 +33,7 @@ import {
 } from './GameTileUtils';
 import WideGameThumbnail from './WideGameThumbnail';
 import useGetGameLayoutData from '../hooks/useGetGameLayoutData';
+import { getGameTileTextFooterData } from '../utils/gameTileLayoutUtils';
 
 const WideGameTileLinkWrapper = ({
   wrapperClassName,
@@ -169,10 +170,9 @@ const WideGameTile = React.forwardRef(
       if (gameData.isShowSponsoredLabel || (gameData.isSponsored && isSponsoredFooterAllowed)) {
         return <WideGameTileSponsoredFooter translate={translate} />;
       }
-      if (gameLayoutData?.footer) {
-        if (gameLayoutData.footer.type === TLayoutComponentType.TextLabel) {
-          return <GameTileTextFooter footerData={gameLayoutData.footer} />;
-        }
+      const gameLayoutFooterData = getGameTileTextFooterData(gameLayoutData);
+      if (gameLayoutFooterData) {
+        return <GameTileTextFooter footerData={gameLayoutFooterData} />;
       }
       if (friendsInGame?.length > 0) {
         return <WideGameTileFacepileFooter friendsData={friendsInGame} isOnline />;

@@ -17,7 +17,13 @@ import { getInGameFriends } from '../utils/parsingUtils';
 import { CreatorLabel } from './CreatorLabel';
 import GameTileOverlayPill from './GameTileOverlayPill';
 import GameTilePlayButtonV2 from './GameTilePlayButtonV2';
-import { GameTileFriendsInGame, GameTileStats, TSharedGameTileProps } from './GameTileUtils';
+import {
+  GameTileFriendsInGame,
+  GameTileStats,
+  GameTileTextFooter,
+  TSharedGameTileProps
+} from './GameTileUtils';
+import { getGameTileTextFooterData } from '../utils/gameTileLayoutUtils';
 
 export const FeaturedGridTile = forwardRef(
   (
@@ -80,6 +86,8 @@ export const FeaturedGridTile = forwardRef(
       string | number | undefined
     >;
 
+    const gameLayoutFooterData = getGameTileTextFooterData(gameLayoutData);
+
     return (
       <div
         ref={ref}
@@ -104,11 +112,15 @@ export const FeaturedGridTile = forwardRef(
               <div className='game-card-name game-name-title' title={gameData.name}>
                 {gameData.name}
               </div>
-              <GameTileStats
-                totalUpVotes={gameData.totalUpVotes}
-                totalDownVotes={gameData.totalDownVotes}
-                playerCount={gameData.playerCount}
-              />
+              {gameLayoutFooterData ? (
+                <GameTileTextFooter footerData={gameLayoutFooterData} />
+              ) : (
+                <GameTileStats
+                  totalUpVotes={gameData.totalUpVotes}
+                  totalDownVotes={gameData.totalDownVotes}
+                  playerCount={gameData.playerCount}
+                />
+              )}
             </div>
             <GameTilePlayButtonV2
               universeId={gameData.universeId.toString()}

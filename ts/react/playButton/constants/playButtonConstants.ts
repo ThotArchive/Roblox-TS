@@ -87,12 +87,30 @@ const counterEvents = {
   Unplayable: 'UnplayableErrorShown',
   SeventeenPlusInPlayable: 'ReachedSeventeenPlusCaseInPlayable',
   PlayButtonIXPError: 'PlayButtonIXPIssueCaught',
-  PlayButtonExposureError: 'PlayButtonExposureLoggingIssueCaught'
+  PlayButtonExposureError: 'PlayButtonExposureLoggingIssueCaught',
+  PlayButtonUpsellSelfUpdateSettingTriggered: 'PlayButtonUpsellSelfUpdateSettingTriggered',
+  PlayButtonUpsellAskYourParentTriggered: 'PlayButtonUpsellAskYourParentTriggered',
+  PlayButtonUpsellRestrictedUnplayableTriggered: 'PlayButtonUpsellRestrictedUnplayableTriggered',
+  PlayButtonUpsellAgeRestrictionVerificationTriggered:
+    'PlayButtonUpsellAgeRestrictionVerificationTriggered',
+  PlayButtonUpsellUnknownSettingOrAge: 'PlayButtonUpsellUnknownSettingOrAge',
+  PlayButtonUpsellAgeNotInMapping: 'PlayButtonUpsellAgeNotInMapping',
+  PlayButtonUpsellParentalConsentError: 'PlayButtonUpsellParentalConsentError',
+  PlayButtonUpsellAgeRestrictionVerificationError:
+    'PlayButtonUpsellAgeRestrictionVerificationError',
+  PlayButtonUpsellUnknownRequirement: 'PlayButtonUpsellUnknownRequirement'
 };
 
 const avatarChatUpsellLayer = 'Voice.AvatarChat.Upsell';
 const avatarChatUpsellLayerU13 = 'Voice.AvatarChat.U13Upsell';
 const playButtonLayer = 'Website.PlayButton';
+
+const unlockPlayIntentConstants = {
+  eventName: 'unlockPlayIntent',
+  gameLaunchFallbackUpsellName: 'GameLaunch',
+  restrictedUnplayableUpsellName: 'RestrictedUnplayableOptionNotFound',
+  unverifiedSeventeenPlusUpsellName: 'AgeVerificationUnverifiedSeventeenPlusUser'
+};
 
 export default {
   playButtonStatusTranslationMap,
@@ -102,5 +120,6 @@ export default {
   counterEvents,
   avatarChatUpsellLayer,
   avatarChatUpsellLayerU13,
-  playButtonLayer
+  playButtonLayer,
+  unlockPlayIntentConstants
 };

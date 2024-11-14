@@ -1,5 +1,5 @@
 export const COOKIE_NAME = 'RBXPaymentsFlowContext';
-export const COOKIE_TIMESPAN = 7200;
+export const COOKIE_TIMESPAN = 600;
 export const COOKIE_REGEX = new RegExp(`^(?:.*; |)${COOKIE_NAME}=([^,]+),([^;]+)(?:;.*|)$`);
 
 export const enum EVENT_NAME {
@@ -115,7 +115,8 @@ export enum PURCHASE_STATUS {
   SUCCESS = 'Success',
   ERROR = 'Error',
   CONTINUE = 'Continue',
-  CANCEL = 'Cancel'
+  CANCEL = 'Cancel',
+  PAYMENT_FLOW_ENDED = 'PaymentFlowEnded'
 }
 
 export const enum ASSET_TYPE {
@@ -148,7 +149,8 @@ export const COUNTER_EVENTS = {
   SEND_USER_EVENT_ERROR: `${COUNTER_PREFIX}SendUserEventError`,
   START_FLOW_ERROR: `${COUNTER_PREFIX}StartFlowError`,
   EVENTS_REGISTER_ERROR: `${COUNTER_PREFIX}EventsRegisterError`,
-  PERFORMANCE_NAVIGATION_TYPE_ERROR: `${COUNTER_PREFIX}PerformanceNavigationTypeError`
+  PERFORMANCE_NAVIGATION_TYPE_ERROR: `${COUNTER_PREFIX}PerformanceNavigationTypeError`,
+  FLOW_ENDED: `${COUNTER_PREFIX}FlowEnded`
 };
 
 export enum CUSTOM_EVENT {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { TranslateFunction } from 'react-utilities';
 import parentalRequestService from '../services/parentalRequestService';
 import useModal from '../../../hooks/useModal';
@@ -41,6 +41,12 @@ const ParentalRequestBroadcast = ({
     },
     onHide: onHideCallback
   });
+  const settingName = useMemo(() => {
+    if (consentType === RequestType.UpdateUserSetting) {
+      return Object.keys(value)[0];
+    }
+    return undefined;
+  }, [consentType, value]);
 
   const broadcastHandler = async () => {
     try {
@@ -50,8 +56,16 @@ const ParentalRequestBroadcast = ({
       });
       const newBirthdateString = value?.newBirthdate as string;
       const newBirthdate = new Date(newBirthdateString);
-      const state = changeBirthdayUtils.getAgeRange(newBirthdate);
-      sendLoadRequestBroadcastEvent(RequestType.UpdateBirthdate, state, response.sessionId);
+      const state =
+        consentType === RequestType.UpdateBirthdate
+          ? changeBirthdayUtils.getAgeRange(newBirthdate)
+          : undefined;
+      sendLoadRequestBroadcastEvent({
+        requestType: consentType,
+        extraState: state,
+        sessionId: response.sessionId,
+        settingName
+      });
       successCallBack(response.sessionId);
     } catch (e) {
       const error = e as ParentalRequestError;

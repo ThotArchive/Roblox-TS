@@ -8,7 +8,9 @@ import {
   TGetProductDetails,
   TShowAgeVerificationOverlayResponse,
   TGuacPlayButtonUIResponse,
-  TPostOptUserInToVoiceChatResponse
+  TPostOptUserInToVoiceChatResponse,
+  TGetUserSettingsAndOptionsResponse,
+  TAgeGuidelinesResponse
 } from '../types/playButtonTypes';
 
 const { gamesDataStore } = dataStores;
@@ -71,11 +73,39 @@ const postOptUserInToVoiceChat = async (
   return data as TPostOptUserInToVoiceChatResponse;
 };
 
+const getUserSettingsAndOptions = (): Promise<TGetUserSettingsAndOptionsResponse> => {
+  const urlConfig = {
+    url: `${EnvironmentUrls.apiGatewayUrl}/user-settings-api/v1/user-settings/settings-and-options`,
+    withCredentials: true
+  };
+
+  return httpService.get<TGetUserSettingsAndOptionsResponse>(urlConfig).then(response => {
+    return response.data;
+  });
+};
+
+const getAgeRecommendation = (universeId: string): Promise<TAgeGuidelinesResponse> => {
+  const urlConfig = {
+    url: `${EnvironmentUrls.apiGatewayUrl}/experience-guidelines-api/experience-guidelines/get-age-recommendation`,
+    withCredentials: true
+  };
+
+  return httpService
+    .post<TAgeGuidelinesResponse>(urlConfig, {
+      universeId
+    })
+    .then(response => {
+      return response.data;
+    });
+};
+
 export default {
   getProductInfo,
   getProductDetails,
   getPlayabilityStatus,
   getShowAgeVerificationOverlay,
   getGuacPlayButtonUI,
-  postOptUserInToVoiceChat
+  postOptUserInToVoiceChat,
+  getUserSettingsAndOptions,
+  getAgeRecommendation
 };

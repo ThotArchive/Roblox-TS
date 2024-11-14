@@ -16,9 +16,7 @@ import {
   getPrologueTranslatedBodyText,
   getPrologueTranslatedTitle
 } from '../../constants/prologueSettings';
-import { sendParentEmailSubmitEvent } from '../../../recourses/parentalRequest/services/eventService';
 import {
-  EventConstants,
   sendAgeChangePageLoadEvent,
   sendEmailParentClickEvent,
   sendVerifyCancelClickEvent
@@ -26,10 +24,12 @@ import {
 
 const VpcPrologue = ({
   translate,
-  onHide
+  onHide,
+  recourseParameters
 }: {
   translate: TranslateFunction;
   onHide: () => void;
+  recourseParameters: Record<string, string> | null;
 }): [JSX.Element, IModalService] => {
   const dispatch = useAppDispatch();
   const featureName = useSelector(selectFeatureName);
@@ -44,7 +44,8 @@ const VpcPrologue = ({
     featureName,
     defaultBodyText,
     connectingBodyText,
-    translate
+    translate,
+    recourseParameters
   );
 
   const changeAgeBody = (

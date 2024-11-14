@@ -14,7 +14,18 @@ const titleDictionary: prologueSettingDictionary = {
   // {AmpFeatureName}: 'PrologueSetting.Title.{AmpFeatureName}'
 };
 
-export function getProloguePromptLine(featureName: string): string {
+export function getProloguePromptLine(
+  featureName: string,
+  recourseParameters?: Record<string, string> | null
+): string {
+  // Temporary fix to show the "experiences" string only for the contentAgeRestriction
+  // case of "CanChangeSetting", since the "CanChangeSetting" feature can be used for other settings.
+  if (featureName === 'CanChangeSetting') {
+    if (recourseParameters?.contentAgeRestriction !== undefined) {
+      return 'PrologueSetting.PromptLine.CanChangeSetting';
+    }
+  }
+
   return promptLineDictionary[featureName];
 }
 
@@ -40,9 +51,11 @@ export function getPrologueTranslatedBodyText(
   featureName: string,
   defaultText: string,
   connectingText: string,
-  translate: TranslateFunction
+  translate: TranslateFunction,
+  recourseParameters?: Record<string, string> | null
 ): string {
-  const featurePromptLine = getProloguePromptLine(featureName);
+  const featurePromptLine = getProloguePromptLine(featureName, recourseParameters);
+
   const translatedBodyText = featurePromptLine
     ? `${translate(featurePromptLine)}, ${translate(connectingText)}`
     : translate(defaultText);
