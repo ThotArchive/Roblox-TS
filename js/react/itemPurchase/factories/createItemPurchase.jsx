@@ -180,7 +180,10 @@ export default function createItemPurchase({
         userassetId: userAssetId,
         placeproductpromotionId: expectedPromoId,
         isPrivateServer,
-        isPlace
+        isPlace,
+        collectibleItemId,
+        collectibleItemInstanceId,
+        collectibleProductId
       };
       itemUpsellProcessParams = {
         errorObject: {

@@ -7,6 +7,7 @@ import {
   ThumbnailTypes
 } from 'roblox-thumbnails';
 import '../../../../css/common/_gameTiles.scss';
+import { urlService } from 'core-utilities';
 import useFocused from '../hooks/useFocused';
 import useFriendsPresence from '../hooks/useFriendsPresence';
 import useGetGameLayoutData from '../hooks/useGetGameLayoutData';
@@ -126,6 +127,7 @@ export const FeaturedGridTile = forwardRef(
               universeId={gameData.universeId.toString()}
               placeId={gameData.placeId.toString()}
               playButtonEventProperties={playButtonEventProperties}
+              redirectPurchaseUrl={urlService.isValidHttpUrl(linkUrl) ? linkUrl : undefined}
             />
           </div>
           {gameData.creatorName !== null && (

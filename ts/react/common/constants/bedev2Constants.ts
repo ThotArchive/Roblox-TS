@@ -32,14 +32,10 @@ const url = {
     url: `${apiGatewayUrl}/rocap/v1/locations/${locationName}/annotations`,
     withCredentials: true
   }),
-  getDeveloperProductsForStorePage: (universeId: string): UrlConfig => ({
-    url: `${apiGatewayUrl}/developer-products/v1/universes/${universeId}/store`,
+  getGuacAppPolicyBehaviorData: (): UrlConfig => ({
+    url: `${apiGatewayUrl}/universal-app-configuration/v1/behaviors/app-policy/content`,
     withCredentials: true
-  }),
-  getGameTransactions: {
-    url: `${apiGatewayUrl}/developer-products/v1/game-transactions`,
-    withCredentials: true
-  }
+  })
 };
 
 export default {

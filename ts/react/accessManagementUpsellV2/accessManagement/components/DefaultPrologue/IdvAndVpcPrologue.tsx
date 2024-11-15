@@ -17,8 +17,7 @@ import {
   getPrologueTranslatedTitle
 } from '../../constants/prologueSettings';
 import {
-  EventConstants,
-  sendAgeChangePageLoadEvent,
+  sendProloguePageLoadEvent,
   sendEmailParentClickEvent,
   sendVerifyCancelClickEvent,
   sendVerifyIdClickEvent
@@ -94,7 +93,7 @@ const IdvAndVpcPrologue = ({
   // Trigger the opening of the error modal in response to a user action or effect
   useEffect(() => {
     IdvAndVpcSelectionModalService.open();
-    sendAgeChangePageLoadEvent(featureName, 'IdvOrVpc');
+    sendProloguePageLoadEvent(featureName, 'IdvOrVpc');
   }, []);
 
   return [IdvAndVpcSelectionModal, IdvAndVpcSelectionModalService];

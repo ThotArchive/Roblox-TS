@@ -11,6 +11,7 @@ import {
   TGetOmniRecommendationsResponse,
   TGetOmniSearchParsedResponse,
   TGetOmniSearchResponse,
+  TGuacAppPolicyBehaviorResponse,
   TOmniRecommendation,
   TOmniSearchContentType,
   TOmniSearchGameDataModel,
@@ -19,18 +20,9 @@ import {
   TSurveyResponseBody,
   TTreatmentType
 } from '../types/bedev2Types';
-import {
-  TDeveloperProduct,
-  TGetGameTransactionsParams,
-  TListDeveloperProductParams,
-  TListDeveloperProductResponseArray,
-  TGetGameTransactionsResponse
-} from '../types/developerProductTypes';
 import { TPageType } from '../types/bedev1Types';
 import { TDeviceFeatures } from '../utils/deviceFeaturesUtils';
 import { getInputUniverseIdsRequestParam } from '../utils/parsingUtils';
-import processDeveloperProductResult from '../utils/processDeveloperProductResult';
-import mapDeveloperProductsAndReceipts from '../utils/mapDeveloperProductsAndReceipts';
 
 const getExperimentationValues = async <T extends Record<string, number | string | boolean>>(
   layerName: string,
@@ -242,39 +234,10 @@ export const getThumbnailForAsset = async (assetId: number): Promise<string> => 
     });
 };
 
-export const getDeveloperProductsByUniverseId = async (
-  universeId: number,
-  page: number,
-  pageSize: number
-): Promise<TDeveloperProduct[]> => {
-  const urlConfig = bedev2Constants.url.getDeveloperProductsForStorePage(universeId.toString());
-  const params: TListDeveloperProductParams = {
-    page,
-    pageSize,
-    storePageEnabled: true
-  };
-  const result = await httpService
-    .get<TListDeveloperProductResponseArray>(urlConfig, params)
+const getGuacAppPolicyBehaviorData = (): Promise<TGuacAppPolicyBehaviorResponse> => {
+  return httpService
+    .get<TGuacAppPolicyBehaviorResponse>(bedev2Constants.url.getGuacAppPolicyBehaviorData())
     .then(response => response.data);
-  return result
-    .map(processDeveloperProductResult)
-    .filter((item): item is TDeveloperProduct => item !== null); // map method returns null for invalid dev products
-};
-
-export const getPendingDeveloperProducts = async (
-  rootPlaceId: number,
-  playerId: number
-): Promise<Map<number, number>> => {
-  const urlConfig = bedev2Constants.url.getGameTransactions;
-  const params: TGetGameTransactionsParams = {
-    placeId: rootPlaceId,
-    playerId,
-    status: 'pending'
-  };
-  const transactions = await httpService
-    .get<TGetGameTransactionsResponse>(urlConfig, params)
-    .then(response => response.data);
-  return mapDeveloperProductsAndReceipts(transactions);
 };
 
 export default {
@@ -287,6 +250,5 @@ export default {
   getSurvey,
   postSurveyResults,
   getThumbnailForAsset,
-  getDeveloperProductsByUniverseId,
-  getPendingDeveloperProducts
+  getGuacAppPolicyBehaviorData
 };

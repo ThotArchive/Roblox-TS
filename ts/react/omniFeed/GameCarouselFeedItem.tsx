@@ -97,6 +97,7 @@ export const GameCarouselFeedItem = ({
         componentType={sort.topicLayoutData?.componentType}
         playerCountStyle={sort.topicLayoutData?.playerCountStyle}
         playButtonStyle={sort.topicLayoutData?.playButtonStyle}
+        subtitleLinkPath={sort.topicLayoutData?.subtitleLinkPath}
         itemsPerRow={itemsPerRow}
         isChartsPageRenameEnabled={isChartsPageRenameEnabled}
       />
@@ -122,6 +123,7 @@ export const GameCarouselFeedItem = ({
       navigationRootPlaceId={sort.topicLayoutData?.navigationRootPlaceId}
       isSponsoredFooterAllowed={sort.topicLayoutData?.isSponsoredFooterAllowed === 'true'}
       seeAllLinkPath={sort.topicLayoutData?.linkPath}
+      subtitleLinkPath={sort.topicLayoutData?.subtitleLinkPath}
       endTimestamp={sort.topicLayoutData?.endTimestamp}
       countdownString={sort.topicLayoutData?.countdownString}
       isExpandHomeContentEnabled={isExpandHomeContentEnabled}

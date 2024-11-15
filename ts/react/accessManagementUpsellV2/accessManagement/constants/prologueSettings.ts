@@ -1,11 +1,12 @@
 import { TranslateFunction } from 'react-utilities';
+import { PrologueConstants } from './viewConstants';
 
 // Feature team can choose to define their promptline and title here,
 // also add the translation under Amp.Upsell namespace.
 // If not defined, will use the default version of prologues.
 const promptLineDictionary: prologueSettingDictionary = {
   // Example
-  // {AmpFeatureName}: 'PrologueSetting.Title.{AmpFeatureName}'
+  // {AmpFeatureName}: 'PrologueSetting.PromptLine.{AmpFeatureName}'
   CanCorrectAge: 'PrologueSetting.PromptLine.CanCorrectAge'
 };
 
@@ -54,6 +55,9 @@ export function getPrologueTranslatedBodyText(
   translate: TranslateFunction,
   recourseParameters?: Record<string, string> | null
 ): string {
+  if (recourseParameters?.enablePurchases !== undefined) {
+    return translate(PrologueConstants.Description.VpcEnablePurchase);
+  }
   const featurePromptLine = getProloguePromptLine(featureName, recourseParameters);
 
   const translatedBodyText = featurePromptLine

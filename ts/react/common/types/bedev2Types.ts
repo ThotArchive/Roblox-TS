@@ -80,6 +80,7 @@ export type TTopicLayoutData = {
   navigationRootPlaceId?: string;
   isSponsoredFooterAllowed?: 'true' | 'false';
   linkPath?: string;
+  subtitleLinkPath?: string;
   endTimestamp?: string;
   countdownString?: string;
   backgroundImageAssetId?: string;
@@ -308,3 +309,7 @@ export type TSendSurveyResultsResponse = {
 export enum TSurveyIcon {
   helpIcon = 'helpIcon'
 }
+
+export type TGuacAppPolicyBehaviorResponse = {
+  shouldShowVpcPlayButtonUpsells: boolean;
+};

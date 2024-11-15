@@ -10,7 +10,7 @@ const getChatSettings = async (): Promise<TGetChatSettings> => {
     withCredentials: true
   });
   return {
-    chatEnabled: data?.isChatEnabled
+    chatEnabled: data?.isChatUserMessagesEnabled
   };
 };
 

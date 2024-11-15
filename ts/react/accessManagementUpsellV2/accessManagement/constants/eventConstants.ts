@@ -8,6 +8,7 @@ export const EventConstants = {
   },
   text: {
     IdvOrVpc: 'Verify Your Age/Parent Permission Needed',
+    VPC: 'Parent Permission Needed',
     VerifyId: 'Verify ID',
     EmailMyParent: 'Email My Parent',
     Cancel: 'X icon or "Cancel"'
@@ -18,12 +19,18 @@ export const EventConstants = {
     verifyCancel: 'verifyCancel'
   },
   context: {
-    SettingsAgeChangeVerify: 'settingsAgeChangeVerify'
+    SettingsAgeChangeVerify: 'settingsAgeChangeVerify',
+    UpdateSetting: 'parentalEntrySettings'
   },
   eventName: {
     AuthPageload: 'authPageload',
     AuthButtonClick: 'authButtonClick'
   }
+};
+const generateState = (extraState?: string, settingName?: string) => {
+  const extraStateString = extraState ? `${extraState}, ` : '';
+  const settingNameString = settingName ? `settingName: ${settingName}, ` : '';
+  return `${extraStateString}${settingNameString}`;
 };
 
 export function sendVerifyIdClickEvent(featureName: string, idvOnly: boolean): void {
@@ -40,7 +47,11 @@ export function sendVerifyIdClickEvent(featureName: string, idvOnly: boolean): v
   }
 }
 
-export function sendEmailParentClickEvent(featureName: string, vpcOnly: boolean): void {
+export function sendEmailParentClickEvent(
+  featureName: string,
+  vpcOnly: boolean,
+  settingName?: string
+): void {
   if (featureName === 'CanCorrectAge') {
     eventStreamService.sendEventWithTarget(
       EventConstants.eventName.AuthButtonClick,
@@ -48,6 +59,16 @@ export function sendEmailParentClickEvent(featureName: string, vpcOnly: boolean)
       {
         btn: EventConstants.btn.EmailParent,
         state: vpcOnly ? EventConstants.state.U13ToU13 : EventConstants.state.U13To1318,
+        associatedText: EventConstants.text.EmailMyParent
+      }
+    );
+  } else if (featureName === 'CanChangeSetting') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.EmailParent,
+        state: generateState(undefined, settingName),
         associatedText: EventConstants.text.EmailMyParent
       }
     );
@@ -72,7 +93,11 @@ function getEventStateForCanCorrectAge(prologue: string) {
   return currentState;
 }
 
-export function sendVerifyCancelClickEvent(featureName: string, prologue: string): void {
+export function sendVerifyCancelClickEvent(
+  featureName: string,
+  prologue: string,
+  settingName?: string
+): void {
   if (featureName === 'CanCorrectAge') {
     const currentState = getEventStateForCanCorrectAge(prologue);
 
@@ -85,10 +110,24 @@ export function sendVerifyCancelClickEvent(featureName: string, prologue: string
         associatedText: EventConstants.text.Cancel
       }
     );
+  } else if (featureName === 'CanChangeSetting') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.verifyCancel,
+        state: generateState(undefined, settingName),
+        associatedText: EventConstants.text.Cancel
+      }
+    );
   }
 }
 
-export function sendAgeChangePageLoadEvent(featureName: string, prologue: string): void {
+export function sendProloguePageLoadEvent(
+  featureName: string,
+  prologue: string,
+  settingName?: string
+): void {
   if (featureName === 'CanCorrectAge') {
     const currentState = getEventStateForCanCorrectAge(prologue);
 
@@ -99,6 +138,15 @@ export function sendAgeChangePageLoadEvent(featureName: string, prologue: string
         state: currentState,
 
         associatedText: EventConstants.text.IdvOrVpc
+      }
+    );
+  } else if (featureName === 'CanChangeSetting') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthPageload,
+      EventConstants.context.UpdateSetting,
+      {
+        state: generateState(undefined, settingName),
+        associatedText: EventConstants.text.VPC
       }
     );
   }

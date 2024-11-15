@@ -6,8 +6,8 @@ type Props = {
   defaultSubtitle?: string;
   endTimestamp?: string;
   countdownString?: string;
-  isSortLinkOverrideEnabled?: boolean;
-  seeAllLink?: string;
+  formatSubtitleLink?: boolean;
+  subtitleLink?: string;
   handleSeeAllLinkClick?: () => void;
   backgroundImageAssetId?: number;
 };
@@ -18,8 +18,8 @@ const GameCarouselSubtitle: React.FC<Props> = ({
   defaultSubtitle,
   endTimestamp,
   countdownString,
-  isSortLinkOverrideEnabled,
-  seeAllLink,
+  formatSubtitleLink,
+  subtitleLink,
   handleSeeAllLinkClick,
   backgroundImageAssetId
 }) => {
@@ -67,7 +67,7 @@ const GameCarouselSubtitle: React.FC<Props> = ({
   }, [defaultSubtitle, countdownTimeRemaining, countdownString]);
 
   const renderSubtitleWithLink = useMemo(() => {
-    if (isSortLinkOverrideEnabled && subtitle) {
+    if (formatSubtitleLink && subtitleLink && subtitle) {
       const startIdx = subtitle.indexOf(subtitleLinkStart);
       const endIdx = subtitle.indexOf(subtitleLinkEnd);
 
@@ -77,7 +77,7 @@ const GameCarouselSubtitle: React.FC<Props> = ({
         const suffix = subtitle.slice(endIdx + subtitleLinkEnd.length);
 
         return (
-          <Link url={seeAllLink} onClick={handleSeeAllLinkClick}>
+          <Link url={subtitleLink} onClick={handleSeeAllLinkClick}>
             {prefix}
             <span className='link-text'>{linkText}</span>
             {suffix}
@@ -91,13 +91,7 @@ const GameCarouselSubtitle: React.FC<Props> = ({
       }
     }
     return subtitle;
-  }, [
-    subtitle,
-    isSortLinkOverrideEnabled,
-    seeAllLink,
-    backgroundImageAssetId,
-    handleSeeAllLinkClick
-  ]);
+  }, [subtitle, subtitleLink, backgroundImageAssetId, handleSeeAllLinkClick]);
 
   return subtitle ? (
     <div className='sort-subtitle-container'>

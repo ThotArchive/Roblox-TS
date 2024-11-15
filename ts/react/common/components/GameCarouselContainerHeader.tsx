@@ -17,6 +17,8 @@ type TGameCarouselContainerHeaderProps = {
   sortTitle: string;
   sortSubtitle?: string;
   seeAllLink: string;
+  subtitleLink: string;
+  shouldShowSeparateSubtitleLink: boolean;
   isSortLinkOverrideEnabled: boolean;
   buildNavigateToSortLinkEventProperties?: TBuildNavigateToSortLinkEventProperties;
   shouldShowSponsoredTooltip: boolean;
@@ -33,6 +35,8 @@ const GameCarouselContainerHeader = ({
   sortTitle,
   sortSubtitle,
   seeAllLink,
+  subtitleLink,
+  shouldShowSeparateSubtitleLink,
   isSortLinkOverrideEnabled,
   buildNavigateToSortLinkEventProperties,
   shouldShowSponsoredTooltip,
@@ -95,8 +99,8 @@ const GameCarouselContainerHeader = ({
         defaultSubtitle={sortSubtitle}
         endTimestamp={endTimestamp}
         countdownString={countdownString}
-        isSortLinkOverrideEnabled={isSortLinkOverrideEnabled}
-        seeAllLink={seeAllLink}
+        formatSubtitleLink={isSortLinkOverrideEnabled || shouldShowSeparateSubtitleLink}
+        subtitleLink={subtitleLink}
         handleSeeAllLinkClick={handleSeeAllLinkClick}
         backgroundImageAssetId={backgroundImageAssetId}
       />

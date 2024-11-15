@@ -49,6 +49,7 @@ type THomePageGameCarouselDiscoveryApiProps = {
   navigationRootPlaceId?: string;
   isSponsoredFooterAllowed?: boolean;
   seeAllLinkPath?: string;
+  subtitleLinkPath?: string;
   itemsPerRow?: number;
   endTimestamp?: string;
   countdownString?: string;
@@ -72,6 +73,7 @@ export const HomePageCarousel = ({
   navigationRootPlaceId,
   isSponsoredFooterAllowed,
   seeAllLinkPath,
+  subtitleLinkPath,
   itemsPerRow,
   startingRow,
   endTimestamp,
@@ -177,6 +179,14 @@ export const HomePageCarousel = ({
     seeAllLinkPath
   ]);
 
+  const subtitleLink: string = useMemo(() => {
+    if (subtitleLinkPath) {
+      return subtitleLinkPath;
+    }
+
+    return seeAllLink;
+  }, [subtitleLinkPath, seeAllLink]);
+
   const buildNavigateToSortLinkEventProperties: TBuildNavigateToSortLinkEventProperties = useCallback(() => {
     if (seeAllLinkPath) {
       return {
@@ -201,6 +211,8 @@ export const HomePageCarousel = ({
         sortTitle={sort.topic}
         sortSubtitle={sort.subtitle}
         seeAllLink={seeAllLink}
+        subtitleLink={subtitleLink}
+        shouldShowSeparateSubtitleLink={!!subtitleLinkPath}
         isSortLinkOverrideEnabled={!!seeAllLinkPath}
         buildNavigateToSortLinkEventProperties={buildNavigateToSortLinkEventProperties}
         shouldShowSponsoredTooltip={sort.topicId === homePage.adSortHomePageId}
@@ -274,6 +286,7 @@ HomePageCarousel.defaultProps = {
   navigationRootPlaceId: undefined,
   isSponsoredFooterAllowed: undefined,
   seeAllLinkPath: undefined,
+  subtitleLinkPath: undefined,
   itemsPerRow: undefined,
   endTimestamp: undefined,
   countdownString: undefined,

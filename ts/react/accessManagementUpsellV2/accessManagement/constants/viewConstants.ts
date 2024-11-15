@@ -32,7 +32,8 @@ export const PrologueConstants = {
     Idv: 'Description.PrologueTextIdv',
     IdvConnectingText: 'Description.PrologueConnectingTextIdv',
     IdvAndVpc: 'Description.PrologueTextIdvAndVpc',
-    IdvAndVpcConnectingText: 'Description.PrologueConnectingTextIdvAndVpc'
+    IdvAndVpcConnectingText: 'Description.PrologueConnectingTextIdvAndVpc',
+    VpcEnablePurchase: 'Description.PrologueEnablePurchase'
   },
   Error: {
     TryAgain: 'Response.ErrorTryAgain'

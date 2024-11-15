@@ -20,7 +20,6 @@ const layerNames = {
   homePageWeb: 'Website.Homepage',
   serverTab: 'GameDetails.ServersTab',
   gameDetails: 'Website.GameDetails',
-  gameDetailsExposure: 'PlayerApp.GameDetailsPage.Exposure',
   searchPage: 'Website.SearchResultsPage',
   discoverPage: 'Website.GamesPage',
   tileLayer: 'Website.TileLayer',
@@ -43,9 +42,6 @@ const defaultValues = {
     IsEventsSectionUprankEnabled: false,
     IsEventsSectionRedesignEnabled: false
   },
-  gameDetailsExposure: {
-    IsShowContainsStrongLanguageWarningEnabled: false
-  },
   searchPage: {
     ShouldUseOmniSearchAPI: false
   },
@@ -56,7 +52,8 @@ const defaultValues = {
     IsHigherResolutionImageEnabled: false
   },
   playButton: {
-    HasUpdatedPlayButtons: false
+    HasUpdatedPlayButtons: false,
+    HasUpdatedPlayButtonsVpc: false
   }
 };
 

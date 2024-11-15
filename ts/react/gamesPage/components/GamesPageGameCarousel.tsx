@@ -47,6 +47,7 @@ type TGamesPageGameCarouselProps = {
   playButtonStyle?: TPlayButtonStyle;
   itemsPerRow?: number;
   isChartsPageRenameEnabled?: boolean;
+  subtitleLinkPath?: string;
 };
 
 export const GamesPageGameCarousel = ({
@@ -63,7 +64,8 @@ export const GamesPageGameCarousel = ({
   playerCountStyle,
   playButtonStyle,
   itemsPerRow,
-  isChartsPageRenameEnabled
+  isChartsPageRenameEnabled,
+  subtitleLinkPath
 }: TGamesPageGameCarouselProps): JSX.Element => {
   const gamesContainerRef = useRef<HTMLUListElement>(null);
 
@@ -153,8 +155,10 @@ export const GamesPageGameCarousel = ({
       <GameCarouselContainerHeader
         sortTitle={sort.topic}
         sortSubtitle={sort.subtitle}
+        subtitleLink={subtitleLinkPath || seeAllLink}
         seeAllLink={seeAllLink}
         isSortLinkOverrideEnabled={false}
+        shouldShowSeparateSubtitleLink={!!subtitleLinkPath}
         shouldShowSponsoredTooltip={sort.topicId === gamesPage.adSortDiscoverId}
         tooltipInfoText={tooltipInfoText}
         titleContainerClassName='container-header games-filter-changer'
@@ -189,7 +193,8 @@ GamesPageGameCarousel.defaultProps = {
   itemsPerRow: undefined,
   playerCountStyle: undefined,
   playButtonStyle: undefined,
-  isChartsPageRenameEnabled: undefined
+  isChartsPageRenameEnabled: undefined,
+  subtitleLinkPath: undefined
 };
 
 export default GamesPageGameCarousel;

@@ -18,7 +18,7 @@ import {
 } from '../../constants/prologueSettings';
 import {
   EventConstants,
-  sendAgeChangePageLoadEvent,
+  sendProloguePageLoadEvent,
   sendVerifyCancelClickEvent,
   sendVerifyIdClickEvent
 } from '../../constants/eventConstants';
@@ -84,7 +84,7 @@ const IdvPrologue = ({
   // Trigger the opening of the error modal in response to a user action or effect
   useEffect(() => {
     requireIdvModalService.open();
-    sendAgeChangePageLoadEvent(featureName, 'Idv');
+    sendProloguePageLoadEvent(featureName, 'Idv');
   }, []);
 
   return [requireIdvModal, requireIdvModalService];

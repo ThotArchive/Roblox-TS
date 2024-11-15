@@ -17,7 +17,7 @@ import {
   getPrologueTranslatedTitle
 } from '../../constants/prologueSettings';
 import {
-  sendAgeChangePageLoadEvent,
+  sendProloguePageLoadEvent,
   sendEmailParentClickEvent,
   sendVerifyCancelClickEvent
 } from '../../constants/eventConstants';
@@ -36,6 +36,7 @@ const VpcPrologue = ({
 
   const featureAccess = useSelector(selectFeatureAccess);
   const recourseResponses = featureAccess.data.recourses;
+  const settingName = recourseParameters ? Object.keys(recourseParameters)[0] : undefined;
 
   const defaultBodyText = PrologueConstants.Description.Vpc;
   const connectingBodyText = PrologueConstants.Description.VpcConnectingText;
@@ -48,7 +49,7 @@ const VpcPrologue = ({
     recourseParameters
   );
 
-  const changeAgeBody = (
+  const vpcPrologueBody = (
     <div>
       <div className='text-description'> {translatedBodyText} </div>
     </div>
@@ -63,22 +64,22 @@ const VpcPrologue = ({
   const [requireVpcModal, requireVpcModalService] = useModal({
     translate,
     title: translatedTitle,
-    body: changeAgeBody,
+    body: vpcPrologueBody,
     actionButtonTranslateKey,
     neutralButtonTranslateKey,
     onAction: () => {
-      sendEmailParentClickEvent(featureName, true);
+      sendEmailParentClickEvent(featureName, true, settingName);
       dispatch(setVerificationStageRecourse(recourseResponses[0]));
       dispatch(setStage(UpsellStage.Verification));
       requireVpcModalService.close();
     },
     size: 'sm',
     onHide: () => {
-      sendVerifyCancelClickEvent(featureName, 'Vpc');
+      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName);
       onHide();
     },
     onNeutral: () => {
-      sendVerifyCancelClickEvent(featureName, 'Vpc');
+      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName);
       onHide();
     }
   });
@@ -86,7 +87,7 @@ const VpcPrologue = ({
   // Trigger the opening of the error modal in response to a user action or effect
   useEffect(() => {
     requireVpcModalService.open();
-    sendAgeChangePageLoadEvent(featureName, 'Vpc');
+    sendProloguePageLoadEvent(featureName, 'Vpc', settingName);
   }, []);
 
   return [requireVpcModal, requireVpcModalService];
