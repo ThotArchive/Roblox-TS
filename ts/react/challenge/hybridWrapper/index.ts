@@ -986,6 +986,53 @@ const renderForceTwoStepVerificationChallengeFromQueryParameters = (
 };
 
 /**
+ * Helper function for block session hybrid challenges.
+ */
+const renderBlockSessionChallengeFromQueryParameters = (
+  containerId: string,
+  hybridTargetToCallbackInputId: Record<HybridTarget, string>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _appType: string
+): boolean => {
+  dispatchNavigateToFeatureHybridEvent(
+    hybridTargetToCallbackInputId,
+    HybridTarget.CHALLENGE_PARSED,
+    { parsed: true }
+  );
+
+  const result = ForceActionRedirect.renderChallenge({
+    containerId,
+    forceActionRedirectChallengeType: ForceActionRedirectChallengeType.BlockSession,
+    renderInline: true,
+    onModalChallengeAbandoned: null
+  });
+
+  // Handle hybrid callbacks for initialize.
+  if (result === false) {
+    dispatchNavigateToFeatureHybridEvent(
+      hybridTargetToCallbackInputId,
+      HybridTarget.CHALLENGE_INITIALIZED,
+      { initialized: false }
+    );
+    return false;
+  }
+  dispatchNavigateToFeatureHybridEvent(
+    hybridTargetToCallbackInputId,
+    HybridTarget.CHALLENGE_INITIALIZED,
+    { initialized: true }
+  );
+
+  // Note that for other challenge types, this hybrid callback might be
+  // triggered internally to the component.
+  dispatchNavigateToFeatureHybridEvent(
+    hybridTargetToCallbackInputId,
+    HybridTarget.CHALLENGE_DISPLAYED,
+    { displayed: true }
+  );
+  return true;
+};
+
+/**
  * Renders a hybrid challenge in a specific element based on the URL query
  * parameters.
  *
@@ -1107,6 +1154,12 @@ export const renderChallengeFromQueryParameters: RenderChallengeFromQueryParamet
     case ChallengeType.EMAIL_VERIFICATION:
       // Supported via generic challenge rendering.
       return false;
+    case ChallengeType.BLOCK_SESSION:
+      return renderBlockSessionChallengeFromQueryParameters(
+        containerId,
+        hybridTargetToCallbackInputId,
+        queryParametersBase.appType
+      );
     case 'generic':
       return renderGenericChallengeFromQueryParameters(
         containerId,

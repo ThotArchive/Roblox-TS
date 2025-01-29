@@ -6,17 +6,15 @@ const startDesktopAndMobileWebChat = chatProperties => {
   if (userId) {
     const deviceType = DeviceMeta && new DeviceMeta();
     if (deviceType && deviceType.isAndroidApp) {
-        var params = { userIds: [] };
-        params.userIds.push(userId);
-        Hybrid.Chat?.startChatConversation(params);
+        window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else if (deviceType && deviceType.isIosApp) {
-        Hybrid.Navigation?.startWebChatConversation(userId);
+        window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else if (deviceType && deviceType.isUWPApp) {
-        Hybrid.Navigation?.startWebChatConversation(userId);
+        window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else if (deviceType && deviceType.isWin32App) {
-        Hybrid.Navigation?.startWebChatConversation(userId);
+        window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else if (deviceType && deviceType.isUniversalApp) {
-        Hybrid.Navigation?.startWebChatConversation(userId);
+        window.location.href = `roblox://navigation/chat?userId=${userId}&entryPoint=AppShellWebView`;
     } else {
       $(document).triggerHandler("Roblox.Chat.StartChat", { userId });
     }

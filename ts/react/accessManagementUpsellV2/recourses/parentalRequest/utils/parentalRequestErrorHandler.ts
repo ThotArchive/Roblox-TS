@@ -15,6 +15,7 @@ const parentalRequestInlineErrorHandler = (errorReason: ParentalRequestErrorReas
     case ParentalRequestErrorReason.ParentAtLinkLimit:
       return gatherParentEmail.emailTooManyChildrenError;
     case ParentalRequestErrorReason.SenderFlooded:
+      return gatherParentEmail.senderFlooded;
     case ParentalRequestErrorReason.ReceiverFlooded:
       return gatherParentEmail.emailTooManyRequest;
     case ParentalRequestErrorReason.ConsentAlreadyApplied:

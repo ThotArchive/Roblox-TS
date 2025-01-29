@@ -44,7 +44,12 @@ export default function generateCookieForAutoPurchase(
   //      - Item Name: used for showing the auto purchase success modal
   // Beware: catalog resellers have the same product id, thus, userAssetId, expected prices, id could not get from API.
   //         However, on the game page, different buy button have different product id for game passes on the game page
-  const autoPurchaseRequiredData = `${itemPurchaseObj.productId || ''}`;
+  let autoPurchaseRequiredData = `${itemPurchaseObj.productId || ''}`;
+
+  // For collectible items, we need to pass the collectible item id, collectible item instance id and collectible product id for auto purchase
+  autoPurchaseRequiredData += `,${itemPurchaseObj.collectibleItemId || ''}`;
+  autoPurchaseRequiredData += `,${itemPurchaseObj.collectibleItemInstanceId || ''}`;
+  autoPurchaseRequiredData += `,${itemPurchaseObj.collectibleProductId || ''}`;
   const cookieData = `${upsellUuid},${assetUrl},${CurrentUser.userId},${purchaseMetadata},${autoPurchaseRequiredData}`;
   const expires = new Date();
   expires.setHours(expires.getHours() + 1);

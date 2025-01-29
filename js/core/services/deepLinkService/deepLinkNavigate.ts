@@ -31,7 +31,6 @@ import {
   ExperienceEventData,
   ExperienceJoinData
 } from './shareLinksTypes';
-import { ZendeskDeepLinkParams, getZendeskUrl } from './utils/externalWebUrlNavigationHelper';
 import ExperienceInviteStatus from './enums/ExperienceInviteStatus';
 import FriendInviteStatus from './enums/FriendInviteStatus';
 import ProfileShareStatus from './enums/ProfileShareStatus';
@@ -43,6 +42,13 @@ import AvatarItemDetailsStatus from './enums/AvatarItemDetailsStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import ContentPostStatus from './enums/ContentPostStatus';
 import ExperienceEventStatus from './enums/ExperienceEventStatus';
+
+export type ZendeskDeepLinkParams = {
+  articleId?: string;
+  domain: string;
+  locale?: string;
+  type?: string;
+};
 
 function isItemDeeplink(navigateSubPath: string, params: DeepLinkParams) {
   return navigateSubPath === PathPart.ItemDetails && params.itemType && params.itemId;
@@ -158,6 +164,10 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
                 data.status === ExperienceInviteStatus.EXPIRED ||
                 data.status === ExperienceInviteStatus.INVITER_NOT_IN_EXPERIENCE
               ) {
+                window.localStorage.setItem(
+                  'ref_info',
+                  btoa(JSON.stringify({ [data.placeId.toString()]: data.inviterId.toString() }))
+                );
                 window.location.href = `${UrlPart.Games}/${data.placeId}?experienceInviteLinkId=${params.code}&experienceInviteStatus=${data.status}`;
                 return true;
               }
@@ -591,8 +601,8 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
     // roblox://navigation/external_web_link?domain=zendesk&locale=ko&articleId=1234&type=policy_update
     let zendeskUrl;
     if (params.domain === ExternalWebUrlDomains.Zendesk) {
-      const zendeskParams = params as ZendeskDeepLinkParams;
-      zendeskUrl = getZendeskUrl(zendeskParams);
+      const { articleId, locale } = params as ZendeskDeepLinkParams;
+      zendeskUrl = urlService.getHelpDeskUrl(locale, articleId);
       if (zendeskUrl) {
         window.open(zendeskUrl, '_blank');
       }
@@ -608,6 +618,16 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
       // roblox://navigation/avatar?itemId=<itemId>&itemType=<itemType>
       // Navigate to avatar details UA
       urlTarget = target.url;
+    }
+  } else if (navigateSubPath === PathPart.Group) {
+    if (params.groupId) {
+      if (params.forumCategoryId && params.forumPostId && params.forumCommentId) {
+        // roblox://navigation/group?groupId=<groupId>&forumCategoryId=<forumCategoryId>&forumPostId=<forumPostId>&forumCommentId=<forumCommentId>
+        urlTarget = `${UrlPart.Groups}/${params.groupId}#!/forums/${params.forumCategoryId}/post/${params.forumPostId}/comment/${params.forumCommentId}`;
+      } else {
+        // roblox://navigation/group?groupId=<groupId>
+        urlTarget = `${UrlPart.Groups}/${params.groupId}`;
+      }
     }
   }
 

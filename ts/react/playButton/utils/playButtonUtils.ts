@@ -1,18 +1,18 @@
 import Roblox, {
+  AccessManagementUpsellService,
   EnvironmentUrls,
   EventStream,
-  IdentityVerificationService,
   GameLauncher,
-  AccessManagementUpsellService
+  IdentityVerificationService
 } from 'Roblox';
-import { deviceMeta as DeviceMeta, jsClientDeviceIdentifier } from 'header-scripts';
+import { eventStreamService, playGameService, TJoinDataProperties } from 'core-roblox-utilities';
 import { uuidService } from 'core-utilities';
-import { playGameService, eventStreamService, TJoinDataProperties } from 'core-roblox-utilities';
+import { deviceMeta as DeviceMeta, jsClientDeviceIdentifier } from 'header-scripts';
 import playButtonConstants, { PlayabilityStatus } from '../constants/playButtonConstants';
 import {
   TAgeGuidelinesResponse,
   TPlayabilityStatus,
-  TPlayabilityStatuses
+  TPlayabilityStatusWithUnplayableError
 } from '../types/playButtonTypes';
 
 const { unlockPlayIntentConstants } = playButtonConstants;
@@ -105,6 +105,20 @@ export const launchGame = (
       '_self'
     );
   } else {
+    // TODO(npatel, 2024-12-03): Modularize this code separately and add stricter type validation via zod.
+    let referredByPlayerId = '0';
+    if (window.localStorage.getItem('ref_info') !== null) {
+      const refInfo: { [key: string]: string } = (() => {
+        const refInfoRaw = window.localStorage.getItem('ref_info');
+        if (!refInfoRaw) return {};
+        try {
+          return JSON.parse(atob(refInfoRaw)) as { [key: string]: string };
+        } catch {
+          return {};
+        }
+      })();
+      referredByPlayerId = refInfo[placeId];
+    }
     playGameService.launchGame(
       playGameService.buildPlayGameProperties(
         rootPlaceId,
@@ -112,11 +126,14 @@ export const launchGame = (
         gameInstanceId,
         /* playerId= */ undefined,
         privateServerLinkCode,
-        /* referredByPlayerId= */ undefined,
+        referredByPlayerId,
         joinData
       ),
       playButtonConstants.eventStreamProperties(placeId, eventProperties)
     );
+    if (window.localStorage.getItem('ref_info')) {
+      window.localStorage.removeItem('ref_info');
+    }
   }
 };
 
@@ -233,25 +250,35 @@ export const getMinimumAgeFromAgeRecommendationResponse = (
 
 export const shouldShowUnplayableButton = (
   playabilityStatus: TPlayabilityStatus | undefined,
-  shouldShowVpcPlayButtonUpsells?: boolean
-): playabilityStatus is Exclude<
-  TPlayabilityStatus,
-  | TPlayabilityStatuses['Playable']
-  | TPlayabilityStatuses['GuestProhibited']
-  | TPlayabilityStatuses['PurchaseRequired']
-  | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
-  | TPlayabilityStatuses['ContextualPlayabilityAgeRecommendationParentalControls']
-> => {
-  return (
-    playabilityStatus !== PlayabilityStatus.Playable &&
-    playabilityStatus !== PlayabilityStatus.GuestProhibited &&
-    playabilityStatus !== PlayabilityStatus.PurchaseRequired &&
-    playabilityStatus !== PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser &&
-    (!shouldShowVpcPlayButtonUpsells ||
-      playabilityStatus !==
-        PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls) &&
-    playabilityStatus !== undefined
-  );
+  shouldShowVpcPlayButtonUpsells?: boolean,
+  hasUpdatedPlayButtonsVpcIxp?: boolean
+): playabilityStatus is TPlayabilityStatusWithUnplayableError => {
+  // playability is loading
+  if (playabilityStatus === undefined) {
+    return false;
+  }
+
+  // these statuses are never fully unplayable
+  if (
+    playabilityStatus === PlayabilityStatus.Playable ||
+    playabilityStatus === PlayabilityStatus.GuestProhibited ||
+    playabilityStatus === PlayabilityStatus.PurchaseRequired ||
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser ||
+    playabilityStatus === PlayabilityStatus.FiatPurchaseRequired
+  ) {
+    return false;
+  }
+
+  // this status is not fully unplayable if action needed button is enabled for vpc cases
+  if (
+    playabilityStatus === PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls
+  ) {
+    if (shouldShowVpcPlayButtonUpsells && hasUpdatedPlayButtonsVpcIxp) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 export const sendUnlockPlayIntentEvent = (

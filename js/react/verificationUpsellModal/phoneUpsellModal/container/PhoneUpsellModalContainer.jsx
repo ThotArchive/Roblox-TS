@@ -151,7 +151,10 @@ function PhoneUpsellModalContainer({
       });
       setPhoneVerificationSuccessPage(successPage);
     }
-    fetchPhoneSuccessPage();
+
+    if (origin !== originValues.challenge) {
+      fetchPhoneSuccessPage();
+    }
   }, []);
 
   return (

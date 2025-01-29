@@ -5,6 +5,8 @@ const apiParamsInitialization = {
   chatApiParams: {
     pageNumberOfUnreadConversations: 1,
     pageSizeOfUnreadConversations: 30,
+    minimumNumConversations: 10,
+    maximumGetUserConversationsDepth: 10,
     getUserConversationsNextCursor: null,
     pageSizeOfConversations: 20,
     pageSizeOfDisplayMessages: 1,

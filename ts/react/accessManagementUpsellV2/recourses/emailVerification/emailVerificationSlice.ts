@@ -5,7 +5,7 @@ import reportEvent from '../../services/reportEventService';
 import { getUserEmailStatus, updateEmailAddress } from './services/emailVerificationAPI';
 
 export interface EmailVerificationState {
-  emailAddress: string;
+  emailAddress: string | null;
   isEmailVerified: boolean;
   isEmailAdded: boolean;
   loading: boolean;

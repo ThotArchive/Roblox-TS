@@ -30,7 +30,7 @@ export enum VIEW_NAME {
   LEAVE_ROBLOX_WARNING = 'LeaveRobloxWarning',
   PREMIUM_DISCLOSURES = 'PremiumDisclosures',
   PRODUCT_PURCHASE = 'ProductPurchase',
-  PRODUCT_PURCHASE_ONE_CLICK_PAY = 'ProductPurchaseOneClickPay',
+  PRODUCT_PURCHASE_QUICK_PAY = 'ProductPurchaseQuickPay',
   PREMIUM_PURCHASE = 'PremiumPurchase',
   MEMBERSHIP = 'Membership',
   MEMBERSHIP_ANGULAR = 'MembershipAngular',
@@ -55,8 +55,9 @@ export enum VIEW_NAME {
   TRANSACTION_PAGE = 'TransactionPage',
   CATALOG_LIST_PAGE = 'CatalogListPage',
   ROBLOX_CREDIT_SETTING_BILLING_PAGE = 'RobloxCreditBillingPage',
-  REDEEM_PAGE = 'RedeemPage',
-  PURCHASE_VPC_MODAL = 'PurchaseVpcModal'
+  REDEEM_ROBLOX_CARD_PAGE = 'RedeemRobloxCardPage',
+  PURCHASE_VPC_MODAL = 'PurchaseVpcModal',
+  OPTIMIZED_PURCHASE_VPC_MODAL = 'OptimizedPurchaseVpcModal'
 }
 
 export enum PURCHASE_EVENT_TYPE {
@@ -74,6 +75,7 @@ export enum VIEW_MESSAGE {
   CONTINUE_TO_VNG = 'Continue to Vng',
   EXTERNAL_LINK_MODAL = 'External Link Modal',
   CANCEL = 'Cancel',
+  CLOSE = 'Close',
   CONTINUE = 'Continue',
   BACK = 'Back',
   CARD_NUMBER_FORM = 'Card Number Form',
@@ -102,12 +104,19 @@ export enum VIEW_MESSAGE {
   GO_TO_ROBUX_PURCHASE_PAGE = 'Go to Robux Purchase Page',
   BILLING_EMAIL_NOT_PREFILLED = 'Billing Email Not Prefilled',
   CREDIT_CONVERSION = 'Credit Conversion',
-  GO_TO_SETTINGS = 'Go to Settings'
+  GO_TO_SETTINGS = 'Go to Settings',
+  PREPARE_PAYMENT_REQUEST_FETCH_FAILED = 'PreparePaymentRequestFetchFailed',
+  PREPARE_PAYMENT_REQUEST_FLOOD_CHECKED = 'PreparePaymentRequestFloodChecked',
+  PREPARE_PAYMENT_REQUEST_REDIRECTED = 'PreparePaymentRequestRedirected',
+  PAYMENT_METHOD_DROPDOWN = 'Payment Method Dropdown',
+  USE_DIFFERENT_PAYMENT_METHOD = 'Use Different Payment Method'
 }
 
 export enum PURCHASE_STATUS {
   ABANDONED = 'Abandoned',
-  FAILED_PRECHECK = 'FailedPrecheck',
+  FAILED_PREPARE_PAYMENT_REQUEST = 'FailedPreparePaymentRequest',
+  PASSED_PREPARE_PAYMENT_REQUEST = 'PassedPreparePaymentRequest',
+  REDIRECTED_TO_PREMIUM_PAGE = 'RedirectedToPremiumPage',
   EXISTING_FLOW_OVERWRITTEN_BY = 'ExistingFlowOverwrittenBy',
   PAYMENT_FLOW_STARTED = 'PaymentFlowStarted',
   BROWSER_PAGE_CHANGED = 'BrowserPageChanged',

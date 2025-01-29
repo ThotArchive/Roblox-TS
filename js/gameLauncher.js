@@ -81,12 +81,14 @@ function joinMultiplayerGame(
   joinAttemptId,
   joinAttemptOrigin,
   joinData,
+  referredByPlayerId
 ) {
-  let params = { 
+  let params = {
     placeId,
     launchData: joinData?.launchData,
     eventId: joinData?.eventId,
     isPlayTogetherGame: isPlayTogetherGame === true,
+    referredByPlayerId
   };
 
   if (gameLauncher.gameLaunchInterface.isJoinAttemptIdEnabled) {

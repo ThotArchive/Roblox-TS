@@ -2,14 +2,18 @@ import fpjs from '@fingerprintjs/fingerprintjs';
 import Roblox from 'Roblox';
 import * as z from 'zod';
 import { RequestServiceDefault } from '../../../common/request';
+import { GET_PRELUDE_CONFIG } from '../../../common/request/types/rotatingClient';
 import * as Captcha from '../captcha';
 import * as CaptchaInterface from '../captcha/interface';
-import * as DeviceIntegrityInterface from '../deviceIntegrity/interface';
 import * as DeviceIntegrity from '../deviceIntegrity';
+import * as DeviceIntegrityInterface from '../deviceIntegrity/interface';
 import * as EmailVerification from '../emailVerification';
 import * as EmailVerificationInterface from '../emailVerification/interface';
 import * as ForceActionRedirect from '../forceActionRedirect';
 import * as ForceActionRedirectInterface from '../forceActionRedirect/interface';
+import { Generic } from '../interface';
+import * as PhoneVerification from '../phoneVerification';
+import * as PhoneVerificationInterface from '../phoneVerification/interface';
 import * as PrivateAccessToken from '../privateAccessToken';
 import * as PrivateAccessTokenInterface from '../privateAccessToken/interface';
 import * as ProofOfSpace from '../proofOfSpace';
@@ -24,8 +28,6 @@ import * as SecurityQuestions from '../securityQuestions';
 import * as SecurityQuestionsInterface from '../securityQuestions/interface';
 import * as TwoStepVerification from '../twoStepVerification';
 import * as TwoStepVerificationInterface from '../twoStepVerification/interface';
-import * as PhoneVerificationInterface from '../phoneVerification/interface';
-import * as PhoneVerification from '../phoneVerification';
 import { EVENT_CONSTANTS, LOG_PREFIX } from './app.config';
 import {
   ChallengeErrorData,
@@ -41,7 +43,6 @@ import {
 import * as Metadata from './interface/metadata/interface';
 import { MetricsServiceDefault } from './services/metricsService';
 import { ChallengeMetadataValidator } from './validators';
-import { Generic } from '../interface';
 
 // Export some additional enums that are declared in the shared interface (they
 // are also defined in the shared interface, but we need to expose them in the
@@ -75,7 +76,10 @@ export const parseChallengeSpecificProperties: ParseChallengeSpecificProperties 
 
   let challengeMetadata: unknown;
   try {
-    challengeMetadata = JSON.parse(challengeMetadataJson);
+    challengeMetadata =
+      challengeMetadataJson === null || challengeMetadataJson === ''
+        ? {}
+        : JSON.parse(challengeMetadataJson);
   } catch (error) {
     return null;
   }
@@ -518,6 +522,22 @@ export const renderChallenge: RenderChallenge = async ({
       }
       return Promise.resolve(success);
     }
+
+    case ChallengeType.BLOCK_SESSION: {
+      const { challengeMetadata } = challengeSpecificProperties;
+      const fullParameters: ForceActionRedirectInterface.ChallengeParameters = {
+        forceActionRedirectChallengeType:
+          ForceActionRedirectInterface.ForceActionRedirectChallengeType.BlockSession,
+        ...challengeBaseProperties,
+        ...challengeMetadata
+      };
+      const success = ForceActionRedirect.renderChallenge(fullParameters);
+      if (success && challengeBaseProperties.onChallengeDisplayed !== undefined) {
+        challengeBaseProperties.onChallengeDisplayed({ displayed: true });
+      }
+      return Promise.resolve(success);
+    }
+
     default: {
       // If we have handled all of the challenge types above, TypeScript will
       // infer `challengeSpecificProperties` to have type `never` and the
@@ -737,3 +757,15 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
       }
     });
   });
+
+// TODO: possibly move this into grasshopper and the invocation to corescripts when its ready.
+export const loadPreludeIfMissing = (): void => {
+  const maybePreludeExists = document.getElementById('prelude');
+  if (maybePreludeExists === null) {
+    const prelude = document.createElement('script');
+    prelude.src = GET_PRELUDE_CONFIG.url;
+    prelude.async = true;
+    prelude.id = 'prelude';
+    document.body.appendChild(prelude);
+  }
+};

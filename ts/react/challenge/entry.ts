@@ -1,5 +1,6 @@
 import Roblox from 'Roblox';
 import * as Captcha from './captcha';
+import * as DeviceIntegrity from './deviceIntegrity';
 import * as ForceActionRedirect from './forceActionRedirect';
 import * as Generic from './generic';
 import * as HybridWrapper from './hybridWrapper';
@@ -11,7 +12,6 @@ import * as Reauthentication from './reauthentication';
 import * as Rostile from './rostile';
 import * as SecurityQuestions from './securityQuestions';
 import * as TwoStepVerification from './twoStepVerification';
-import * as DeviceIntegrity from './deviceIntegrity';
 
 // This type constraint (`typeof Interface`) ensures that any changes made to
 // the shared interface types for this component get reflected in its compiled
@@ -34,3 +34,6 @@ const AccountIntegrityChallengeService: typeof Interface = {
 Object.assign(Roblox, {
   AccountIntegrityChallengeService
 });
+
+// Side-effect of loading the prelude asynchronously.
+Generic.loadPreludeIfMissing();

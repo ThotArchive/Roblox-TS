@@ -136,9 +136,15 @@ function chatService(
       };
     },
 
-    getMetaData() {
+    getMetaData(shouldBypassCache = false) {
+      const urlConfig = shouldBypassCache
+        ? {
+            ...apiParamsInitialization.apiSets.getMetaData,
+            noCache: true
+          }
+        : apiParamsInitialization.apiSets.getMetaData;
       const params = {};
-      return httpService.httpGet(apiParamsInitialization.apiSets.getMetaData, params);
+      return httpService.httpGet(urlConfig, params);
     },
 
     getUnreadConversationCount() {

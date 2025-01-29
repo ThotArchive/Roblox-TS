@@ -33,24 +33,34 @@ export function ItemCardCaption({
   translate,
   iconToRender
 }: TItemCardCaptionProps): JSX.Element {
+  const hideCreatorName = creatorName === undefined;
+  const hidePrice =
+    price === undefined &&
+    lowestPrice === undefined &&
+    premiumPricing === undefined &&
+    priceStatus === undefined;
   return (
     <div className='item-card-caption'>
       <ItemCardName name={name} premiumPricing={premiumPricing} />
-      <ItemCardCreatorName
-        creatorName={creatorName}
-        creatorType={creatorType}
-        creatorTargetId={creatorTargetId}
-        translate={translate}
-        iconToRender={iconToRender}
-      />
-      <ItemCardPrice
-        creatorTargetId={creatorTargetId}
-        price={price}
-        lowestPrice={lowestPrice}
-        priceStatus={priceStatus}
-        premiumPricing={premiumPricing}
-        unitsAvailableForConsumption={unitsAvailableForConsumption}
-      />
+      {!hideCreatorName && (
+        <ItemCardCreatorName
+          creatorName={creatorName}
+          creatorType={creatorType}
+          creatorTargetId={creatorTargetId}
+          translate={translate}
+          iconToRender={iconToRender}
+        />
+      )}
+      {!hidePrice && (
+        <ItemCardPrice
+          creatorTargetId={creatorTargetId}
+          price={price}
+          lowestPrice={lowestPrice}
+          priceStatus={priceStatus}
+          premiumPricing={premiumPricing}
+          unitsAvailableForConsumption={unitsAvailableForConsumption}
+        />
+      )}
     </div>
   );
 }

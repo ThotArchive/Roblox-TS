@@ -142,3 +142,11 @@ export type PhoneVerification = {
 export type EmailVerification = {
   frictionContext?: FrictionContext;
 } & Shared;
+
+/**
+ * The challenge metadata type returned by the GCS for `BlockSession` with any
+ * custom properties added by clients.
+ */
+export type BlockSession = {
+  challengeId: string;
+} & Shared;

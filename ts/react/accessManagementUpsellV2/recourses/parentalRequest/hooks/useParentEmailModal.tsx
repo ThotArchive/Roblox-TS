@@ -132,7 +132,7 @@ const useParentEmailModal = (
         <p className='text-error form-control-label'>{getSetEmailErrorMessage()}</p>
       </div>
       <div
-        className='text-footer user-settings-modal-text-footer'
+        className='text-footer access-management-upsell-inner-modal-text-footer'
         dangerouslySetInnerHTML={{
           __html: translate(gatherParentEmail.footer, {
             linkStart: `<a class='text-link' rel='noreferrer' target='_blank' href='${privacyPolicyUrl}'>`,
@@ -151,13 +151,13 @@ const useParentEmailModal = (
         onHidecallback();
       }}
       backdrop
-      className='user-settings-modal'
+      className='access-management-upsell-inner-modal'
       size='sm'
-      aria-labelledby='user-settings-modal-title'
+      aria-labelledby='access-management-upsell-inner-modal-title'
       centered>
       <Modal.Header useBaseBootstrapComponent>
-        <div className='user-settings-modal-title-container'>
-          <Modal.Title id='user-settings-modal-title'>
+        <div className='access-management-upsell-inner-modal-title-container'>
+          <Modal.Title id='access-management-upsell-inner-modal-title'>
             {translate(gatherParentEmail.title)}
           </Modal.Title>
         </div>

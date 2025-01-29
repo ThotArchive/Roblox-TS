@@ -18,6 +18,7 @@ const parentalRequestConstants = {
       emailTooManyChildrenError: 'Message.EmailIneligible',
       childTooManyParentsError: 'Message.ExistAccountWithEmail',
       emailTooManyRequest: 'Message.TooManyAttempts',
+      senderFlooded: 'Message.TooManyAttemptAskParent',
       alreadyApplied: 'Description.AllSet',
       seeRequestAfterLink: 'Message.RequestCreatedEmailNotSent',
       alreadyLinked: 'Message.AlreadyLinked'

@@ -22,6 +22,11 @@ const FORCE_TWO_STEP_VERIFICATION_TRANSLATION_CONFIG: TranslationConfig = {
   feature: 'Feature.ForceTwoStepVerification'
 };
 
+const BLOCK_SESSION_TRANSLATION_CONFIG: TranslationConfig = {
+  common: [],
+  feature: 'Feature.Denied'
+};
+
 /**
  * Language resource keys for force authenticator that are requested dynamically.
  */
@@ -36,6 +41,12 @@ export const FORCE_TWO_STEP_VERIFICATION_LANGUAGE_RESOURCES = [
   'ForceTwoStepVerification.Header',
   'ForceTwoStepVerification.Body',
   'ForceTwoStepVerification.Action'
+] as const;
+
+export const BLOCK_SESSION_LANGUAGE_RESOURCES = [
+  'Denied.Header',
+  'Denied.Body',
+  'Denied.Action'
 ] as const;
 
 export const getForceActionRedirectChallengeConfig = (
@@ -67,6 +78,18 @@ export const getForceActionRedirectChallengeConfig = (
             Header: translate('ForceTwoStepVerification.Header'),
             Body: translate('ForceTwoStepVerification.Body'),
             Action: translate('ForceTwoStepVerification.Action')
+          } as const)
+      };
+    case ForceActionRedirectChallengeType.BlockSession:
+      return {
+        redirectURLSignifier: 'blocksession' as const,
+        translationConfig: BLOCK_SESSION_TRANSLATION_CONFIG,
+        translationResourceKeys: BLOCK_SESSION_LANGUAGE_RESOURCES,
+        getTranslationResources: (translate: ForceActionRedirectTranslateFunction) =>
+          ({
+            Header: translate('Denied.Header'),
+            Body: translate('Denied.Body'),
+            Action: translate('Denied.Action')
           } as const)
       };
     default:

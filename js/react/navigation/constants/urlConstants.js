@@ -38,5 +38,6 @@ export default {
   getGiftCardVisibilityUrl: () => `${apiGatewayUrl}/credit-balance/v1/get-gift-card-visibility`,
   getIntlAuthComplianceUrl: () =>
     `${universalAppConfigurationApi}/v1/behaviors/intl-auth-compliance/content`,
-  getSignedVngShopUrl: () => `${apiGatewayUrl}/vng-payments/v1/getVngShopUrl`
+  getSignedVngShopUrl: () => `${apiGatewayUrl}/vng-payments/v1/getVngShopUrl`,
+  getRobuxBadgeUrl: () => `${apiGatewayUrl}/robuxbadge/v1/robuxbadge`
 };

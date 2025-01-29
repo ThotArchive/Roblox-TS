@@ -14,7 +14,8 @@ const {
   getCreditBalanceForNavigationUrl,
   getConversionMetadataUrl,
   getGiftCardVisibilityUrl,
-  getSignedVngShopUrl
+  getSignedVngShopUrl,
+  getRobuxBadgeUrl
 } = urlConstants;
 
 export default {
@@ -85,6 +86,10 @@ export default {
   },
   getVngShopSignedRedirectionUrl() {
     const urlConfig = { url: getSignedVngShopUrl(), withCredentials: true };
+    return httpService.get(urlConfig);
+  },
+  getRobuxBadge() {
+    const urlConfig = { url: getRobuxBadgeUrl(), withCredentials: true };
     return httpService.get(urlConfig);
   }
 };

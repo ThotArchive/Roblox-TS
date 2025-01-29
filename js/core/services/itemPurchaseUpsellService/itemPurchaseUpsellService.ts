@@ -97,7 +97,8 @@ export default class ItemPurchaseUpsellService {
             itemDetail.buyButtonElementDataset?.assetType ?? '',
             !!itemDetail.buyButtonElementDataset?.userassetId,
             itemDetail.buyButtonElementDataset?.isPrivateServer ?? false,
-            itemDetail.buyButtonElementDataset?.isPlace ?? false
+            itemDetail.buyButtonElementDataset?.isPlace ?? false,
+            itemDetail.buyButtonElementDataset?.productId
           );
           itemPurchaseAjaxData.thumbnailImageUrl = PreProcessThumbnailUrl(
             itemPurchaseAjaxData,
@@ -121,7 +122,8 @@ export default class ItemPurchaseUpsellService {
             itemDetail.buyButtonElementDataset?.assetType ?? '',
             !!itemDetail.buyButtonElementDataset?.userassetId,
             itemDetail.buyButtonElementDataset?.isPrivateServer ?? false,
-            itemDetail.buyButtonElementDataset?.isPlace ?? false
+            itemDetail.buyButtonElementDataset?.isPlace ?? false,
+            itemDetail.buyButtonElementDataset?.productId
           );
           itemPurchaseAjaxData.thumbnailImageUrl = PreProcessThumbnailUrl(
             itemPurchaseAjaxData,
@@ -187,7 +189,8 @@ export default class ItemPurchaseUpsellService {
         itemDetailDataset?.assetType ?? '',
         !!itemDetailDataset?.userassetId,
         itemDetailDataset?.isPrivateServer ?? false,
-        itemDetailDataset?.isPlace ?? false
+        itemDetailDataset?.isPlace ?? false,
+        itemDetailDataset?.productId
       );
       openInsufficientRobuxExceedLargestPackageModal(
         robuxShortfallPrice,

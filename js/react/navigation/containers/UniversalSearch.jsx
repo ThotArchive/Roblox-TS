@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withTranslations, usePrevious, useDebounce } from 'react-utilities';
 import { httpService, pageName } from 'core-utilities';
 import { eventStreamService } from 'core-roblox-utilities';
-import { ExperimentationService } from 'Roblox';
 import { translationConfig } from '../translation.config';
 import SearchInput from '../components/SearchInput';
 import layout from '../constants/layoutConstants';
@@ -29,7 +28,6 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
   const [isInitialCall, setIsInitialCall] = useState(true);
   const [isMenuHover, setIsMenuHover] = useState(false);
   const [indexOfSelectedOption, setSelectedListOptions] = useState(0);
-  const [disableGamesAutocompleteHoldout, setDisableGamesAutocompleteHoldout] = useState(false);
   const [useAvatarAutocompletFallbackUrl, setUseAvatarAutocompletFallbackUrl] = useState(false);
   const { keyCodes } = layout;
 
@@ -45,16 +43,6 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     .getNewUniversalSearchLinks()
     .findIndex(({ label }) => label === linkConstants.avatarSearchLink.label);
   const userLanguageCode = searchUtil.getAvatarAutocompleteLanguageCode();
-
-  useEffect(() => {
-    if (ExperimentationService) {
-      ExperimentationService.getAllValuesForLayer(search.experimentLayer).then(ixpResult => {
-        if (ixpResult.ixpDisableGamesAutocomplete) {
-          setDisableGamesAutocompleteHoldout(true);
-        }
-      });
-    }
-  }, []);
 
   const showAvatarAutocompleteSuggestions = navigationUtil.getAvatarAutocompleteSearchLinks();
   const constructSearchSuggestions = additionalSuggestions => {
@@ -187,10 +175,7 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
             }
             setUseAvatarAutocompletFallbackUrl(true);
           }
-        } else if (
-          search.isAutocompleteSuggestionsIXPTestEnabled() &&
-          !disableGamesAutocompleteHoldout
-        ) {
+        } else if (search.isAutocompleteSuggestionsIXPTestEnabled()) {
           try {
             const data = await searchService.getSearchSuggestion(debouncedSearchInput);
             const end = Date.now();
@@ -352,10 +337,35 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
           }
         }
 
+        if (document.getElementById('routing')) {
+          const url = new URL(redirectUrl);
+          if (url.origin === window.location.origin && url.pathname === '/catalog') {
+            const customEvent = new CustomEvent('externalNavigation', {
+              detail: { url: redirectUrl }
+            });
+            window.dispatchEvent(customEvent);
+            // close auto completes and unfocus the input
+            setIsMenuOpen(false);
+            document.getElementById('navbar-search-input').blur();
+            return;
+          }
+        }
+
         window.location = redirectUrl;
       }
     }
   };
+
+  const setSearchMenuClose = () => {
+    setIsMenuOpen(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener('setSearchMenuClose', setSearchMenuClose);
+    return () => {
+      window.removeEventListener('setSearchMenuClose', setSearchMenuClose);
+    };
+  }, [isMenuOpen]);
 
   return (
     <SearchInput

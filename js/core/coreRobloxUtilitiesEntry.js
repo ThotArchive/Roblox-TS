@@ -15,6 +15,7 @@ import playGameService from './services/playGames/playGameService';
 import userInfoService from './services/userInfoService/userInfoService';
 import elementVisibilityService from './services/elementVisibilityService/elementVisibilityService';
 import entityUrl from './utils/entityUrl/entityUrl';
+// Note: importing the GCS interceptor has the side effect of running the initialization logic.
 import initializeGenericChallengeInterceptor from './utils/jquery/genericChallengeInterceptor';
 import upsellUtil from './utils/upsellUtil';
 import pageHeartbeatInit from './pageHeartbeat/pageHeartbeatScheduler';

@@ -1,10 +1,10 @@
-import { Endpoints } from 'Roblox';
+import { Endpoints, EnvironmentUrls } from 'Roblox';
 import realtimeFactory from '../lib/factory';
 
 $(function() {
   realtimeFactory.GetClient().Subscribe('AuthenticationNotifications', function(data) {
     if (data.Type === 'SignOut') {
-      let url = '/authentication/is-logged-in';
+      let url = EnvironmentUrls.usersApi + '/v1/users/authenticated';
       if (Endpoints) {
         url = Endpoints.generateAbsoluteUrl(url, null, true);
       }

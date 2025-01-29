@@ -4,7 +4,6 @@ import linkConstants from './linkConstants';
 const { apiGatewayUrl, apiGatewayCdnUrl, localeApi } = EnvironmentUrls;
 export const getNavigationContainer = () => document.getElementById('navigation-container');
 export default {
-  experimentLayer: 'Website.TopNavSearchBox',
   debounceTimeout: 100,
   debouncedSearchInputMaxLength: 35,
   expiryTimeout: 5000,

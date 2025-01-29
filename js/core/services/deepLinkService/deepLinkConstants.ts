@@ -54,8 +54,7 @@ export const DeepLinkNavigationMap: { [path: string]: string } = {
   [PathPart.AccountInfo]: '/my/account#!/info',
   [PathPart.PrivacySettings]: '/my/account#!/privacy',
   [PathPart.ParentalControls]: '/my/account#!/parental-controls',
-  [PathPart.SpendingSettings]: '/my/account#!/billing',
-  [PathPart.Group]: '/groups/{groupId}'
+  [PathPart.SpendingSettings]: '/my/account#!/billing'
 };
 
 export const UrlPart = {

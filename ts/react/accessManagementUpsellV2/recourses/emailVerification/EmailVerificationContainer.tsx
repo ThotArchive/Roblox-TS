@@ -18,6 +18,7 @@ const EmailVerificationContainer = ({
   translate: WithTranslationsProps['translate'];
   onHide: () => void;
 }): JSX.Element => {
+  const EmailRecourse = 'AddedEmail';
   const dispatch = useAppDispatch();
   const emailVerificationState = useSelector(selectEmailVerification);
   const featureName = useSelector(selectFeatureName);
@@ -38,8 +39,10 @@ const EmailVerificationContainer = ({
   useEffect(() => {
     if (emailVerificationState.isEmailAdded) {
       emailModalService.close();
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      setTimeout(() => dispatch(fetchFeatureAccess({ featureName, ampFeatureCheckData })), 3000);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispatch(
+        fetchFeatureAccess({ featureName, ampFeatureCheckData, successfulAction: EmailRecourse })
+      );
     }
   }, [emailVerificationState]);
   return <div>{emailModal}</div>;

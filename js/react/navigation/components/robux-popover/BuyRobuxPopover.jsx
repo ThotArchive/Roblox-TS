@@ -22,6 +22,7 @@ function BuyRobuxPopover({
   isExperimentCallDone,
   isGetCurrencyCallDone,
   openConvertCreditModal,
+  showRobuxBadge,
   robuxAmount,
   robuxError,
   translate
@@ -124,7 +125,13 @@ function BuyRobuxPopover({
           button={
             <button type='button' className='btn-navigation-nav-robux-md'>
               <BuyRobuxIcon
-                {...{ robuxAmount, isGetCurrencyCallDone, robuxError, creditDisplayConfig }}
+                {...{
+                  robuxAmount,
+                  isGetCurrencyCallDone,
+                  robuxError,
+                  creditDisplayConfig,
+                  showRobuxBadge
+                }}
               />
               {/* Wallet credit balance only shown on showCreditAndRobux variant */}
               {creditDisplayConfig ===
@@ -149,7 +156,8 @@ function BuyRobuxPopover({
                   creditDisplayConfig,
                   openConvertCreditModal,
                   onBuyGiftCardClick,
-                  onBuyRobuxExternalClick
+                  onBuyRobuxExternalClick,
+                  showRobuxBadge
                 }}
               />
             </ul>
@@ -168,7 +176,8 @@ BuyRobuxPopover.defaultProps = {
   currencyCode: 'USD',
   creditDisplayConfig: layoutConstants.creditDisplayConfigVariants.control,
   isExperimentCallDone: false,
-  isEligibleForVng: false
+  isEligibleForVng: false,
+  showRobuxBadge: false
 };
 
 BuyRobuxPopover.propTypes = {
@@ -182,7 +191,8 @@ BuyRobuxPopover.propTypes = {
   creditDisplayConfig: PropTypes.string,
   isExperimentCallDone: PropTypes.bool,
   openConvertCreditModal: PropTypes.func.isRequired,
-  isEligibleForVng: PropTypes.bool
+  isEligibleForVng: PropTypes.bool,
+  showRobuxBadge: PropTypes.bool
 };
 
 export default BuyRobuxPopover;

@@ -50,6 +50,8 @@ export const renderChallenge: RenderChallenge = ({
       />,
       container
     );
+    eventService.sendChallengeInitializedEvent();
+    metricsService.fireChallengeInitializedEvent();
     return true;
   }
 

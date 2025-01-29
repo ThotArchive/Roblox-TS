@@ -616,7 +616,10 @@ function chatController(
     $scope.chatLibrary.dialogDict[layoutId] = dialogInitValue;
   };
 
-  $scope.getUserConversations = function () {
+  $scope.getUserConversations = function (depth = 0) {
+    if (depth >= $scope.chatApiParams.maximumGetUserConversationsDepth) {
+      return;
+    }
     const cursor = $scope.chatApiParams.getUserConversationsNextCursor;
     chatService
       .getUserConversations(
@@ -638,18 +641,18 @@ function chatController(
           if (data && data.length > 0) {
             userIds = conversationsUtility.getUserIdsNotInFriendsDict(data, friendsDict);
             $scope.buildChatUserListByConversations(data, false);
-            $scope.chatApiParams.getUserConversationsNextCursor = response.next_cursor;
             $scope.retrieveDialogStatus();
           }
 
           const isEndOfConversations = !response.next_cursor;
-          if (!data || isEndOfConversations) {
+          if (isEndOfConversations) {
             $scope.chatApiParams.loadMoreConversations = false;
             $scope.chatApiParams.getUserConversationsNextCursor = null;
-            if (data && data.length === 0) {
+            if (angular.equals($scope.chatUserDict, {})) {
               $scope.chatLibrary.chatLayout.chatLandingEnabled = true;
             }
           } else {
+            $scope.chatApiParams.getUserConversationsNextCursor = response.next_cursor;
             $scope.chatApiParams.loadMoreConversations = true;
           }
           if ($scope.chatLibrary.chatLayout.pageDataLoading) {
@@ -659,7 +662,14 @@ function chatController(
             initialzeUrlParser();
           }
           contactsService.getUserContacts(userIds, friendsDict);
-          return usersService.getUserInfo(userIds, friendsDict);
+          usersService.getUserInfo(userIds, friendsDict);
+
+          if (
+            $scope.chatApiParams.loadMoreConversations &&
+            $scope.chatLibrary.chatLayoutIds?.length < $scope.chatApiParams.minimumNumConversations
+          ) {
+            $scope.getUserConversations(depth + 1);
+          }
         },
         error => {
           console.debug(error);
@@ -1277,7 +1287,9 @@ function chatController(
       const settingsChanged = data.SettingsChanged ?? [];
       if (
         !settingsChanged.includes('WhoCanChatWithMeInApp') &&
-        !settingsChanged.includes('WhoCanGroupChatWithMeInApp')
+        !settingsChanged.includes('WhoCanGroupChatWithMeInApp') &&
+        !settingsChanged.includes('WhoCanOneOnOnePartyWithMe') &&
+        !settingsChanged.includes('WhoCanGroupPartyWithMe')
       ) {
         return;
       }
@@ -1285,7 +1297,7 @@ function chatController(
       const oldIsChatEnabled = $scope.getIsChatEnabled();
       // eslint-disable-next-line consistent-return
       return $scope
-        .fetchAllWebChatSettings()
+        .fetchAllWebChatSettings(true)
         .then(allData => {
           $scope.parseChatSettingsResponsesForChatEnabled(allData);
           const newIsChatEnabled = $scope.getIsChatEnabled();
@@ -2469,8 +2481,8 @@ function chatController(
     return promiseResult.status === 'fulfilled' ? promiseResult.value ?? {} : {};
   };
 
-  $scope.fetchAllWebChatSettings = function () {
-    const promises = [chatService.getMetaData(), guacService.getChatUiPolicies()];
+  $scope.fetchAllWebChatSettings = function (shouldBypassCache) {
+    const promises = [chatService.getMetaData(shouldBypassCache), guacService.getChatUiPolicies()];
 
     return Promise.allSettled(promises).then(([metadataResult, chatUiPoliciesResult]) => {
       return {

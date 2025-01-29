@@ -20,9 +20,9 @@ const initialAccessState: AccessState = {
 
 export interface UpsellState {
   featureName: string | null;
-  ampFeatureCheckData: ExtraParameter[];
-  stage: UpsellStage;
-  verificationStageRecourse: RecourseResponse;
+  ampFeatureCheckData: ExtraParameter[] | undefined;
+  stage: UpsellStage | null;
+  verificationStageRecourse: RecourseResponse | null;
   featureAccess: AccessState;
   showUpsell: boolean;
   redirectLink: string | null;
@@ -42,10 +42,21 @@ const initialState: UpsellState = {
 
 export const fetchFeatureAccess = createAsyncThunk(
   'accessManagement/fetchFeatureAccess',
-  async (arg: { featureName: string; ampFeatureCheckData?: ExtraParameter[] }, thunkAPI) => {
+  async (
+    arg: {
+      featureName: string;
+      ampFeatureCheckData?: ExtraParameter[];
+      successfulAction?: string;
+    },
+    thunkAPI
+  ) => {
     try {
-      const { featureName, ampFeatureCheckData } = arg;
-      const response = await fetchFeatureCheckResponse(featureName, ampFeatureCheckData);
+      const { featureName, ampFeatureCheckData, successfulAction } = arg;
+      const response = await fetchFeatureCheckResponse(
+        featureName,
+        ampFeatureCheckData,
+        successfulAction
+      );
       return response;
     } catch (error) {
       reportEvent(ReportEvent.AMPCheckFailed, null, {

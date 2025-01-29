@@ -9,6 +9,24 @@ import { ACCOUNT_SETTINGS_SECURITY_PATH } from '../app.config';
 import useForceActionRedirectContext from '../hooks/useForceActionRedirectContext';
 import { ForceActionRedirectActionType } from '../store/action';
 
+export const buttonAction = (redirectURLSignifier: string, closeModal: () => void) => {
+  // blocksession is a unique case where we currently don't have a redirect- the modal is purely informative.
+  // In the future we may want to redirect to the support page.
+  if (redirectURLSignifier === 'blocksession') {
+    closeModal();
+  } else {
+    const accountSettingsUrl = ACCOUNT_SETTINGS_SECURITY_PATH + redirectURLSignifier;
+    // Checks if page is loaded in an iframe.
+    if (window.top && window.top !== window.self) {
+      // For Barista we want to load the account settings URL in the topmost frame.
+      window.top.location.href = accountSettingsUrl;
+    } else {
+      // The `_self` target opens the redirect URL in the current page.
+      window.open(accountSettingsUrl, '_self');
+    }
+  }
+};
+
 /**
  * A container element for the Force Action modal UI.
  */
@@ -44,21 +62,12 @@ const ForceActionRedirect: React.FC = () => {
   /*
    * Render Properties
    */
+
   const positiveButton: FooterButtonConfig = {
     content: resources.Action,
     label: resources.Action,
     enabled: true,
-    action: () => {
-      const accountSettingsUrl = ACCOUNT_SETTINGS_SECURITY_PATH + redirectURLSignifier;
-      // Checks if page is loaded in an iframe.
-      if (window.top && window.top !== window.self) {
-        // For Barista we want to load the account settings URL in the topmost frame.
-        window.top.location.href = accountSettingsUrl;
-      } else {
-        // The `_self` target opens the redirect URL in the current page.
-        window.open(accountSettingsUrl, '_self');
-      }
-    }
+    action: () => buttonAction(redirectURLSignifier, closeModal)
   };
 
   /*

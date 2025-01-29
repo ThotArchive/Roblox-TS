@@ -170,6 +170,22 @@ class LanguageSelector extends React.Component {
     return unsortedLocales;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  filterLocalesBySeoSupport(unsortedLocales) {
+    if (Array.isArray(unsortedLocales)) {
+      return unsortedLocales
+        .filter(
+          // SEO doesn't support extended language codes such as 'zh-hans' for now.
+          locale =>
+            locale.isEnabledForFullExperience && locale.locale.language.languageCode.length === 2
+        )
+        .sort((a, b) => {
+          return a.locale.nativeName > b.locale.nativeName ? 1 : -1;
+        });
+    }
+    return unsortedLocales;
+  }
+
   findSupportedLocaleByLocaleCode(localeCode) {
     const { supportedLocales } = this.state;
     return supportedLocales.find(supportedLocale => {
@@ -180,9 +196,18 @@ class LanguageSelector extends React.Component {
   loadSupportedLocales() {
     localeDataStore.getLocalesWithCache(cacheConstants.getLocalesCacheTimeoutInMs).then(
       response => {
-        this.setState({
-          supportedLocales: this.sortSupportedLocalesByFullExperience(response.data)
-        });
+        const { hideSeoUnsupportedLocales } = this.props;
+
+        if (hideSeoUnsupportedLocales) {
+          this.setState({
+            supportedLocales: this.filterLocalesBySeoSupport(response.data)
+          });
+        } else {
+          this.setState({
+            supportedLocales: this.sortSupportedLocalesByFullExperience(response.data)
+          });
+        }
+
         this.loadUserLocale();
       },
       error => {
@@ -279,7 +304,8 @@ LanguageSelector.defaultProps = {
   isAuthenticatedUser: false,
   isNative: false,
   showWarningModalForUnsupportedLocale: true,
-  showWarningMessageForUnsupportedLocale: true
+  showWarningMessageForUnsupportedLocale: true,
+  hideSeoUnsupportedLocales: false
 };
 
 LanguageSelector.propTypes = {
@@ -288,7 +314,8 @@ LanguageSelector.propTypes = {
   isNative: PropTypes.bool,
   showWarningModalForUnsupportedLocale: PropTypes.bool,
   showWarningMessageForUnsupportedLocale: PropTypes.bool,
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
+  hideSeoUnsupportedLocales: PropTypes.bool
 };
 
 export default LanguageSelector;

@@ -12,7 +12,6 @@ type TParentalControlsActionNeededButtonProps = {
   universeId: string;
   hideButtonText?: boolean;
   buttonClassName?: string;
-  hasUpdatedPlayButtonsIxp?: boolean;
   placeId: string;
   rootPlaceId?: string;
   privateServerLinkCode?: string;
@@ -24,7 +23,6 @@ export const ParentalControlsActionNeededButton = ({
   universeId,
   hideButtonText,
   buttonClassName,
-  hasUpdatedPlayButtonsIxp,
   placeId,
   rootPlaceId,
   privateServerLinkCode,
@@ -73,23 +71,11 @@ export const ParentalControlsActionNeededButton = ({
 
   return (
     <React.Fragment>
-      {hasUpdatedPlayButtonsIxp ? (
-        <ActionNeededButton
-          onButtonClick={onPlayButtonClick}
-          hideButtonText={hideButtonText}
-          buttonClassName={buttonClassName}
-        />
-      ) : (
-        // For holdout users, show the green play button UI with the same click handler
-        // Remove when cleaning up hasUpdatedPlayButtonsIxp as True
-        <ActionNeededButton
-          onButtonClick={onPlayButtonClick}
-          hideButtonText
-          iconClassName='icon-common-play'
-          buttonClassName='btn-common-play-game-lg'
-        />
-      )}
-
+      <ActionNeededButton
+        onButtonClick={onPlayButtonClick}
+        hideButtonText={hideButtonText}
+        buttonClassName={buttonClassName}
+      />
       {isSelfUpdateSettingModalOpen && (
         <SelfUpdateSettingModal
           isModalOpen={isSelfUpdateSettingModalOpen}
@@ -112,7 +98,6 @@ export const ParentalControlsActionNeededButton = ({
 ParentalControlsActionNeededButton.defaultProps = {
   hideButtonText: undefined,
   buttonClassName: undefined,
-  hasUpdatedPlayButtonsIxp: undefined,
   rootPlaceId: undefined,
   privateServerLinkCode: undefined,
   gameInstanceId: undefined,

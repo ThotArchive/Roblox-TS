@@ -15,15 +15,12 @@ function Footer(props) {
   const showLanguageSelector = isAuthenticatedUser || isLandingPage;
 
   const handleLanguageChange = supportedLocale => {
-    const { locale } = supportedLocale;
+    const { locale, language } = supportedLocale;
     if (isLandingPage && locale) {
-      const queryParameters = new URLSearchParams(window.location.search);
-      // Fetch dataToken url query param
-      const dataToken = queryParameters.get('dataToken');
-      const isDataTokenPresent = !!dataToken;
+      const queryParameters = Object.fromEntries(new URLSearchParams(window.location.search));
       const urlFormatObject = {
-        pathname: window.location.pathname,
-        query: isDataTokenPresent ? { locale, dataToken } : { locale }
+        pathname: language.languageCode,
+        query: queryParameters
       };
       window.location.href = urlService.formatUrl(urlFormatObject);
     } else {
@@ -47,6 +44,7 @@ function Footer(props) {
               isAuthenticatedUser={isAuthenticatedUser}
               showWarningMessageForUnsupportedLocale={false}
               isNative={isPortableDevice}
+              hideSeoUnsupportedLocales={isLandingPage}
             />
           )}
         </div>

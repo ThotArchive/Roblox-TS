@@ -1,19 +1,13 @@
-import { TranslateFunction, withTranslations } from 'react-utilities';
 import React from 'react';
-import { TPlayabilityStatus, TPlayabilityStatuses } from '../types/playButtonTypes';
-import playButtonConstants from '../constants/playButtonConstants';
+import { TranslateFunction, withTranslations } from 'react-utilities';
 import playButtonTranslationConfig from '../../../../translation.config';
+import playButtonConstants from '../constants/playButtonConstants';
+import { TPlayabilityStatusWithUnplayableError } from '../types/playButtonTypes';
 
-const { playButtonStatusTranslationMap } = playButtonConstants;
+const { playButtonErrorStatusTranslationMap, PlayabilityStatus } = playButtonConstants;
 
 export type TErrorProps = {
-  playabilityStatus: Exclude<
-    TPlayabilityStatus,
-    | TPlayabilityStatuses['Playable']
-    | TPlayabilityStatuses['GuestProhibited']
-    | TPlayabilityStatuses['PurchaseRequired']
-    | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
-  >;
+  playabilityStatus: TPlayabilityStatusWithUnplayableError;
   errorClassName?: string;
 };
 
@@ -25,7 +19,11 @@ export const Error = ({
   translate: TranslateFunction;
 }): JSX.Element => (
   <span data-testid='play-error' className={errorClassName}>
-    {translate(playButtonStatusTranslationMap[playabilityStatus])}
+    {translate(
+      playButtonErrorStatusTranslationMap[playabilityStatus]
+        ? playButtonErrorStatusTranslationMap[playabilityStatus]
+        : playButtonErrorStatusTranslationMap[PlayabilityStatus.UnplayableOtherReason]
+    )}
   </span>
 );
 

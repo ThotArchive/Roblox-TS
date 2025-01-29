@@ -1,5 +1,5 @@
 export const translationConfig = {
-  common: ['CommonUI.Features', 'CommonUI.Messages', 'Common.AlertsAndOptions', 'Common.Presence'],
+  common: ['CommonUI.Features', 'CommonUI.Messages', 'Common.AlertsAndOptions'],
   feature: 'Feature.ShopDialog'
 };
 export const redeemTranslationConfig = {

@@ -1,5 +1,5 @@
+import { cryptoUtil } from 'core-roblox-utilities';
 import { httpService } from 'core-utilities';
-import { cryptoUtil, TSecureAuthIntent } from 'core-roblox-utilities';
 import {
   ChallengeIdAndActionType,
   UserId

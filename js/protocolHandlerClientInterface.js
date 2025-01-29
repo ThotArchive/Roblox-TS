@@ -13,6 +13,10 @@ import {
 import { getCurrentBrowser } from 'core-utilities';
 import $ from 'jquery';
 import GameLauncher from './gameLauncher';
+import {
+  getDeferredDeeplinkQueryParams,
+  getIsDeferredDeeplinkEnabled
+} from '../ts/deferredDeeplinks/deferredDeeplinkUtilities';
 
 const ProtocolHandlerClientInterface = {
   isInstalling: false,
@@ -144,17 +148,21 @@ function waitForStatus(gameLaunchParams) {
   const deferred = new $.Deferred();
   clearInterval(ProtocolHandlerClientInterface.statusInterval);
   ProtocolHandlerClientInterface.statusInterval = setInterval(() => {
-    const url = Endpoints.getAbsoluteUrl('/client-status');
-
-    $.ajax(url, {
-      success(status) {
-        if (status !== 'Unknown') {
-          deferred.resolve(gameLaunchParams);
-          clearInterval(ProtocolHandlerClientInterface.statusInterval);
-        }
-      },
-      cache: false
-    });
+    const url = `${EnvironmentUrls.matchmakingApi}/v1/client-status`;
+    $.ajax(
+        {
+          method: 'GET',
+          url: url,
+          dataType: "json",
+          contentType: 'application/json',
+          cache: false,
+          success(response) {
+            if (response?.status !== 'Unknown') {
+              deferred.resolve(gameLaunchParams);
+              clearInterval(ProtocolHandlerClientInterface.statusInterval);
+            }
+          }
+        });
   }, 3000);
   return deferred;
 }
@@ -183,12 +191,18 @@ function cleanUpAndLogFailure(gameLaunchParams) {
 }
 
 function resetClientStatus() {
-  const url = Endpoints.getAbsoluteUrl('/client-status/set?status=Unknown');
+  const url = `${EnvironmentUrls.matchmakingApi}/v1/client-status`;
+  const body = {
+    status: "Unknown"
+  }
 
   return $.ajax({
     method: 'POST',
-    url
-  });
+    url: url,
+    contentType: 'application/json',
+    data: body,
+    dataType: "json"
+  })?.success;
 }
 
 function getClientAssertionEnabled() {
@@ -604,7 +618,7 @@ function joinMultiplayerGame(placeLauncherParams) {
     placeId: placeLauncherParams.placeId,
     isPlayTogetherGame,
     launchData: placeLauncherParams.launchData,
-    eventId: placeLauncherParams.eventId,
+    eventId: placeLauncherParams.eventId
   };
 
   return startGame(startGameParams);
@@ -688,9 +702,20 @@ function playTogetherGame(placeLauncherParams) {
   return startGame(startGameParams);
 }
 
-function startDownload() {
+async function startDownload() {
   const iframe = document.getElementById('downloadInstallerIFrame');
-  iframe.src = '/download/client';
+  let downloadUrl = '/download/client';
+  let queryParams = '';
+
+  const isDeferredDeeplinkEnabled = await getIsDeferredDeeplinkEnabled();
+  if (isDeferredDeeplinkEnabled) {
+    // NOTE: This policy is needed for deferred deeplinking from Chrome on Windows. Otherwise, the deeplink URL is wiped from the installer
+    iframe.referrerPolicy = 'no-referrer';
+    const deeplinkParams = await getDeferredDeeplinkQueryParams(window.location.toString());
+    queryParams = deeplinkParams;
+  }
+
+  iframe.src = `${downloadUrl}${queryParams}`;
 }
 
 function startStudioDownload() {
@@ -698,7 +723,7 @@ function startStudioDownload() {
   iframe.src = '/download/studio';
 }
 
-function beginProtocolHandlerInstall(gameLaunchDefaultParams, isStudioInstall) {
+async function beginProtocolHandlerInstall(gameLaunchDefaultParams, isStudioInstall) {
   // remove gameinfo, if it's there
   let gameLaunchParams = { ...gameLaunchDefaultParams };
   const { gameInfo } = gameLaunchParams;
@@ -721,7 +746,7 @@ function beginProtocolHandlerInstall(gameLaunchDefaultParams, isStudioInstall) {
   if (isStudioInstall) {
     startStudioDownload();
   } else {
-    startDownload();
+    await startDownload();
   }
 }
 
@@ -806,17 +831,17 @@ function showAreYouInstalledDialog(onClose, gameLaunchParams) {
   });
 }
 
-function manualDownload() {
+async function manualDownload() {
   $(GameLauncher).trigger(GameLauncher.manualDownloadEvent, {
     launchMethod: 'Protocol',
     params: {}
   });
-  startDownload();
+  await startDownload();
 }
 
-function attachManualDownloadToLink() {
-  $('body #GameLaunchManualInstallLink').click(function () {
-    manualDownload();
+async function attachManualDownloadToLink() {
+  $('body #GameLaunchManualInstallLink').click(async function () {
+    await manualDownload();
     return false;
   });
 }

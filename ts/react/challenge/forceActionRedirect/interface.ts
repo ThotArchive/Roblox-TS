@@ -5,6 +5,7 @@
 
 import { TranslationConfig } from 'react-utilities';
 import {
+  BLOCK_SESSION_LANGUAGE_RESOURCES,
   FORCE_AUTHENTICATOR_LANGUAGE_RESOURCES,
   FORCE_TWO_STEP_VERIFICATION_LANGUAGE_RESOURCES
 } from './app.config';
@@ -22,7 +23,8 @@ export enum ErrorCode {
  */
 export enum ForceActionRedirectChallengeType {
   ForceAuthenticator = 'ForceAuthenticator',
-  ForceTwoStepVerification = 'ForceTwoStepVerification'
+  ForceTwoStepVerification = 'ForceTwoStepVerification',
+  BlockSession = 'BlockSession'
 }
 
 /*
@@ -43,7 +45,8 @@ export type ForceActionRedirectChallengeConfig = {
   translationConfig: TranslationConfig;
   translationResourceKeys:
     | typeof FORCE_AUTHENTICATOR_LANGUAGE_RESOURCES
-    | typeof FORCE_TWO_STEP_VERIFICATION_LANGUAGE_RESOURCES;
+    | typeof FORCE_TWO_STEP_VERIFICATION_LANGUAGE_RESOURCES
+    | typeof BLOCK_SESSION_LANGUAGE_RESOURCES;
   getTranslationResources: (
     translate: ForceActionRedirectTranslateFunction
   ) => ForceActionRedirectTranslationResources;

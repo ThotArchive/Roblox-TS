@@ -106,7 +106,14 @@ async function validateAndGetDataObject(
 
   let productInfo;
   try {
-    productInfo = await getProductIdWrapper(itemPath, cookieData.productId);
+    // It is a known issue that Item-Hydration service returns incorrect productId for collectible items which is propogated to the cookie.
+    // For Collectible Items, we need to use productId from the itemDetailDataElementMap
+    const productId =
+      cookieData.collectibleItemId == null
+        ? cookieData.productId
+        : itemDetailDataElementMap?.productId;
+
+    productInfo = await getProductIdWrapper(itemPath, productId);
   } catch (e) {
     sendEvent(ITEM_UPSELL_EVENTS.CONTEXT_NAME.PRODUCT_ID_NOT_EXIST, {
       itemPath,
@@ -139,7 +146,12 @@ async function validateAndGetDataObject(
     currentTime: itemDetailDataElementMap?.currentTime,
     isPurchaseEnabled: itemDetailDataElementMap?.isPurchaseEnabled,
     placeproductpromotionId: itemDetailDataElementMap?.placeproductpromotionId,
-    userassetId: cookieData.userAssetId || itemDetailDataElementMap?.userassetId
+    userassetId: cookieData.userAssetId || itemDetailDataElementMap?.userassetId,
+    collectibleItemId: cookieData.collectibleItemId || itemDetailDataElementMap?.collectibleItemId,
+    collectibleItemInstanceId:
+      cookieData.collectibleItemInstanceId || itemDetailDataElementMap?.collectibleItemInstanceId,
+    collectibleProductId:
+      cookieData.collectibleProductId || itemDetailDataElementMap?.collectibleProductId
   } as ItemDetailElementDataset;
 
   if (!itemDetailData) {

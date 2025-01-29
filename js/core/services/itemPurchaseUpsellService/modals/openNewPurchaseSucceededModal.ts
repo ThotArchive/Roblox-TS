@@ -50,9 +50,11 @@ export default function openNewPurchaseSucceededModal(
       paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
         paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
         true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.PURCHASE_WARNING,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
         paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.OK
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.OK,
+        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        true
       );
       reportCounter(
         UPSELL_COUNTER_NAMES.AutoPurchaseSucceedEquipMyAvatar,
@@ -77,9 +79,11 @@ export default function openNewPurchaseSucceededModal(
       paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
         paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
         true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.PURCHASE_WARNING,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
         paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        true
       );
       reportCounter(UPSELL_COUNTER_NAMES.AutoPurchaseSucceedBackToShop, itemPurchaseObj.assetType);
       redirectToItemPath(itemPurchaseObj.itemPath);
@@ -90,9 +94,11 @@ export default function openNewPurchaseSucceededModal(
       paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
         paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
         true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.PURCHASE_WARNING,
+        paymentFlowAnalyticsService.ENUM_VIEW_NAME.SUCCESS,
         paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        { item_type: itemPurchaseObj.assetType, item_id: itemPurchaseObj.productId },
+        true
       );
       reportCounter(UPSELL_COUNTER_NAMES.AutoPurchaseSucceedClose, itemPurchaseObj.assetType);
       redirectToItemPath(itemPurchaseObj.itemPath);

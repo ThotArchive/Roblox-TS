@@ -1,16 +1,9 @@
 import angularJsUtilitiesModule from "../angularJsUtilitiesModule";
+import ValidEmailRegex from "../constants/regexConstants";
 
-function regexService(httpService, urlService) {
-    "ngInject";
-     var emailRegexUrl = "/regex/email";
-
+function regexService() {
     function getEmailRegex() {
-        var url = emailRegexUrl;
-        var urlConfig = {
-            url: urlService.getAbsoluteUrl(url)
-        }
-
-        return httpService.httpGet(urlConfig, null);
+        return Promise.resolve({ Regex: ValidEmailRegex });
     }
     
     return {

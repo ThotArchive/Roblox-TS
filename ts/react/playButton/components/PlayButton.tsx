@@ -1,26 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Loading, Button } from 'react-style-guide';
-import { createItemPurchase } from 'roblox-item-purchase';
-import { TranslateFunction, withTranslations } from 'react-utilities';
 import { authenticatedUser } from 'header-scripts';
-import {
-  Thumbnail2d,
-  ThumbnailTypes,
-  DefaultThumbnailSize,
-  ThumbnailFormat
-} from 'roblox-thumbnails';
+import React, { useEffect, useState } from 'react';
+import { Button, Loading } from 'react-style-guide';
+
 import { ExperimentationService, NavigationService } from 'Roblox';
+import { TValidHttpUrl } from 'core-utilities';
 import { fireEvent } from 'roblox-event-tracker';
+import playButtonConstants from '../constants/playButtonConstants';
+import playButtonService from '../services/playButtonService';
 import {
   TPlayabilityStatus,
   TPlayabilityStatuses,
-  TGetProductInfo,
-  TGetProductDetails,
   TShowAgeVerificationOverlayResponse,
-  TUniversePlaceVoiceEnabledSettings
+  TUniversePlaceVoiceEnabledSettings,
+  ValueOf
 } from '../types/playButtonTypes';
-import playButtonService from '../services/playButtonService';
-import playButtonConstants from '../constants/playButtonConstants';
 import {
   handleShareLinkEventLogging,
   launchGame,
@@ -30,12 +23,11 @@ import {
   startVerificationFlow,
   startVoiceOptInOverlayFlow
 } from '../utils/playButtonUtils';
-import playButtonTranslationConfig from '../../../../translation.config';
-import SeventeenPlusActionNeededButton from './SeventeenPlusActionNeededButton';
 import ParentalControlsActionNeededButton from './ParentalControlsActionNeededButton';
+import PurchaseButton from './PurchaseButtonContainer';
+import SeventeenPlusActionNeededButton from './SeventeenPlusActionNeededButton';
 import UnplayableButton from './UnplayableButton';
 
-const [ItemPurchase, itemPurchaseService] = createItemPurchase();
 const {
   PlayabilityStatus,
   counterEvents,
@@ -43,108 +35,6 @@ const {
   avatarChatUpsellLayerU13,
   playButtonLayer
 } = playButtonConstants;
-
-type ValueOf<T> = T[keyof T];
-
-export type TPurchaseButtonProps = {
-  universeId: string;
-  placeId: string;
-  iconClassName?: string;
-  buttonWidth?: ValueOf<typeof Button.widths>;
-  buttonClassName?: string;
-  refetchPlayabilityStatus: () => void;
-  hideButtonText?: boolean;
-};
-
-export const PurchaseButton = ({
-  translate,
-  universeId,
-  placeId,
-  iconClassName = 'icon-robux-white',
-  buttonWidth = Button.widths.full,
-  buttonClassName = 'btn-common-play-game-lg',
-  refetchPlayabilityStatus,
-  hideButtonText = false
-}: TPurchaseButtonProps & {
-  translate: TranslateFunction;
-}): JSX.Element => {
-  const [productInfo, setProductInfo] = useState<TGetProductInfo | undefined>(undefined);
-  const [productDetails, setProductDetails] = useState<TGetProductDetails | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchProductInfo = async () => {
-      try {
-        const response = await playButtonService.getProductInfo([universeId]);
-        setProductInfo(response);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    const fetchProductDetails = async () => {
-      try {
-        const response = await playButtonService.getProductDetails([placeId]);
-        setProductDetails(response);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    // eslint-disable-next-line no-void
-    void fetchProductInfo();
-    // eslint-disable-next-line no-void
-    void fetchProductDetails();
-  }, []);
-
-  if (productInfo === undefined || productDetails === undefined) {
-    return <Loading />;
-  }
-
-  return (
-    <React.Fragment>
-      <Button
-        data-testid='play-purchase-button'
-        width={buttonWidth}
-        className={buttonClassName}
-        onClick={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          itemPurchaseService.start();
-        }}>
-        <span className={iconClassName} />
-        {!hideButtonText && <span className='btn-text'>{productInfo.price}</span>}
-      </Button>
-      <ItemPurchase
-        {...{
-          translate,
-          productId: productInfo.productId,
-          expectedPrice: productInfo.price,
-          thumbnail: (
-            <Thumbnail2d
-              type={ThumbnailTypes.gameIcon}
-              size={DefaultThumbnailSize}
-              targetId={parseInt(universeId, 10)}
-              imgClassName='game-card-thumb'
-              format={ThumbnailFormat.jpeg}
-            />
-          ),
-          assetName: productDetails.name,
-          assetType: 'Place',
-          sellerName: productDetails.builder,
-          expectedCurrency: 1,
-          expectedSellerId: productInfo.sellerId,
-          onPurchaseSuccess: refetchPlayabilityStatus,
-          isPlace: true
-        }}
-      />
-    </React.Fragment>
-  );
-};
-
-export const WithTranslationPurchaseButton = withTranslations<TPurchaseButtonProps>(
-  PurchaseButton,
-  playButtonTranslationConfig
-);
 
 const getShowIdentityVerificationFlow = async (
   universeId: string
@@ -314,7 +204,7 @@ export const PlayButton = ({
         setUseCameraU13Design(showIdentityVerificationFlow.useCameraU13Design);
         setUseVoiceUpsellV2Design(showIdentityVerificationFlow.useVoiceUpsellV2Design);
       } catch (e) {
-        console.error(e);
+        fireEvent(counterEvents.PlayButtonShowIdentificationError);
         setElegibleToSeeVoiceUpsell(false);
         setIsExperienceVoiceEnabled(false);
         setShowVerification(false);
@@ -431,7 +321,10 @@ export type TDefaultPlayButtonProps = {
   disableLoadingState?: boolean;
   buttonClassName?: string;
   hasUpdatedPlayButtonsIxp?: boolean;
+  hasUpdatedPlayButtonsVpcIxp?: boolean;
   shouldShowVpcPlayButtonUpsells?: boolean;
+  redirectPurchaseUrl?: TValidHttpUrl;
+  showDefaultPurchaseText?: boolean;
 };
 
 const logPlayButtonExposure = () => {
@@ -458,7 +351,10 @@ export const DefaultPlayButton = ({
   disableLoadingState,
   buttonClassName,
   hasUpdatedPlayButtonsIxp,
-  shouldShowVpcPlayButtonUpsells
+  hasUpdatedPlayButtonsVpcIxp,
+  shouldShowVpcPlayButtonUpsells,
+  redirectPurchaseUrl,
+  showDefaultPurchaseText
 }: TDefaultPlayButtonProps): JSX.Element => {
   switch (playabilityStatus) {
     case undefined:
@@ -522,17 +418,23 @@ export const DefaultPlayButton = ({
         />
       );
     case PlayabilityStatus.PurchaseRequired:
+    case PlayabilityStatus.FiatPurchaseRequired:
       return (
-        <WithTranslationPurchaseButton
+        <PurchaseButton
           refetchPlayabilityStatus={refetchPlayabilityStatus}
           universeId={universeId}
           placeId={placeId}
           hideButtonText={hideButtonText}
           buttonClassName={buttonClassName}
+          redirectPurchaseUrl={redirectPurchaseUrl}
+          playabilityStatus={playabilityStatus}
+          showDefaultPurchaseText={showDefaultPurchaseText}
         />
       );
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
-      if (shouldShowVpcPlayButtonUpsells) {
+      logPlayButtonExposure();
+
+      if (shouldShowVpcPlayButtonUpsells && hasUpdatedPlayButtonsVpcIxp) {
         fireEvent(counterEvents.ActionNeeded);
 
         return (
@@ -545,7 +447,6 @@ export const DefaultPlayButton = ({
             privateServerLinkCode={privateServerLinkCode}
             gameInstanceId={gameInstanceId}
             eventProperties={eventProperties}
-            hasUpdatedPlayButtonsIxp={hasUpdatedPlayButtonsIxp}
           />
         );
       }

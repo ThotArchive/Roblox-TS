@@ -36,14 +36,21 @@ const followPlayer = (playerId, joinAttemptId, joinAttemptOrigin) => {
   GameLauncher.followPlayerIntoGame(playerId, joinAttemptId, joinAttemptOrigin);
 };
 
-const joinMultiPlayer = (placeId, joinAttemptId, joinAttemptOrigin, joinData) => {
+const joinMultiPlayer = (
+  placeId,
+  joinAttemptId,
+  joinAttemptOrigin,
+  joinData,
+  referredByPlayerId
+) => {
   GameLauncher.joinMultiplayerGame(
     placeId,
     true,
     false,
     joinAttemptId,
     joinAttemptOrigin,
-    joinData
+    joinData,
+    referredByPlayerId
   );
 };
 
@@ -131,7 +138,13 @@ const launchGame = (playGameProperties, eventStreamProperties) => {
     } else {
       sendEventStream(currentESProperties);
       sendGamePlayIntentEvent(currentESProperties.gamePlayIntentEventCtx, placeId, joinAttemptId);
-      joinMultiPlayer(placeId, joinAttemptId, currentESProperties.gamePlayIntentEventCtx, joinData);
+      joinMultiPlayer(
+        placeId,
+        joinAttemptId,
+        currentESProperties.gamePlayIntentEventCtx,
+        joinData,
+        referredByPlayerId
+      );
     }
   }
 };

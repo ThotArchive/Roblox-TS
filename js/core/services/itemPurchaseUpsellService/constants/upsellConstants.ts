@@ -19,6 +19,10 @@ export const ORIGINAL_PURCHASE_API = '/v1/purchases/products/{productId}';
 export const GET_PRODUCT_INFO_API = '/v1/products/{productId}';
 export const GET_PURCHASE_WARNING_API = '/purchase-warning/v1/purchase-warnings';
 export const ACK_PURCHASE_WARNING_API = '/purchase-warning/v1/purchase-warnings/acknowledge';
+export const COLLECTIBLE_ITEM_PURCHASE_API =
+  '/marketplace-sales/v1/item/{collectibleItemId}/purchase-item';
+export const COLLECTIBLE_ITEM_INSTANCE_PURCHASE_API =
+  '/marketplace-sales/v1/item/{collectibleItemId}/purchase-resale';
 export const PRODUCT_INFO_API_SUCCESS_REASON = 'Success';
 export const PURCHASE_WARNING_REQUEST_TIMEOUT = 5000;
 
@@ -28,7 +32,8 @@ export const PERIODICAL_BALANCE_CHECK_RETRY_TIMES = 5; // extend to 20 seconds p
 export const ASSET_TYPE_ENUM = {
   GAME_PASS: 'Game Pass',
   BUNDLE: 'Bundle',
-  BUNDLE_ALIAS: 'Package'
+  BUNDLE_ALIAS: 'Package',
+  PRIVATE_SERVER: 'Private Server'
   // the itemType of bundle item is Bundle, the assetType is Package in the cshtml
   // but in the product API, the asset type of bundle item is Bundle...
   // not gonna dig into it why, just check both for the bundle items whenever it's a package

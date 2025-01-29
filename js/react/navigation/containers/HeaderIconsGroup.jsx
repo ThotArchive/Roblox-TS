@@ -5,6 +5,7 @@ import { authenticatedUser } from 'header-scripts';
 import { withTranslations } from 'react-utilities';
 import { createSystemFeedback } from 'react-style-guide';
 import { localStorageService } from 'core-roblox-utilities';
+import { CurrentUser } from 'Roblox';
 import navigationService from '../services/navigationService';
 import NotificationStreamPopover from '../components/NotificationStreamPopover';
 import SettingsPopover from '../components/SettingsPopover';
@@ -27,6 +28,7 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
   const [robuxAmount, setRobuxAmount] = useState(0);
   const [isEligibleForVng, setIsEligibleForVng] = useState(false);
   const [canAccessStream, setCanAccessStream] = useState(true);
+  const [showRobuxBadge, setShowRobuxBadge] = useState(false);
   const [robuxError, setRobuxError] = useState('');
   const [creditDisplayConfig, setCreditDisplayConfig] = useState(
     layoutConstants.creditDisplayConfigVariants.control
@@ -87,6 +89,25 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
       );
     }
   };
+  const getRobuxBadge = () => {
+    if (isAuthenticated) {
+      navigationService.getRobuxBadge().then(({ data: robuxBadgeData }) => {
+        if (robuxBadgeData.is_virtual_item_available) {
+          const prevLocalVirtualItemStartTimeSeconds =
+            localStorageService.getLocalStorage(
+              `prevLocalVirtualItemStartTimeSeconds${CurrentUser.userId}`
+            ) || -1;
+          if (
+            prevLocalVirtualItemStartTimeSeconds <
+            robuxBadgeData.active_virtual_item_start_time_seconds_utc
+          ) {
+            setShowRobuxBadge(true);
+          }
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     window.addEventListener(`navigation-update-user-currency`, event => {
       getUserCurrency();
@@ -102,6 +123,9 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
 
       // Get vng metadata
       getVngMetadata();
+
+      // Get Robux badge data
+      getRobuxBadge();
 
       // Set credit amount
       navigationService
@@ -175,7 +199,7 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
   return (
     <ul className='nav navbar-right rbx-navbar-icon-group'>
       <SystemFeedback />
-      <AgeBracketDisplay translate={translate} />
+      <AgeBracketDisplay />
       <UniverseSearchIcon {...{ translate, toggleUniverseSearch }} />
       {canAccessStream && notificationStream}
       <BuyRobuxPopover
@@ -190,7 +214,8 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
           isEligibleForVng,
           isExperimentCallDone,
           isGetCurrencyCallDone,
-          openConvertCreditModal
+          openConvertCreditModal,
+          showRobuxBadge
         }}
       />
       <SettingsPopover {...{ translate, accountNotificationCount }} />

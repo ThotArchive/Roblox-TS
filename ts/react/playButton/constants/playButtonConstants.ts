@@ -1,4 +1,4 @@
-import { TPlayabilityStatus, TPlayabilityStatuses } from '../types/playButtonTypes';
+import { TPlayabilityStatusWithUnplayableError } from '../types/playButtonTypes';
 
 export const PlayabilityStatus = {
   UnplayableOtherReason: 'UnplayableOtherReason',
@@ -22,7 +22,10 @@ export const PlayabilityStatus = {
   ContextualPlayabilityAgeGated: 'ContextualPlayabilityAgeGated',
   PlaceHasNoPublishedVersion: 'PlaceHasNoPublishedVersion',
   ContextualPlayabilityUnverifiedSeventeenPlusUser:
-    'ContextualPlayabilityUnverifiedSeventeenPlusUser'
+    'ContextualPlayabilityUnverifiedSeventeenPlusUser',
+  FiatPurchaseRequired: 'FiatPurchaseRequired',
+  ContextualPlayabilityUnrated: 'ContextualPlayabilityUnrated',
+  ContextualPlayabilityAgeGatedByDescriptor: 'ContextualPlayabilityAgeGatedByDescriptor'
 } as const;
 
 // NOTE: This does not override the true event name since it is set in:
@@ -46,40 +49,38 @@ const eventStreamProperties = (
   gamePlayIntentEventCtx: 'PlayButton'
 });
 
-const playButtonStatusTranslationMap: Record<
-  Exclude<
-    TPlayabilityStatus,
-    | TPlayabilityStatuses['Playable']
-    | TPlayabilityStatuses['GuestProhibited']
-    | TPlayabilityStatuses['PurchaseRequired']
-    | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']
-  >,
-  string
-> = {
-  [PlayabilityStatus.UnplayableOtherReason]: 'Response.GameTemporarilyUnavailable',
-  [PlayabilityStatus.TemporarilyUnavailable]: 'Response.GameTemporarilyUnavailable',
-  [PlayabilityStatus.GameUnapproved]: 'Label.GameUnavailablePlaceUnderReview',
-  [PlayabilityStatus.IncorrectConfiguration]: 'Response.GameTemporarilyUnavailable',
-  [PlayabilityStatus.UniverseRootPlaceIsPrivate]: 'Label.GameUnavailableCurrentlyIsPrivateVisitor',
-  [PlayabilityStatus.InsufficientPermissionFriendsOnly]: 'Label.GameUnavailablePermissionLevels',
-  [PlayabilityStatus.InsufficientPermissionGroupOnly]: 'Label.GameUnavailablePermissionLevels',
-  [PlayabilityStatus.DeviceRestricted]: 'Response.GameTemporarilyUnavailable',
-  [PlayabilityStatus.UnderReview]: 'Label.GameUnavailablePlaceUnderReview',
-  [PlayabilityStatus.AccountRestricted]: 'Label.GameUnavailableAccountResrictions',
-  [PlayabilityStatus.ComplianceBlocked]: 'Label.ComplianceBlocked',
+const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayableError, string> = {
+  [PlayabilityStatus.UnplayableOtherReason]: 'UnplayableError.UnplayableOther',
+  [PlayabilityStatus.TemporarilyUnavailable]: 'UnplayableError.TemporarilyUnavailable',
+  [PlayabilityStatus.GameUnapproved]: 'UnplayableError.GameUnapproved',
+  [PlayabilityStatus.IncorrectConfiguration]: 'UnplayableError.IncorrectConfiguration',
+  [PlayabilityStatus.UniverseRootPlaceIsPrivate]: 'UnplayableError.UniverseRootPlaceIsPrivate',
+  [PlayabilityStatus.InsufficientPermissionFriendsOnly]:
+    'UnplayableError.InsufficientPermissionFriendsOnly',
+  [PlayabilityStatus.InsufficientPermissionGroupOnly]:
+    'UnplayableError.InsufficientPermissionGroupOnly',
+  [PlayabilityStatus.DeviceRestricted]: 'UnplayableError.DeviceRestrictedDefault',
+  [PlayabilityStatus.UnderReview]: 'UnplayableError.UnderReview',
+  [PlayabilityStatus.AccountRestricted]: 'UnplayableError.AccountRestricted',
+  [PlayabilityStatus.ComplianceBlocked]: 'UnplayableError.ComplianceBlocked',
   [PlayabilityStatus.ContextualPlayabilityRegionalAvailability]:
-    'Label.ContextualPlayabilityRegionalAvailability',
+    'UnplayableError.ContextualPlayabilityRegionalAvailability',
   [PlayabilityStatus.ContextualPlayabilityRegionalCompliance]:
-    'Label.ContextualPlayabilityRegionalCompliance',
+    'UnplayableError.ContextualPlayabilityRegionalCompliance',
   [PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls]:
-    'Label.ContextualPlayabilityAgeRecommendationParentalControls',
-  [PlayabilityStatus.ContextualPlayabilityAgeGated]: 'Label.ContextualPlayabilityAgeGated',
-  [PlayabilityStatus.PlaceHasNoPublishedVersion]: 'Label.GameUnavailableRootPlaceIsUnpublished'
+    'UnplayableError.ContextualPlayabilityAgeRecommendationParentalControls',
+  [PlayabilityStatus.ContextualPlayabilityAgeGated]:
+    'UnplayableError.ContextualPlayabilityAgeGated',
+  [PlayabilityStatus.PlaceHasNoPublishedVersion]: 'UnplayableError.PlaceHasNoPublishedVersion',
+  [PlayabilityStatus.ContextualPlayabilityUnrated]: 'UnplayableError.ContextualPlayabilityUnrated',
+  [PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor]:
+    'UnplayableError.ContextualPlayabilityAgeGatedByDescriptor'
 };
 
 const playButtonTextTranslationMap = {
   ActionNeeded: 'PlayButtonText.ActionNeeded',
-  Unplayable: 'PlayButtonText.Unavailable'
+  Unplayable: 'PlayButtonText.Unavailable',
+  Buy: 'PlayButtonText.Buy'
 };
 
 const counterEvents = {
@@ -98,7 +99,9 @@ const counterEvents = {
   PlayButtonUpsellParentalConsentError: 'PlayButtonUpsellParentalConsentError',
   PlayButtonUpsellAgeRestrictionVerificationError:
     'PlayButtonUpsellAgeRestrictionVerificationError',
-  PlayButtonUpsellUnknownRequirement: 'PlayButtonUpsellUnknownRequirement'
+  PlayButtonUpsellUnknownRequirement: 'PlayButtonUpsellUnknownRequirement',
+  PreparePurchaseUrlError: 'PreparePurchaseUrlError',
+  PlayButtonShowIdentificationError: 'PlayButtonShowIdentificationIssueCaught'
 };
 
 const avatarChatUpsellLayer = 'Voice.AvatarChat.Upsell';
@@ -109,11 +112,12 @@ const unlockPlayIntentConstants = {
   eventName: 'unlockPlayIntent',
   gameLaunchFallbackUpsellName: 'GameLaunch',
   restrictedUnplayableUpsellName: 'RestrictedUnplayableOptionNotFound',
-  unverifiedSeventeenPlusUpsellName: 'AgeVerificationUnverifiedSeventeenPlusUser'
+  unverifiedSeventeenPlusUpsellName: 'AgeVerificationUnverifiedSeventeenPlusUser',
+  fiatPurchaseUpsellName: 'FiatPurchase'
 };
 
 export default {
-  playButtonStatusTranslationMap,
+  playButtonErrorStatusTranslationMap,
   playButtonTextTranslationMap,
   eventStreamProperties,
   PlayabilityStatus,

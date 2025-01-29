@@ -99,4 +99,9 @@ const initializeGenericChallengeInterceptor = (forceInit?: boolean) => {
   initialized = true;
 };
 
+// The GCS jquery interceptor initializes itself at most once on import.
+if (!initialized) {
+  initializeGenericChallengeInterceptor();
+}
+
 export default initializeGenericChallengeInterceptor;

@@ -64,14 +64,14 @@ const useModal: TCreateSettingsModal = ({
         onHide();
       }}
       backdrop
-      className='user-settings-modal'
+      className='access-management-upsell-inner-modal'
       size={size}
-      aria-labelledby='user-settings-modal-title'
+      aria-labelledby='access-management-upsell-inner-modal-title'
       scrollable
       centered>
       <Modal.Header useBaseBootstrapComponent>
-        <div className='user-settings-modal-title-container'>
-          <Modal.Title id='user-settings-modal-title'>{title}</Modal.Title>
+        <div className='access-management-upsell-inner-modal-title-container'>
+          <Modal.Title id='access-management-upsell-inner-modal-title'>{title}</Modal.Title>
         </div>
         <button
           type='button'
@@ -113,7 +113,9 @@ const useModal: TCreateSettingsModal = ({
         )}
       </Modal.Footer>
       {footer && (
-        <div className='text-footer user-settings-modal-text-footer border-top'>{footer}</div>
+        <div className='text-footer access-management-upsell-inner-modal-text-footer border-top'>
+          {footer}
+        </div>
       )}
     </Modal>
   );

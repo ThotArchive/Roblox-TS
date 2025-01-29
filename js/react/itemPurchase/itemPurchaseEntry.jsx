@@ -16,6 +16,7 @@ import '../../../css/itemPurchase/itemPurchase.scss';
 import PriceContainer from './components/PriceContainer';
 import TransactionVerb from '../../../ts/react/enums/TransactionVerb';
 import BatchBuyPriceContainer from './components/BatchBuyPriceContainer';
+import { ASSET_TYPE_ENUM } from '../../core/services/itemPurchaseUpsellService/constants/upsellConstants';
 
 const { errorTypeIds } = itemPurchaseConstants;
 const purchasebuttonId = 'display-price-container';
@@ -33,7 +34,8 @@ window.RobloxItemPurchase = {
   PriceLabel,
   AssetName,
   TransactionVerb,
-  BatchBuyPriceContainer
+  BatchBuyPriceContainer,
+  ASSET_TYPE_ENUM
 };
 
 ready(() => {

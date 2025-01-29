@@ -44,6 +44,7 @@ export type ErrorCode<T extends ChallengeType> = {
   [ChallengeType.PROOF_OF_SPACE]: ProofOfSpace.ErrorCode;
   [ChallengeType.EMAIL_VERIFICATION]: EmailVerification.ErrorCode;
   [ChallengeType.PHONE_VERIFICATION]: PhoneVerification.ErrorCode;
+  [ChallengeType.BLOCK_SESSION]: ForceActionRedirect.ErrorCode;
 }[T];
 
 /*

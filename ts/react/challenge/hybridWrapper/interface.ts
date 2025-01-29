@@ -48,6 +48,7 @@ export type OnChallengeCompletedData<T extends ChallengeType> = {
   [ChallengeType.PROOF_OF_SPACE]: ProofOfSpace.OnChallengeCompletedData;
   [ChallengeType.PHONE_VERIFICATION]: PhoneVerification.OnChallengeCompletedData;
   [ChallengeType.EMAIL_VERIFICATION]: EmailVerification.OnChallengeCompletedData;
+  [ChallengeType.BLOCK_SESSION]: never;
 }[T];
 
 /**

@@ -9,12 +9,15 @@ import { ExtraParameter } from '../types/AmpTypes';
 // function to fetch AMP response
 export const fetchFeatureCheckResponse = (
   featureName: string,
-  extraParameters: ExtraParameter[] = null
+  extraParameters: ExtraParameter[] = null,
+  successfulAction: string = null
 ) => {
-  const encodedString = btoa(JSON.stringify(extraParameters));
-  const urlConfig = extraParameters
-    ? getAmpUpsellWithParametersUrlConfig(featureName, encodedString)
-    : getAmpUpsellUrlConfig(featureName);
+  const encodedExtraParameters = btoa(JSON.stringify(extraParameters));
+  const urlConfig = getAmpUpsellWithParametersUrlConfig(
+    featureName,
+    encodedExtraParameters,
+    successfulAction
+  );
 
   return new Promise(resolve => {
     httpService.get(urlConfig).then(

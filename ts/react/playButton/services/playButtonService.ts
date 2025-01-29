@@ -10,7 +10,9 @@ import {
   TGuacPlayButtonUIResponse,
   TPostOptUserInToVoiceChatResponse,
   TGetUserSettingsAndOptionsResponse,
-  TAgeGuidelinesResponse
+  TAgeGuidelinesResponse,
+  TFiatPreparePurchaseResponse,
+  TFiatPreparePurchaseCheckoutUrl
 } from '../types/playButtonTypes';
 
 const { gamesDataStore } = dataStores;
@@ -99,6 +101,26 @@ const getAgeRecommendation = (universeId: string): Promise<TAgeGuidelinesRespons
     });
 };
 
+const getFiatPurchaseUrl = (rootPlaceId: string, expectedBasePriceId: string): Promise<string> => {
+  const urlConfig = {
+    url: `${EnvironmentUrls.apiGatewayUrl}/fiat-paid-access-service/v1/purchase`,
+    withCredentials: true,
+    retryable: true
+  };
+
+  return httpService
+    .post<TFiatPreparePurchaseResponse>(urlConfig, {
+      rootPlaceId,
+      expectedBasePriceId
+    })
+    .then(response => {
+      const parsedCheckoutUrlData = JSON.parse(
+        response.data?.checkoutUrl ?? ''
+      ) as TFiatPreparePurchaseCheckoutUrl;
+      return parsedCheckoutUrlData?.checkoutUrl ?? '';
+    });
+};
+
 export default {
   getProductInfo,
   getProductDetails,
@@ -107,5 +129,6 @@ export default {
   getGuacPlayButtonUI,
   postOptUserInToVoiceChat,
   getUserSettingsAndOptions,
-  getAgeRecommendation
+  getAgeRecommendation,
+  getFiatPurchaseUrl
 };

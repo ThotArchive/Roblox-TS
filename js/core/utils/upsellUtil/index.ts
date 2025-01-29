@@ -24,7 +24,7 @@ function parseUpsellCookie() {
   }
 
   const upsellData = decodeURIComponent(catalogUpsellData[1]).split(',');
-  if (upsellData.length !== 8) {
+  if (upsellData.length !== 11) {
     expireUpsellCookie();
     return {};
   }
@@ -38,6 +38,11 @@ function parseUpsellCookie() {
   const userAssetId = upsellData[6] || undefined; // only is useful for resellers
   const productId = upsellData[7] || undefined;
 
+  // Needed for collectible items
+  const collectibleItemId = upsellData[8] || undefined;
+  const collectibleItemInstanceId = upsellData[9] || undefined;
+  const collectibleProductId = upsellData[10] || undefined;
+
   const itemUrlValid = UPSELL_TARGET_ITEM_URL_COOKIE_DATA_REGEX.exec(targetItemUrl);
   UPSELL_TARGET_ITEM_URL_COOKIE_DATA_REGEX.lastIndex = 0; // reset regex
   if (
@@ -49,7 +54,7 @@ function parseUpsellCookie() {
     const returnUrl = urlService.formatUrl({
       pathname: targetItemUrl,
       query: { [UPSELL_QUERY_PARAM_KEY]: upsellUuidFromCookie }
-    }) as string;
+    });
     return {
       upsellUuid: upsellUuidFromCookie,
       targetItemUrl,
@@ -59,7 +64,10 @@ function parseUpsellCookie() {
       expectedPrice,
       expectedSellerId,
       userAssetId,
-      productId
+      productId,
+      collectibleItemId,
+      collectibleItemInstanceId,
+      collectibleProductId
     };
   }
 

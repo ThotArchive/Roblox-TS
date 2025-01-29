@@ -26,7 +26,7 @@ const miscSearchLink = [
   },
   avatarSearchLink,
   {
-    url: getAbsoluteUrl('/search/groups?keyword='),
+    url: getAbsoluteUrl('/search/communities?keyword='),
     label: 'Label.sGroups',
     pageSort: ['groups'],
     icon: 'icon-menu-groups'
@@ -43,7 +43,7 @@ export default {
   creatorMarketplaceUrl: `https://create.${EnvironmentUrls.domain}/marketplace/models?keyword=`,
   scrollListItems: {
     home: {
-      url: getAbsoluteUrl('/'),
+      url: getAbsoluteUrl('/home'),
       idSelector: 'nav-home',
       iconClass: 'icon-nav-home',
       name: 'home',
@@ -95,7 +95,7 @@ export default {
       labelTranslationKey: 'Label.sTrade'
     },
     groups: {
-      url: getAbsoluteUrl('/my/groups'),
+      url: getAbsoluteUrl('/my/communities'),
       idSelector: 'nav-group',
       iconClass: 'icon-nav-group',
       name: 'groups',
@@ -151,12 +151,12 @@ export default {
       pageSort: ['home', 'games', 'discover']
     },
     {
-      url: getAbsoluteUrl('/catalog/browse.aspx?CatalogContext=1&Keyword='),
+      url: getAbsoluteUrl('/catalog?CatalogContext=1&Keyword='),
       label: 'Label.sCatalog',
       pageSort: ['catalog', 'inventory', 'bundles']
     },
     {
-      url: getAbsoluteUrl('/search/groups?keyword='),
+      url: getAbsoluteUrl('/search/communities?keyword='),
       label: 'Label.sGroups',
       pageSort: ['groups']
     },

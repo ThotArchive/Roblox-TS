@@ -6,20 +6,6 @@ import {
 } from '../constants/urlConstants';
 import { VerificationErrorCode } from '../../../enums';
 
-// function to fetch AMP response
-export const fetchFeatureCheckResponse = (featureName: string) => {
-  const urlConfig = startPersonaIdVerificationUrlConfig();
-  const params = { generateLink: true };
-  return httpService
-    .post(urlConfig, params)
-    .then(({ data }) => {
-      return data;
-    })
-    .catch(err => {
-      throw new Error('Error checking AMP feature access');
-    });
-};
-
 export const startPersonaIdVerification = () => {
   const urlConfig = startPersonaIdVerificationUrlConfig();
   const params = { generateLink: true };

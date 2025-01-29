@@ -11,7 +11,7 @@ import {
   EnvironmentUrls,
   RobloxTranslationResource
 } from 'Roblox';
-import { httpService } from 'core-utilities';
+import { httpService, uuidService } from 'core-utilities';
 import {
   ItemPurchaseObject,
   PurchaseResponse,
@@ -21,6 +21,8 @@ import LoadingOverlay from '../../components/LoadingOverlay';
 import openNewPurchaseSucceededModal from '../../modals/openNewPurchaseSucceededModal';
 import {
   ASSET_TYPE_ENUM,
+  COLLECTIBLE_ITEM_INSTANCE_PURCHASE_API,
+  COLLECTIBLE_ITEM_PURCHASE_API,
   GAME_PASS_PURCHASE_API,
   ORIGINAL_PURCHASE_API,
   UPSELL_COUNTER_NAMES
@@ -68,7 +70,12 @@ async function purchaseWithUrl(
       expectedPrice: itemPurchaseObj.expectedPrice,
       expectedSellerId: itemPurchaseObj.expectedSellerId,
       expectedPromoId: itemPurchaseObj.expectedPromoId,
-      userAssetId: itemPurchaseObj.userAssetId
+      userAssetId: itemPurchaseObj.userAssetId,
+      collectibleItemId: itemPurchaseObj.itemDetail?.collectibleItemId,
+      collectibleProductId: itemPurchaseObj.itemDetail?.collectibleProductId,
+      expectedPurchaserId: CurrentUser.userId,
+      expectedPurchaserType: 'User',
+      idempotencyKey: uuidService.generateRandomUuid()
     };
 
     const response = await httpService.post<PurchaseResponse>(urlConfig, requestBody);
@@ -155,6 +162,18 @@ export default async function initiateAutoPurchaseItem(
     itemPurchaseObj.productId
   )}`;
 
+  let collectibleItemPurchaseApiURL;
+  if (itemPurchaseObj.itemDetail?.collectibleItemId) {
+    const collectibleApiPath = itemPurchaseObj.itemDetail.collectibleItemInstanceId
+      ? COLLECTIBLE_ITEM_INSTANCE_PURCHASE_API
+      : COLLECTIBLE_ITEM_PURCHASE_API;
+
+    collectibleItemPurchaseApiURL = `${EnvironmentUrls.apiGatewayUrl}${collectibleApiPath.replace(
+      '{collectibleItemId}',
+      itemPurchaseObj.itemDetail.collectibleItemId
+    )}`;
+  }
+
   if (purchaseCallback) {
     return purchaseCallback({
       productId: itemPurchaseObj.productId,
@@ -171,6 +190,15 @@ export default async function initiateAutoPurchaseItem(
   if (itemPurchaseObj.assetType === ASSET_TYPE_ENUM.GAME_PASS) {
     return purchaseWithUrl(
       gamePassPurchasingUrl,
+      itemPurchaseObj,
+      loadingOverlay,
+      translationResource
+    );
+  }
+
+  if (collectibleItemPurchaseApiURL) {
+    return purchaseWithUrl(
+      collectibleItemPurchaseApiURL,
       itemPurchaseObj,
       loadingOverlay,
       translationResource

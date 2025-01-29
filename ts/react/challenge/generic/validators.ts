@@ -111,6 +111,8 @@ const EmailVerificationValidator = z
   })
   .and(SharedChallengeMetadataValidator);
 
+const BlockSessionValidator = z.any();
+
 /**
  * A dictionary of validators corresponding to the challenge metadata types
  * defined in the `interface` directory. The type constraints expressed here
@@ -131,5 +133,6 @@ export const ChallengeMetadataValidator: {
   [ChallengeType.DEVICE_INTEGRITY]: DeviceIntegrityValidator,
   [ChallengeType.PROOF_OF_SPACE]: ProofOfSpaceValidator,
   [ChallengeType.PHONE_VERIFICATION]: PhoneVerificationValidator,
-  [ChallengeType.EMAIL_VERIFICATION]: EmailVerificationValidator
+  [ChallengeType.EMAIL_VERIFICATION]: EmailVerificationValidator,
+  [ChallengeType.BLOCK_SESSION]: BlockSessionValidator
 };

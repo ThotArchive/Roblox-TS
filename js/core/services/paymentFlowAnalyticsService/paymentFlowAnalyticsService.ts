@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { uuidService } from '@rbx/core';
-import { EnvironmentUrls, EventStream } from 'Roblox';
+import { EnvironmentUrls, EventStream, DeviceMeta } from 'Roblox';
 import { fireEvent } from 'roblox-event-tracker';
 import PaymentFlowContext from './paymentFlowContext';
 import {
@@ -73,7 +73,8 @@ export class PaymentFlowAnalyticsService {
   private startPaymentFlowOrThrow(triggerContext: TRIGGERING_CONTEXT) {
     if (!this.purchaseFlowUuid) {
       // No existing flow Uuid, starting a new flow
-      this.purchaseFlowUuid = uuidService.generateRandomUuid();
+      this.purchaseFlowUuid =
+        PaymentFlowAnalyticsService.getUrlAnalyticId() ?? uuidService.generateRandomUuid();
       this.triggerContext = triggerContext;
       this.writePaymentFlowContextIntoCookie();
       this.sendUserPurchaseStatusEvent(triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_STARTED);
@@ -89,6 +90,7 @@ export class PaymentFlowAnalyticsService {
    * @param isReseller
    * @param isPrivateServer
    * @param isPlace
+   * @param itemId
    */
   public startRobuxUpsellFlow(
     assetType: ASSET_TYPE | string,
@@ -151,9 +153,12 @@ export class PaymentFlowAnalyticsService {
     isTerminalView = false
   ) {
     try {
+      const sanitziedTriggerContext = PaymentFlowAnalyticsService.ReclassifyPlatformTriggeringContext(
+        { triggerContext }
+      );
       this.eventMetadata = { ...this.eventMetadata, ...eventMetadata };
       this.sendUserPurchaseFlowEventOrThrow(
-        triggerContext,
+        sanitziedTriggerContext,
         isMidPurchaseStep,
         viewName,
         purchaseEventType,
@@ -205,7 +210,15 @@ export class PaymentFlowAnalyticsService {
     viewName?: VIEW_NAME
   ) {
     try {
-      this.sendUserPurchaseStatusEventOrThrow(triggerContext, status, viewMessage, viewName);
+      const sanitziedTriggerContext = PaymentFlowAnalyticsService.ReclassifyPlatformTriggeringContext(
+        { triggerContext }
+      );
+      this.sendUserPurchaseStatusEventOrThrow(
+        sanitziedTriggerContext,
+        status,
+        viewMessage,
+        viewName
+      );
     } catch (e) {
       fireEvent(COUNTER_EVENTS.SEND_STATUS_EVENT_ERROR);
     }
@@ -429,12 +442,51 @@ export class PaymentFlowAnalyticsService {
     return false;
   }
 
+  private static getUrlAnalyticId(): string | null {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has('analyticId') ? urlParams.get('analyticId') : null;
+  }
+
   private setupEventListeners() {
     try {
       window.addEventListener('load', this.handleRefresh.bind(this));
       window.addEventListener('pageshow', this.handleGoBackForward.bind(this));
     } catch (e) {
       fireEvent(COUNTER_EVENTS.EVENTS_REGISTER_ERROR);
+    }
+  }
+
+  /**
+   * Due to the fact that different Apps could choose to send WEB or WEBVIEW context on their own which is hard to controlled and very inconsistent, force reclassifying the triggering context for the two Robux purchase events based on if the user is in App or not.
+   *
+   * @param triggerContext
+   * @private
+   */
+  private static ReclassifyPlatformTriggeringContext({
+    triggerContext
+  }: {
+    triggerContext: TRIGGERING_CONTEXT;
+  }): TRIGGERING_CONTEXT {
+    const isInApp =
+      DeviceMeta &&
+      (DeviceMeta().isAmazonApp ||
+        DeviceMeta().isUWPApp ||
+        DeviceMeta().isIosApp ||
+        DeviceMeta().isAndroidApp);
+
+    switch (triggerContext) {
+      case TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE:
+      case TRIGGERING_CONTEXT.WEBVIEW_ROBUX_PURCHASE:
+        return isInApp
+          ? TRIGGERING_CONTEXT.WEBVIEW_ROBUX_PURCHASE
+          : TRIGGERING_CONTEXT.WEB_ROBUX_PURCHASE;
+      case TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE:
+      case TRIGGERING_CONTEXT.WEBVIEW_PREMIUM_PURCHASE:
+        return isInApp
+          ? TRIGGERING_CONTEXT.WEBVIEW_PREMIUM_PURCHASE
+          : TRIGGERING_CONTEXT.WEB_PREMIUM_PURCHASE;
+      default:
+        return triggerContext;
     }
   }
 

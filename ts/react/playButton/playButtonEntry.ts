@@ -1,12 +1,9 @@
-import { usePlayabilityStatus } from './hooks/usePlayabilityStatus';
-import { PlayabilityStatus } from './constants/playButtonConstants';
-import { launchGame, launchLogin, shouldShowUnplayableButton } from './utils/playButtonUtils';
-import {
-  PlayButton,
-  WithTranslationPurchaseButton,
-  DefaultPlayButton
-} from './components/PlayButton';
+import { DefaultPlayButton, PlayButton } from './components/PlayButton';
+import PurchaseButton from './components/PurchaseButtonContainer';
 import UnplayableError from './components/UnplayableError';
+import { PlayabilityStatus } from './constants/playButtonConstants';
+import { usePlayabilityStatus } from './hooks/usePlayabilityStatus';
+import { launchGame, launchLogin, shouldShowUnplayableButton } from './utils/playButtonUtils';
 
 export default {
   usePlayabilityStatus,
@@ -16,6 +13,6 @@ export default {
   shouldShowUnplayableButton,
   DefaultPlayButton,
   PlayButton,
-  PurchaseButton: WithTranslationPurchaseButton,
+  PurchaseButton,
   Error: UnplayableError
 };

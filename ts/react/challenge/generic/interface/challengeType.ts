@@ -19,7 +19,8 @@ enum ChallengeType {
   DEVICE_INTEGRITY = 'deviceintegrity',
   PROOF_OF_SPACE = 'proofofspace',
   PHONE_VERIFICATION = 'phoneverification',
-  EMAIL_VERIFICATION = 'emailverification'
+  EMAIL_VERIFICATION = 'emailverification',
+  BLOCK_SESSION = 'blocksession'
 }
 
 export default ChallengeType;

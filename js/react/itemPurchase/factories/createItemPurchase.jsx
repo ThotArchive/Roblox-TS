@@ -56,7 +56,8 @@ export default function createItemPurchase({
       itemUpsellProcessParams.itemDetail.buyButtonElementDataset.assetType,
       !!itemUpsellProcessParams.itemDetail.buyButtonElementDataset.userassetId,
       itemUpsellProcessParams.itemDetail.buyButtonElementDataset.isPrivateServer,
-      itemUpsellProcessParams.itemDetail.buyButtonElementDataset.isPlace
+      itemUpsellProcessParams.itemDetail.buyButtonElementDataset.isPlace,
+      itemUpsellProcessParams.itemDetail.buyButtonElementDataset.productId
     );
     insufficientFundsModalService.open();
   };
