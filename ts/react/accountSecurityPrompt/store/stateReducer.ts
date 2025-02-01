@@ -27,19 +27,13 @@ const accountSecurityPromptStateReducer = (
       newState.modalState = action.modalState;
 
       // Handle various updates related to the new modal state.
-      if (newState.modalState === ModalState.ACCOUNT_PIN_FORM_EXPIRED) {
-        newState.accountPinUnlockedUntil = null;
-      } else if (newState.modalState === ModalState.CHANGE_PASSWORD_CONFIRMATION) {
+      if (newState.modalState === ModalState.CHANGE_PASSWORD_CONFIRMATION) {
         newState.isFlowComplete = true;
       }
       return newState;
 
     case AccountSecurityPromptActionType.SET_EMAIL_ADDRESS:
       newState.emailAddress = action.emailAddress;
-      return newState;
-
-    case AccountSecurityPromptActionType.SET_ACCOUNT_PIN_UNLOCKED_UNTIL:
-      newState.accountPinUnlockedUntil = action.accountPinUnlockedUntil;
       return newState;
 
     default:

@@ -3,7 +3,6 @@ import { Modal } from 'react-style-guide';
 import { PromptType } from '../../../../../common/request/types/promptAssignments';
 import { FooterButtonConfig, FragmentModalFooter } from '../../../../common/modalFooter';
 import { FragmentModalHeader, HeaderButtonType } from '../../../../common/modalHeader';
-import { mapAccountPinErrorToResource } from '../../../constants/resources';
 import { ModalFragmentProps } from '../../../constants/types';
 import useAccountSecurityPromptContext from '../../../hooks/useAccountSecurityPromptContext';
 import { AccountSecurityPromptActionType } from '../../../store/action';
@@ -32,39 +31,12 @@ const ModalChangePasswordIntro: React.FC<ModalFragmentProps> = ({
    * Event Handlers
    */
 
-  const continueToChangePassword = async () => {
+  const continueToChangePassword = () => {
     setRequestError(null);
     setRequestInFlight(true);
-    const result = await requestService.accountPin.getState();
-    if (result.isError) {
-      setRequestInFlight(false);
-      setRequestError(mapAccountPinErrorToResource(resources, result.error));
-      return;
-    }
-
-    const accountPinUnlocked =
-      result.value.unlockedUntil !== null && result.value.unlockedUntil > 0;
-    if (!result.value.isEnabled || accountPinUnlocked) {
-      // Transition: Set the time the pin is unlocked for, then show the change
-      // password page.
-      dispatch({
-        type: AccountSecurityPromptActionType.SET_ACCOUNT_PIN_UNLOCKED_UNTIL,
-        accountPinUnlockedUntil:
-          result.value.unlockedUntil !== null
-            ? Date.now() + result.value.unlockedUntil * 1000
-            : null
-      });
-      dispatch({
-        type: AccountSecurityPromptActionType.SET_MODAL_STATE,
-        modalState: ModalState.CHANGE_PASSWORD_FORM
-      });
-      return;
-    }
-
-    // Transition: Account pin needs to be unlocked.
     dispatch({
       type: AccountSecurityPromptActionType.SET_MODAL_STATE,
-      modalState: ModalState.ACCOUNT_PIN_FORM
+      modalState: ModalState.CHANGE_PASSWORD_FORM
     });
   };
 

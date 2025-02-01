@@ -103,8 +103,7 @@ export const AccountSecurityPromptContextProvider = ({
     isFlowComplete: false,
     modalState,
     lastModalState: null,
-    emailAddress: '',
-    accountPinUnlockedUntil: null
+    emailAddress: ''
   }));
 
   // Components will access and mutate state via these variables:

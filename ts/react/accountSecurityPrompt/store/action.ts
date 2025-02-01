@@ -5,8 +5,7 @@ export enum AccountSecurityPromptActionType {
   DISMISS_FOREVER,
   SET_FLOW_COMPLETE,
   SET_MODAL_STATE,
-  SET_EMAIL_ADDRESS,
-  SET_ACCOUNT_PIN_UNLOCKED_UNTIL
+  SET_EMAIL_ADDRESS
 }
 
 export type AccountSecurityPromptAction =
@@ -23,8 +22,4 @@ export type AccountSecurityPromptAction =
   | {
       type: AccountSecurityPromptActionType.SET_EMAIL_ADDRESS;
       emailAddress: string;
-    }
-  | {
-      type: AccountSecurityPromptActionType.SET_ACCOUNT_PIN_UNLOCKED_UNTIL;
-      accountPinUnlockedUntil: number | null;
     };

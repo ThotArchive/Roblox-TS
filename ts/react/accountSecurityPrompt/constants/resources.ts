@@ -1,5 +1,4 @@
 import { TranslateFunction } from 'react-utilities';
-import * as AccountPin from '../../../common/request/types/accountPin';
 import * as Email from '../../../common/request/types/email';
 import * as Passwords from '../../../common/request/types/passwords';
 
@@ -29,8 +28,7 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
         'Action.SetUpAuthenticatorAccountRestoresPolicyUpsell'
       ),
       SetUpEmail2SV: translate('Action.SetUpEmail2SV'),
-      SubmitChangePassword: translate('Action.SubmitChangePassword'),
-      UnlockAccountPin: translate('Action.UnlockAccountPin')
+      SubmitChangePassword: translate('Action.SubmitChangePassword')
     },
     Message: {
       // Some of these messages show up elsewhere in `web-frontend`, but
@@ -59,7 +57,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
           Flooded: translate('Message.Error.Password.Flooded'),
           InvalidPassword: translate('Message.Error.Password.InvalidPassword'),
           InvalidCurrentPassword: translate('Message.Error.Password.InvalidCurrentPassword'),
-          PinLocked: translate('Message.Error.Password.PinLocked'),
           Default: translate('Message.Error.Password.Default')
         },
         /**
@@ -81,16 +78,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
           ForbiddenPassword: translate('Message.Error.PasswordValidation.ForbiddenPassword'),
           DumbStrings: translate('Message.Error.PasswordValidation.DumbStrings'),
           Default: translate('Message.Error.PasswordValidation.Default')
-        },
-        /**
-         * From `AccountPinController.cs` in the Authentication API.
-         */
-        Pin: {
-          NoAccountPin: translate('Message.Error.Pin.NoAccountPin'),
-          AccountLocked: translate('Message.Error.Pin.AccountLocked'),
-          Flooded: translate('Message.Error.Pin.Flooded'),
-          IncorrectPin: translate('Message.Error.Pin.IncorrectPin'),
-          Default: translate('Message.Error.Pin.Default')
         },
         PromptAssignments: {
           Default: translate('Message.Error.PromptAssignments.Default')
@@ -146,7 +133,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
           linkStart: `<a href="${accountSettingsSecurityDomain}" class="text-link" target="_blank">`,
           linkEnd: '</a>'
         }),
-      EnterYourAccountPin: translate('Description.EnterYourAccountPin'),
       GenericTextOnlyBanner: (resourceId: string): string => translate(resourceId),
       // IMPORTANT: Do not inject user input into this variable; this content is
       // rendered as HTML.
@@ -168,8 +154,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
       UnusualActivity: translate('Description.UnusualActivity')
     },
     Header: {
-      AccountPinExpired: translate('Header.AccountPinExpired'),
-      AccountPinRequired: translate('Header.AccountPinRequired'),
       AccountRestoresPolicyUpdate: translate('Header.AccountRestoresPolicyUpdate'),
       AccountRestoresPolicyUpdateV3: translate('Header.AccountRestoresPolicyUpdateV3'),
       AccountRestoresPolicyUpsell: translate('Header.AccountRestoresPolicyUpsell'),
@@ -193,7 +177,6 @@ export const getPersonalizedResources = (translate: TranslateFunction, isUserUnd
       YourPasswordMightBeStolen: translate('Header.YourPasswordMightBeStolen')
     },
     Label: {
-      AccountPin: translate('Label.AccountPin'),
       AtLeastCharacters: (count: number): string => translate('Label.AtLeastCharacters', { count }),
       AuthenticatorUpsellBadActorHeadline: translate('Label.AuthenticatorUpsellBadActorHeadline'),
       AuthenticatorUpsellBadActorMessage: translate('Label.AuthenticatorUpsellBadActorMessage'),
@@ -257,8 +240,6 @@ export const mapPasswordErrorToResource = (
       return resources.Message.Error.Passwords.InvalidPassword;
     case Passwords.PasswordsError.INVALID_CURRENT_PASSWORD:
       return resources.Message.Error.Passwords.InvalidCurrentPassword;
-    case Passwords.PasswordsError.PIN_LOCKED:
-      return resources.Message.Error.Passwords.PinLocked;
     default:
       return resources.Message.Error.Passwords.Default;
   }
@@ -295,23 +276,5 @@ export const mapPasswordValidationStatusToResource = (
       return resources.Message.Error.PasswordValidation.DumbStrings;
     default:
       return resources.Message.Error.PasswordValidation.Default;
-  }
-};
-
-export const mapAccountPinErrorToResource = (
-  resources: AccountSecurityPromptResources,
-  error: AccountPin.AccountPinError | null
-): string => {
-  switch (error) {
-    case AccountPin.AccountPinError.NO_ACCOUNT_PIN:
-      return resources.Message.Error.Pin.NoAccountPin;
-    case AccountPin.AccountPinError.ACCOUNT_LOCKED:
-      return resources.Message.Error.Pin.AccountLocked;
-    case AccountPin.AccountPinError.FLOODED:
-      return resources.Message.Error.Pin.Flooded;
-    case AccountPin.AccountPinError.INCORRECT_PIN:
-      return resources.Message.Error.Pin.IncorrectPin;
-    default:
-      return resources.Message.Error.Pin.Default;
   }
 };

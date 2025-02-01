@@ -1,6 +1,5 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Modal } from 'react-style-guide';
-import * as AccountPin from '../../../../../common/request/types/accountPin';
 import * as Passwords from '../../../../../common/request/types/passwords';
 import InputControl, {
   validateChained,
@@ -26,7 +25,7 @@ import { returnToIntro } from '../../commonHandlers';
  */
 const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
   const {
-    state: { username, resources, requestService, accountPinUnlockedUntil },
+    state: { username, resources, requestService },
     dispatch
   } = useAccountSecurityPromptContext();
 
@@ -43,8 +42,6 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
   const [requestError, setRequestError] = useState<string | null>(null);
   const [requestErrorForCurrentPassword, setRequestErrorForCurrentPassword] = useState(false);
   const [requestInFlight, setRequestInFlight] = useState<boolean>(false);
-  const [accountPinUnlockedForMinutes, setAccountPinUnlockedForMinutes] = useState(0);
-  const [accountPinUnlockedForSeconds, setAccountPinUnlockedForSeconds] = useState(0);
 
   /*
    * Event Handlers
@@ -69,14 +66,6 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
     );
     if (passwordResult.isError) {
       setRequestInFlight(false);
-      // Transition: Account pin needs to be unlocked.
-      if (passwordResult.error === Passwords.PasswordsError.PIN_LOCKED) {
-        dispatch({
-          type: AccountSecurityPromptActionType.SET_MODAL_STATE,
-          modalState: ModalState.ACCOUNT_PIN_FORM_EXPIRED
-        });
-        return;
-      }
       if (passwordResult.error === Passwords.PasswordsError.INVALID_CURRENT_PASSWORD) {
         setRequestErrorForCurrentPassword(true);
       } else {
@@ -86,63 +75,12 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
       return;
     }
 
-    // Attempt to re-lock the user's account pin if it was unlocked.
-    if (accountPinUnlockedUntil !== null) {
-      const pinResult = await requestService.accountPin.lock();
-      if (!pinResult.isError || pinResult.error === AccountPin.AccountPinError.ACCOUNT_LOCKED) {
-        dispatch({
-          type: AccountSecurityPromptActionType.SET_ACCOUNT_PIN_UNLOCKED_UNTIL,
-          accountPinUnlockedUntil: null
-        });
-      }
-    }
-
     // Transition: Password was successfully changed.
     dispatch({
       type: AccountSecurityPromptActionType.SET_MODAL_STATE,
       modalState: ModalState.CHANGE_PASSWORD_CONFIRMATION
     });
   };
-
-  /*
-   * Effects
-   */
-
-  // Countdown timer effect.
-  useEffect(() => {
-    let intervalId: number;
-    const runCountdown = () => {
-      if (accountPinUnlockedUntil === null) {
-        clearInterval(intervalId);
-        return;
-      }
-
-      if (Date.now() < accountPinUnlockedUntil) {
-        // Pin not expired; update countdown timer.
-        const accountPinUnlockedForSecondsTotal = (accountPinUnlockedUntil - Date.now()) / 1000;
-        setAccountPinUnlockedForMinutes(Math.floor(accountPinUnlockedForSecondsTotal / 60));
-        setAccountPinUnlockedForSeconds(Math.floor(accountPinUnlockedForSecondsTotal % 60));
-      } else {
-        // Transition: Pin expired; return to account pin form.
-        dispatch({
-          type: AccountSecurityPromptActionType.SET_MODAL_STATE,
-          modalState: ModalState.ACCOUNT_PIN_FORM_EXPIRED
-        });
-      }
-    };
-
-    // Run once immediately.
-    runCountdown();
-    intervalId = setInterval(runCountdown, 1000);
-
-    // Cleans up the interval when the component effects are cleaned up.
-    return () => clearInterval(intervalId);
-  }, [
-    accountPinUnlockedUntil,
-    setAccountPinUnlockedForMinutes,
-    setAccountPinUnlockedForSeconds,
-    dispatch
-  ]);
 
   /*
    * Render Properties
@@ -198,22 +136,7 @@ const ModalChangePasswordForm: React.FC<ModalFragmentProps> = () => {
         buttonType={HeaderButtonType.BACK}
         buttonAction={returnToIntro(dispatch)}
         buttonEnabled={!requestInFlight}
-        headerInfo={
-          accountPinUnlockedUntil !== null ? (
-            <React.Fragment>
-              <p className='small modal-modern-header-info-line'>{resources.Label.TimeRemaining}</p>
-              <p
-                className='small modal-modern-header-info-line'
-                style={{ fontFamily: 'monospace, monospace' }}>
-                {accountPinUnlockedForMinutes.toString().padStart(2, '0')}
-                {
-                  // eslint-disable-next-line react/jsx-no-literals
-                }
-                :{accountPinUnlockedForSeconds.toString().padStart(2, '0')}
-              </p>
-            </React.Fragment>
-          ) : null
-        }
+        headerInfo={null}
       />
       <Modal.Body>
         <InputControl

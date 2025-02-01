@@ -14,8 +14,7 @@ import { getCurrentBrowser } from 'core-utilities';
 import $ from 'jquery';
 import GameLauncher from './gameLauncher';
 import {
-  getDeferredDeeplinkQueryParams,
-  getIsDeferredDeeplinkEnabled
+  getDeferredDeeplinkQueryParams
 } from '../ts/deferredDeeplinks/deferredDeeplinkUtilities';
 
 const ProtocolHandlerClientInterface = {
@@ -707,13 +706,10 @@ async function startDownload() {
   let downloadUrl = '/download/client';
   let queryParams = '';
 
-  const isDeferredDeeplinkEnabled = await getIsDeferredDeeplinkEnabled();
-  if (isDeferredDeeplinkEnabled) {
-    // NOTE: This policy is needed for deferred deeplinking from Chrome on Windows. Otherwise, the deeplink URL is wiped from the installer
-    iframe.referrerPolicy = 'no-referrer';
-    const deeplinkParams = await getDeferredDeeplinkQueryParams(window.location.toString());
-    queryParams = deeplinkParams;
-  }
+  // NOTE: This policy is needed for deferred deeplinking from Chrome on Windows. Otherwise, the deeplink URL is wiped from the installer
+  iframe.referrerPolicy = 'no-referrer';
+  const deeplinkParams = await getDeferredDeeplinkQueryParams(window.location.toString());
+  queryParams = deeplinkParams;
 
   iframe.src = `${downloadUrl}${queryParams}`;
 }

@@ -10,23 +10,6 @@ import {
 import getExperienceAffiliateReferralUrl from './getExperienceAffiliateReferralUrlParams';
 import createDeeplinkToken from './deferredDeeplinkTokenService';
 
-// TODO (xueyinwang): fully remove the function for full launch
-async function getIsDeferredDeeplinkEnabled(): Promise<boolean> {
-  const { isMac, isWindows } = jsClientDeviceIdentifier;
-
-  if (isMac) {
-    return true;
-  }
-
-  if (!isWindows) {
-    return false;
-  }
-
-  const deeplinkLayerName = isMac ? deferredDeeplinkMacLayerName : deferredDeeplinkWindowsLayerName;
-  const ixpResponse = await ExperimentationService.getAllValuesForLayer(deeplinkLayerName);
-  return !!ixpResponse[isDeferredDeeplinkEnabledFlagName];
-}
-
 function getDeferredDeeplinkUrl(url: string): string | null {
   const affiliateReferralUrl = getExperienceAffiliateReferralUrl(url);
   if (affiliateReferralUrl) {
@@ -63,4 +46,4 @@ async function getDeferredDeeplinkQueryParams(url: string): Promise<string> {
   return queryParams;
 }
 
-export { getIsDeferredDeeplinkEnabled, getDeferredDeeplinkUrl, getDeferredDeeplinkQueryParams };
+export { getDeferredDeeplinkUrl, getDeferredDeeplinkQueryParams };

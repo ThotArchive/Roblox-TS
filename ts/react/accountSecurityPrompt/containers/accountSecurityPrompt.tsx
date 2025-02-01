@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Modal } from 'react-style-guide';
 import { PromptType } from '../../../common/request/types/promptAssignments';
 import BannerAccountSecurity from '../components/bannerAccountSecurity';
-import ModalAccountPinForm from '../components/modal/accountPinForm';
 import ModalAccountRestoresPolicyUpsell from '../components/modal/accountRestoresPolicyUpsell/upsell';
 import ModalAuthenticatorUpsellDownload from '../components/modal/authenticatorUpsell/download';
 import ModalAuthenticatorUpsellIntro from '../components/modal/authenticatorUpsell/intro';
@@ -31,12 +30,6 @@ const getModalSchema = (modalState: ModalState): ModalSchema | null => {
     case ModalState.CHANGE_PASSWORD_FORM:
       return {
         innerFragment: ModalChangePasswordForm,
-        canClickBackdropToClose: false
-      };
-    case ModalState.ACCOUNT_PIN_FORM:
-    case ModalState.ACCOUNT_PIN_FORM_EXPIRED:
-      return {
-        innerFragment: ModalAccountPinForm,
         canClickBackdropToClose: false
       };
     case ModalState.CHANGE_PASSWORD_CONFIRMATION:

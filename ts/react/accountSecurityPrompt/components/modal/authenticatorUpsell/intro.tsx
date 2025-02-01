@@ -4,7 +4,6 @@ import * as PromptAssignments from '../../../../../common/request/types/promptAs
 import { FooterButtonConfig, FragmentModalFooter } from '../../../../common/modalFooter';
 import { FragmentModalHeader, HeaderButtonType } from '../../../../common/modalHeader';
 import { LOG_PREFIX } from '../../../app.config';
-import { mapAccountPinErrorToResource } from '../../../constants/resources';
 import { ModalFragmentProps } from '../../../constants/types';
 import useAccountSecurityPromptContext from '../../../hooks/useAccountSecurityPromptContext';
 import { AccountSecurityPromptActionType } from '../../../store/action';
@@ -54,15 +53,9 @@ const ModalAuthenticatorUpsellIntro: React.FC<ModalFragmentProps> = ({
     await dismissTemporary();
   };
 
-  const continueToDownloadAuthApp = async () => {
+  const continueToDownloadAuthApp = () => {
     setRequestError(null);
     setRequestInFlight(true);
-    const result = await requestService.accountPin.getState();
-    if (result.isError) {
-      setRequestInFlight(false);
-      setRequestError(mapAccountPinErrorToResource(resources, result.error));
-      return;
-    }
 
     dispatch({
       type: AccountSecurityPromptActionType.SET_MODAL_STATE,
