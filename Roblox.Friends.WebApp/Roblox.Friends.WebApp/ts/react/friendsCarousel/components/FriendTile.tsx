@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { EventContext } from '@rbx/unified-logging';
 import { EnvironmentUrls } from 'Roblox';
 import { TranslateFunction } from 'react-utilities';
 import Presence from 'roblox-presence';
@@ -6,20 +7,36 @@ import { TFriend } from '../types/friendsCarouselTypes';
 import FriendTileContent from './FriendTileContent';
 import FriendTileDropDown from './FriendTileDropdown';
 import FriendTilePopover from './FriendTilePopover';
+import useFriendsCarouselClickTracker from '../hooks/useFriendsCarouselClickTracker';
+import FriendCarouselNames from '../constants/friendCarouselNames';
 
 const DROPDOWN_WIDTH = 240;
 const DROPDOWN_WIDTH_INGAME = 315;
 
 const FriendTile = ({
   friend,
+  friendIndex,
   isOwnUser,
   translate,
-  canChat
+  canChat,
+  carouselName,
+  eventContext,
+  homePageSessionInfo,
+  sortId,
+  sortPosition,
+  totalNumberOfFriends
 }: {
   friend: TFriend;
+  friendIndex: number;
   isOwnUser: boolean;
   translate: TranslateFunction;
   canChat: boolean;
+  carouselName: FriendCarouselNames;
+  eventContext: EventContext;
+  homePageSessionInfo: string | undefined;
+  sortId: number | undefined;
+  sortPosition: number | undefined;
+  totalNumberOfFriends: number;
 }): JSX.Element => {
   const userProfileUrl = `${EnvironmentUrls.websiteUrl}/users/${friend.id}/profile`;
   const displayName = friend.combinedName;
@@ -36,6 +53,17 @@ const FriendTile = ({
       : userPresenceFull;
 
   const gameUrl = isInGame ? `${EnvironmentUrls.websiteUrl}/games/${presence.placeId ?? ''}` : '';
+
+  const sendClickEvent = useFriendsCarouselClickTracker(
+    friend,
+    friendIndex,
+    carouselName,
+    eventContext,
+    homePageSessionInfo,
+    sortId,
+    sortPosition,
+    totalNumberOfFriends
+  );
 
   return (
     <div className='friends-carousel-tile'>
@@ -55,6 +83,7 @@ const FriendTile = ({
               userPresence={userPresence}
               translate={translate}
               hasVerifiedBadge={friend.hasVerifiedBadge}
+              sendClickEvent={sendClickEvent}
             />
           </button>
         }

@@ -74,7 +74,7 @@ export const OmniFeedItem = ({
         />
       );
     case TTreatmentType.FriendCarousel:
-      return <FriendCarouselFeedItem />;
+      return <FriendCarouselFeedItem sortId={sort.topicId} sortPosition={positionId} />;
     case TTreatmentType.Pills:
       return (
         <FiltersFeedItem

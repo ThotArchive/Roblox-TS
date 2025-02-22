@@ -53,20 +53,16 @@ export const GameTileBase = ({
   gameData,
   isOnScreen,
   page,
-  shouldUseHigherResolutionIcon,
   buildEventProperties,
   isFocused,
   topicId
 }: Omit<TSharedGameTileProps, 'translate'> & {
   children: JSX.Element;
   page?: PageContext;
-  shouldUseHigherResolutionIcon?: boolean;
   isOnScreen?: boolean;
   isFocused?: boolean;
 }): JSX.Element => {
-  const iconSize = shouldUseHigherResolutionIcon
-    ? ThumbnailGameIconSize.size256
-    : ThumbnailGameIconSize.size150;
+  const iconSize = ThumbnailGameIconSize.size256;
 
   const gameLayoutData = useGetGameLayoutData(gameData, topicId);
 
@@ -115,7 +111,6 @@ export const GameTileBase = ({
 GameTileBase.defaultProps = {
   page: PageContext.HomePage,
   isOnScreen: true,
-  shouldUseHigherResolutionIcon: false,
   isFocused: false
 };
 

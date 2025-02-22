@@ -1,8 +1,8 @@
 const UPSELL_COOKIE_KEY = 'RBXCatalogUpsellData';
 const UPSELL_COOKIE_KEY_REGEX = /RBXCatalogUpsellData=([^;]+)/;
 const UPSELL_QUERY_PARAM_KEY = 'UpsellUuid';
-const UPSELL_TARGET_ITEM_URL_COOKIE_DATA_REGEX = /^\/[\w-]+\/\d+$/g;
-const UPSELL_TARGET_ITEM_URL_REGEX = /\/[\w-]+\/\d+/g;
+const UPSELL_TARGET_ITEM_URL_COOKIE_DATA_REGEX = /((\/[\w-]+)+)\/(\d+)/g;
+const UPSELL_TARGET_ITEM_URL_REGEX = /((\/[\w-]+)+)\/(\d+)/g;
 
 export {
   UPSELL_COOKIE_KEY,

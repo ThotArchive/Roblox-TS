@@ -12,7 +12,7 @@ export const fetchFeatureCheckResponse = (
   extraParameters: ExtraParameter[] = null,
   successfulAction: string = null
 ) => {
-  const encodedExtraParameters = btoa(JSON.stringify(extraParameters));
+  const encodedExtraParameters = extraParameters ? btoa(JSON.stringify(extraParameters)) : null;
   const urlConfig = getAmpUpsellWithParametersUrlConfig(
     featureName,
     encodedExtraParameters,

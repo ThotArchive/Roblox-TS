@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { EventContext } from '@rbx/unified-logging';
 import { WithTranslationsProps, withTranslations } from 'react-utilities';
 import friendsService from '../services/friendsService';
 import chatService from '../services/chatService';
@@ -6,6 +7,7 @@ import { translationConfig } from '../translation.config';
 import { TGetFriendsCountResponse, TFriend, TGetChatSettings } from '../types/friendsCarouselTypes';
 import FriendsCarouselHeader from '../components/FriendsCarouselHeader';
 import FriendsList from '../components/FriendsList';
+import FriendCarouselNames from '../constants/friendCarouselNames';
 
 const allSettled = (promises: Promise<any>[]) => {
   return Promise.all(
@@ -21,11 +23,21 @@ const allSettled = (promises: Promise<any>[]) => {
 const FriendsCarouselContainer = ({
   translate,
   profileUserId,
-  isOwnUser
+  isOwnUser,
+  carouselName,
+  eventContext,
+  homePageSessionInfo,
+  sortId,
+  sortPosition
 }: {
   translate?: (key: string) => string;
   profileUserId: number;
   isOwnUser: boolean;
+  carouselName: FriendCarouselNames;
+  eventContext: EventContext;
+  homePageSessionInfo: string | undefined;
+  sortId: number | undefined;
+  sortPosition: number | undefined;
 } & WithTranslationsProps): JSX.Element => {
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
   const [friends, setFriends] = useState<TFriend[] | null>(null);
@@ -68,6 +80,11 @@ const FriendsCarouselContainer = ({
         translate={translate}
         isOwnUser={isOwnUser}
         canChat={canChat}
+        carouselName={carouselName}
+        eventContext={eventContext}
+        homePageSessionInfo={homePageSessionInfo}
+        sortId={sortId}
+        sortPosition={sortPosition}
       />
     </div>
   );

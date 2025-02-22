@@ -7,7 +7,14 @@ const { THUMBNAIL_STATUS } = thumbnailConstants;
 const { STATUS_TYPES } = statusContants;
 
 // TODO: refactor only use headshot css class
-const AvatarHeadshot = ({ imageLink, status, statusLink, thumbnail, statusIcon }) => {
+const AvatarHeadshot = ({
+  imageLink,
+  status,
+  statusLink,
+  thumbnail,
+  statusIcon,
+  handleImageClick
+}) => {
   const getStatusIconClass = () => {
     return `icon-${status}`;
   };
@@ -15,9 +22,13 @@ const AvatarHeadshot = ({ imageLink, status, statusLink, thumbnail, statusIcon }
   const presenceStatusIcon = statusIcon ?? <span className={getStatusIconClass()} />;
 
   return (
-    <div className='avatar avatar-card-fullbody'>
+    <div className='avatar avatar-card-fullbody' data-testid='avatar-card-container'>
       {imageLink ? (
-        <a href={imageLink} className='avatar-card-link'>
+        <a
+          href={imageLink}
+          onClick={handleImageClick}
+          className='avatar-card-link'
+          data-testid='avatar-card-link'>
           {thumbnail}
         </a>
       ) : (
@@ -39,7 +50,8 @@ AvatarHeadshot.defaultProps = {
   status: 'offline',
   statusIcon: undefined,
   statusLink: '',
-  thumbnail: null
+  thumbnail: null,
+  handleImageClick: undefined
 };
 
 AvatarHeadshot.propTypes = {
@@ -47,7 +59,8 @@ AvatarHeadshot.propTypes = {
   status: PropTypes.oneOf(Object.values(STATUS_TYPES)),
   statusIcon: PropTypes.element,
   statusLink: PropTypes.string,
-  thumbnail: PropTypes.element
+  thumbnail: PropTypes.element,
+  handleImageClick: PropTypes.func
 };
 
 AvatarHeadshot.statusType = STATUS_TYPES;

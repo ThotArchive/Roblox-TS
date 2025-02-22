@@ -10,19 +10,21 @@ import { RecourseResponse } from '../../types/AmpTypes';
 import { sendClickRequestBroadcastConfirmEvent } from './services/eventService';
 import userSettingsService from './services/userSettingsService';
 import RequestType from './enums/RequestType';
-
+import ExpNewChildModal from '../../enums/ExpNewChildModal';
 import changeBirthdayUtils from './utils/changeBirthdayUtils';
 
 const ParentalRequestContainer = ({
   translate,
   recourse,
   onHidecallback,
-  value = null
+  value = null,
+  expChildModalType = null
 }: {
   translate: WithTranslationsProps['translate'];
   recourse: RecourseResponse;
   onHidecallback: () => void;
   value: Record<string, string> | null;
+  expChildModalType?: ExpNewChildModal;
 }): JSX.Element => {
   const { emailSentConfirmation } = parentalRequestConstants.translationKeys;
   const { action: recourseAction, parentConsentTypes } = recourse;
@@ -90,17 +92,13 @@ const ParentalRequestContainer = ({
         });
         break;
       }
-      case RequestType.UpdateUserSetting: {
-        const settingName = Object.keys(value)[0];
+      default: {
         sendClickRequestBroadcastConfirmEvent({
-          requestType: RequestType.UpdateUserSetting,
-          settingName,
-          sessionId
+          requestType: consentType,
+          sessionId,
+          details: value
         });
-        break;
       }
-      // TODO: Migrate other request type when we kill wizard VPC
-      default:
     }
   };
   return (
@@ -121,6 +119,7 @@ const ParentalRequestContainer = ({
           successCallback={successCallBack}
           onHidecallback={onHidecallback}
           value={value}
+          expChildModalType={expChildModalType}
         />
       )}
       {confirmationModal}

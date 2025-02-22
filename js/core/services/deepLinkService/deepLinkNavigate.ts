@@ -193,7 +193,9 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
                   data.launchData
                     ? `&launchData=${encodeURIComponent(encodeURIComponent(data.launchData))}`
                     : ''
-                }${includeInstanceId ? `&gameInstanceId=${data.instanceId}` : ''}`;
+                }${includeInstanceId ? `&gameInstanceId=${data.instanceId}` : ''}${
+                  data.inviterId ? `&referredByPlayerId=${data.inviterId}` : ''
+                }`;
                 ProtocolHandlerClientInterface.startGameWithDeepLinkUrl(launchLink, data.placeId);
                 return true;
               }

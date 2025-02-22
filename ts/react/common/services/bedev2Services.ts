@@ -18,7 +18,8 @@ import {
   TSendSurveyResultsResponse,
   TSurvey,
   TSurveyResponseBody,
-  TTreatmentType
+  TTreatmentType,
+  TGetProfilesResponse
 } from '../types/bedev2Types';
 import { TPageType } from '../types/bedev1Types';
 import { TDeviceFeatures } from '../utils/deviceFeaturesUtils';
@@ -240,6 +241,22 @@ const getGuacAppPolicyBehaviorData = (): Promise<TGuacAppPolicyBehaviorResponse>
     .then(response => response.data);
 };
 
+const getProfiles = async (userIds: number[]): Promise<TGetProfilesResponse> => {
+  const urlConfig = {
+    url: `${EnvironmentUrls.apiGatewayUrl}/user-profile-api/v1/user/profiles/get-profiles`,
+    retryable: true,
+    withCredentials: true
+  };
+
+  const requestData = {
+    userIds,
+    fields: ['names.combinedName', 'names.username']
+  };
+
+  const { data }: { data: TGetProfilesResponse } = await httpService.post(urlConfig, requestData);
+  return data;
+};
+
 export default {
   getExperimentationValues,
   getOmniRecommendations,
@@ -250,5 +267,6 @@ export default {
   getSurvey,
   postSurveyResults,
   getThumbnailForAsset,
-  getGuacAppPolicyBehaviorData
+  getGuacAppPolicyBehaviorData,
+  getProfiles
 };

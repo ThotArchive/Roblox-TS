@@ -18,6 +18,7 @@ export type TItemCardCaptionProps = {
   unitsAvailableForConsumption: number | undefined;
   translate: TranslateFunction;
   iconToRender?: JSX.Element;
+  enableThumbnailPrice?: boolean;
 };
 
 export function ItemCardCaption({
@@ -31,7 +32,8 @@ export function ItemCardCaption({
   premiumPricing,
   unitsAvailableForConsumption,
   translate,
-  iconToRender
+  iconToRender,
+  enableThumbnailPrice
 }: TItemCardCaptionProps): JSX.Element {
   const hideCreatorName = creatorName === undefined;
   const hidePrice =
@@ -51,7 +53,7 @@ export function ItemCardCaption({
           iconToRender={iconToRender}
         />
       )}
-      {!hidePrice && (
+      {!hidePrice && !enableThumbnailPrice && (
         <ItemCardPrice
           creatorTargetId={creatorTargetId}
           price={price}
@@ -59,6 +61,7 @@ export function ItemCardCaption({
           priceStatus={priceStatus}
           premiumPricing={premiumPricing}
           unitsAvailableForConsumption={unitsAvailableForConsumption}
+          enableThumbnailPrice={enableThumbnailPrice}
         />
       )}
     </div>

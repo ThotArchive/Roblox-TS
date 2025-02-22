@@ -12,7 +12,7 @@ type Props = {
   backgroundImageAssetId?: number;
 };
 
-const { subtitleLinkStart, subtitleLinkEnd } = homePage;
+const { linkStartDelimiter, linkEndDelimiter } = homePage;
 
 const GameCarouselSubtitle: React.FC<Props> = ({
   defaultSubtitle,
@@ -68,13 +68,13 @@ const GameCarouselSubtitle: React.FC<Props> = ({
 
   const renderSubtitleWithLink = useMemo(() => {
     if (formatSubtitleLink && subtitleLink && subtitle) {
-      const startIdx = subtitle.indexOf(subtitleLinkStart);
-      const endIdx = subtitle.indexOf(subtitleLinkEnd);
+      const startIdx = subtitle.indexOf(linkStartDelimiter);
+      const endIdx = subtitle.indexOf(linkEndDelimiter);
 
       if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
         const prefix = subtitle.slice(0, startIdx);
-        const linkText = subtitle.slice(startIdx + subtitleLinkStart.length, endIdx);
-        const suffix = subtitle.slice(endIdx + subtitleLinkEnd.length);
+        const linkText = subtitle.slice(startIdx + linkStartDelimiter.length, endIdx);
+        const suffix = subtitle.slice(endIdx + linkEndDelimiter.length);
 
         return (
           <Link url={subtitleLink} onClick={handleSeeAllLinkClick}>

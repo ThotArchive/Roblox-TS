@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ClassNames from 'classnames';
 import Button from '../../button/components/ButtonBase';
 
-function Toggle({ isOn, className, isDisabled, onToggle }) {
+function Toggle({ isOn, className, isDisabled, onToggle, id }) {
   const classNames = ClassNames('btn-toggle', className, {
     disabled: isDisabled,
     on: isOn
@@ -14,7 +14,12 @@ function Toggle({ isOn, className, isDisabled, onToggle }) {
   };
 
   return (
-    <Button type='button' className={classNames} onClick={handleToggle} disabled={isDisabled}>
+    <Button
+      id={id}
+      type='button'
+      className={classNames}
+      onClick={handleToggle}
+      disabled={isDisabled}>
       <span className='toggle-flip' />
       <span className='toggle-on' />
       <span className='toggle-off' />
@@ -25,14 +30,16 @@ function Toggle({ isOn, className, isDisabled, onToggle }) {
 Toggle.defaultProps = {
   isDisabled: false,
   onToggle: () => {},
-  className: ''
+  className: '',
+  id: ''
 };
 
 Toggle.propTypes = {
   isOn: PropTypes.bool.isRequired,
   className: PropTypes.string,
   isDisabled: PropTypes.bool,
-  onToggle: PropTypes.func
+  onToggle: PropTypes.func,
+  id: PropTypes.string
 };
 
 export default Toggle;

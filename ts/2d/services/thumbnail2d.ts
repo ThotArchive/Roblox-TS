@@ -53,14 +53,18 @@ const loadThumbnailImage = (
     });
   }
 
-  if (format == null)
-  {
+  if (format == null) {
     format = ThumbnailFormat.webp;
   }
-  
+
   // Temp solution to override game icon request format for security purpose
   let formatOverride = format;
-  if (thumbnailType === ThumbnailTypes.gameIcon || thumbnailType === ThumbnailTypes.gameThumbnail || thumbnailType === ThumbnailTypes.placeGameIcon || thumbnailType === ThumbnailTypes.universeThumbnail) { 
+  if (
+    thumbnailType === ThumbnailTypes.gameIcon ||
+    thumbnailType === ThumbnailTypes.gameThumbnail ||
+    thumbnailType === ThumbnailTypes.placeGameIcon ||
+    thumbnailType === ThumbnailTypes.universeThumbnail
+  ) {
     formatOverride = ThumbnailFormat.webp;
   }
 
@@ -74,7 +78,9 @@ const loadThumbnailImage = (
 
   const customHandler = [ThumbnailTypes.universeThumbnails, ThumbnailTypes.universeThumbnail];
   // null requesterKey creates new batch request processor.
-  const requesterKey = !customHandler.includes(thumbnailType) ? 'thumbnail2dProcessor' : 'universeThumbnailProcessor';
+  const requesterKey = !customHandler.includes(thumbnailType)
+    ? 'thumbnail2dProcessor'
+    : 'universeThumbnailProcessor';
   return defaultThumbnailRequester.processThumbnailBatchRequest(
     item,
     (items: Array<QueueItem<ThumbnailQueueItem>>) => {

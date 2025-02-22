@@ -20,8 +20,8 @@ function layoutLibraryService($log, languageResource) {
       inboxLink: '/my/messages/#!/inbox',
       inboxMessageDetailQuery: '?conversationId=',
       groupLinkName: 'goToGroupPage',
-      groupLink: '/groups/{id}',
-      myGroupsLink: '/my/groups'
+      groupLink: '/communities/{id}',
+      myGroupsLink: '/my/communities'
     },
 
     stringTemplates: {

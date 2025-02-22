@@ -1,5 +1,5 @@
 enum RequestType {
-  ChargebackReenableAccount = 'ChargebackReenableAccount',
+  LiftPunishment = 'LiftPunishment',
   SavePaymentMethods = 'SavePaymentMethods',
   UpdateUserSetting = 'UpdateUserSetting',
   UpdateBirthdate = 'UpdateBirthdate',

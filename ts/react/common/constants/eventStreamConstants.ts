@@ -88,7 +88,8 @@ export enum EventType {
   SurveyImpression = 'surveyImpression',
   InterestCatcherClick = 'interestCatcherClick',
   FilterImpressions = 'filterImpressions',
-  GamesFilterClick = 'gamesFilterClick'
+  GamesFilterClick = 'gamesFilterClick',
+  RequestRefundClick = 'requestRefundClick'
 }
 
 export enum SessionInfoType {
@@ -96,6 +97,10 @@ export enum SessionInfoType {
   GameSearchSessionInfo = 'gameSearchSessionInfo',
   DiscoverPageSessionInfo = 'discoverPageSessionInfo'
 }
+
+export type TDiscoverySessionInfo = {
+  [key in SessionInfoType]?: string;
+};
 
 export enum TSurveyInteractionType {
   Submission = 'submission',
@@ -260,6 +265,12 @@ export type TGameDetailReferral =
     }
   | Record<string, never>;
 
+export type TRequestRefundClick =
+  | {
+      [EventStreamMetadata.PlaceId]: number;
+    }
+  | Record<string, never>;
+
 export enum TInterestCatcherButton {
   Skip = 'skip',
   Continue = 'continue',
@@ -409,6 +420,16 @@ export default {
     },
     parseEventParams({
       ...params
+    })
+  ],
+  [EventType.RequestRefundClick]: (params: TRequestRefundClick): TEvent => [
+    {
+      name: EventType.RequestRefundClick,
+      type: EventType.RequestRefundClick,
+      context: formInteraction
+    },
+    parseEventParams({
+      [EventStreamMetadata.PlaceId]: params.placeId
     })
   ]
 };

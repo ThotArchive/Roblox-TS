@@ -1,5 +1,5 @@
 import suffixes from './suffixes';
-import suffixNames from './suffixNames';
+import SuffixNames from './suffixNames';
 import numberFormat from '../numberFormat/numberFormat';
 
 const oneThousand = 1000;
@@ -14,7 +14,7 @@ const oneTrillion = 1000000000000;
 const getTruncValue = (
   value: number,
   abbreviationThreshold?: number,
-  suffixType?: suffixNames,
+  suffixType?: SuffixNames,
   digitsAfterDecimalPoint?: number
 ): string => {
   const newValue = `${value}`;
@@ -25,7 +25,7 @@ const getTruncValue = (
     return numberFormat.getNumberFormat(value);
   }
 
-  const suffix = suffixType ? suffixes[suffixType] : suffixes[suffixNames.withPlus];
+  const suffix = suffixType ? suffixes[suffixType] : suffixes[SuffixNames.withPlus];
   let append = suffix[suffix.length - 1];
   let numOfTrimmedChars = 12;
   const power = Math.floor(Math.log(value) / Math.log(oneThousand));
@@ -55,7 +55,7 @@ const getTruncValue = (
  */
 const getAbbreviatedValue = (
   value: number,
-  suffixType?: suffixNames,
+  suffixType?: SuffixNames,
   abbreviationThreshold?: number,
   isFormatEnabledUnderThreshold?: boolean
 ): string => {
@@ -63,7 +63,7 @@ const getAbbreviatedValue = (
   if (abbreviationThreshold && value < abbreviationThreshold) {
     return isFormatEnabledUnderThreshold ? numberFormat.getNumberFormat(value) : newValue;
   }
-  const suffix = suffixType ? suffixes[suffixType] : suffixes[suffixNames.withoutPlus];
+  const suffix = suffixType ? suffixes[suffixType] : suffixes[SuffixNames.withoutPlus];
   const maxSuffixNum = Math.ceil(newValue.length / 3);
   const maxDecPlaces = Math.pow(oneThousand, maxSuffixNum);
   const maxShortValue = Math.round((value / maxDecPlaces) * 10) / 10;
@@ -82,6 +82,7 @@ const getAbbreviatedValue = (
 
 export default {
   getAbbreviatedValue,
-  suffixNames,
+  suffixNames: SuffixNames,
+  suffixes,
   getTruncValue
 };

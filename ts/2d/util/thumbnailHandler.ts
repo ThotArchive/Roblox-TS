@@ -137,7 +137,8 @@ export default {
     },
 
     (item: UniverseThumbnails) => item.universeId.toString(),
-    (item: QueueItem<ThumbnailQueueItem>) => item.data.targetId ? item.data.targetId.toString(): '',
+    (item: QueueItem<ThumbnailQueueItem>) =>
+      item.data.targetId ? item.data.targetId.toString() : '',
     (item: UniverseThumbnails) => !item.error,
     (result: UniverseThumbnails, limit) => {
       return limit === 1 ? { thumbnail: result.thumbnails[0] } : { thumbnails: result.thumbnails };

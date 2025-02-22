@@ -1,5 +1,6 @@
 import React from 'react';
 import { authenticatedUser } from 'header-scripts';
+import ClassNames from 'classnames';
 import itemCardConstants from '../constants/itemCardConstants';
 import { getNumberFormat } from '../utils/parsingUtils';
 
@@ -10,6 +11,7 @@ export type TItemCardPriceProps = {
   priceStatus: string | undefined;
   premiumPricing: number | undefined;
   unitsAvailableForConsumption: number | undefined;
+  enableThumbnailPrice: boolean;
 };
 
 export function ItemCardPrice({
@@ -18,7 +20,8 @@ export function ItemCardPrice({
   lowestPrice,
   priceStatus,
   premiumPricing,
-  unitsAvailableForConsumption
+  unitsAvailableForConsumption,
+  enableThumbnailPrice
 }: TItemCardPriceProps): JSX.Element {
   const hasSecondaryInfo = () => {
     return (
@@ -43,9 +46,10 @@ export function ItemCardPrice({
   return (
     <React.Fragment>
       <div
-        className={`text-overflow item-card-price font-header-2 text-subheader ${
-          hasSecondaryInfo() ? 'margin-top-none' : ''
-        }`}>
+        className={ClassNames('text-overflow item-card-price font-header-2 text-subheader', {
+          'margin-top-none': hasSecondaryInfo(),
+          'thumbnail-price': enableThumbnailPrice
+        })}>
         {priceStatus ? (
           <span className='text text-label text-robux-tile'>{priceStatus}</span>
         ) : (

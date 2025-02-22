@@ -14,8 +14,8 @@ export const homePage = {
   missingNumberOfRowsForLoggingErrorEvent: 'HomePageMissingNumberOfRowsForLoggingError',
   omniRecommendationEndpointErrorEvent: 'HomePageOmniRecommendationEndpointError',
   omniRecommendationEndpointSuccessEvent: 'HomePageOmniRecommendationEndpointSuccess',
-  subtitleLinkStart: '{linkStart}',
-  subtitleLinkEnd: '{linkEnd}'
+  linkStartDelimiter: '{linkStart}',
+  linkEndDelimiter: '{linkEnd}'
 };
 
 export const gamesPage = {
@@ -29,7 +29,11 @@ export const gamesPage = {
 export const gameDetailsPage = {
   maxTilesPerCarouselPage: 6,
   visitsTruncationDigitsAfterDecimalPoint: 1,
-  surveyImpressionsIntersectionThreshold: 0.5
+  surveyImpressionsIntersectionThreshold: 0.5,
+  eventsRedesignExposureLogError: 'EventsRedesignExposureLogError',
+  eventsRedesignExposureLogServiceMissing: 'EventsRedesignExposureLogServiceMissing',
+  requestRefundError: 'RequestRefundError',
+  votingPanelLoadFailure: 'VotingPanelLoadFailure'
 };
 
 export const common = {

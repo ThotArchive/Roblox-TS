@@ -9,7 +9,6 @@ import { TGetFriendsResponse, TGetPlaceDetails } from '../types/bedev1Types';
 import { THoverStyle } from '../types/bedev2Types';
 import { PageContext } from '../types/pageContext';
 import { getGameTileTextFooterData } from '../utils/gameTileLayoutUtils';
-import { useIconResolutionExperiment } from '../utils/IconResolutionExperimentContextProvider';
 import { getInGameFriends } from '../utils/parsingUtils';
 import {
   GameTileBase,
@@ -57,8 +56,6 @@ export const GameTile = forwardRef<HTMLDivElement, TGameTileProps>(
       gameData.universeId
     ]);
     const gameLayoutData = useGetGameLayoutData(gameData, topicId);
-
-    const { shouldUseHigherResolutionIcon } = useIconResolutionExperiment();
 
     useEffect(() => {
       const fetchGameDetails = async () => {
@@ -117,7 +114,6 @@ export const GameTile = forwardRef<HTMLDivElement, TGameTileProps>(
           buildEventProperties={buildEventProperties}
           gameData={gameData}
           page={page}
-          shouldUseHigherResolutionIcon={shouldUseHigherResolutionIcon}
           isFocused={isFocused}
           topicId={topicId}>
           {getGameTileContent()}

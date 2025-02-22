@@ -13,6 +13,14 @@ class PageNameProvider {
         return PageNameProvider.internalPageName;
     }
 
+    static setInternalPageName(pageName: string): void {
+        const metaTag: any = document.querySelector('meta[name="page-meta"]');
+        if (metaTag && metaTag.dataset && metaTag.dataset.internalPageName) {
+            metaTag.dataset.internalPageName = pageName;
+        }
+        PageNameProvider.internalPageName = pageName;
+    }
+
     static isLandingPage = (): boolean => {
         const pageName = PageNameProvider.getInternalPageName();
         return pageName === PageNames.Landing

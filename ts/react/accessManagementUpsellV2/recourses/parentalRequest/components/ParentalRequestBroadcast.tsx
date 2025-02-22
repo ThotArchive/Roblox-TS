@@ -41,12 +41,6 @@ const ParentalRequestBroadcast = ({
     },
     onHide: onHideCallback
   });
-  const settingName = useMemo(() => {
-    if (consentType === RequestType.UpdateUserSetting) {
-      return Object.keys(value)[0];
-    }
-    return undefined;
-  }, [consentType, value]);
 
   const broadcastHandler = async () => {
     try {
@@ -64,7 +58,7 @@ const ParentalRequestBroadcast = ({
         requestType: consentType,
         extraState: state,
         sessionId: response.sessionId,
-        settingName
+        details: value
       });
       successCallBack(response.sessionId);
     } catch (e) {

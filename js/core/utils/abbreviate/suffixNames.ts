@@ -1,6 +1,6 @@
-enum suffixNames {
+enum SuffixNames {
   withPlus = 'withPlus',
   withoutPlus = 'withoutPlus'
 }
 
-export default suffixNames;
+export default SuffixNames;

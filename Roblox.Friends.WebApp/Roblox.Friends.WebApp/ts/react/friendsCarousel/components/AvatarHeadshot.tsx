@@ -7,10 +7,12 @@ import Presence from 'roblox-presence';
 const AvatarHeadshot = ({
   id,
   userProfileUrl,
+  handleImageClick,
   translate
 }: {
   id: number;
   userProfileUrl: string;
+  handleImageClick?: () => void;
   translate: TranslateFunction;
 }): JSX.Element => {
   const thumbnail = (
@@ -26,8 +28,13 @@ const AvatarHeadshot = ({
       statusIcon={<Presence.PresenceStatusIcon translate={translate} userId={id} />}
       thumbnail={thumbnail}
       imageLink={userProfileUrl}
+      handleImageClick={handleImageClick}
     />
   );
+};
+
+AvatarHeadshot.defaultProps = {
+  handleImageClick: undefined
 };
 
 export default AvatarHeadshot;

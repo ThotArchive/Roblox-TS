@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { EventContext } from '@rbx/unified-logging';
 import FriendTile from './FriendTile';
 import { TFriend } from '../types/friendsCarouselTypes';
+import useFriendsCarouselImpressionTracker from '../hooks/useFriendsCarouselImpressionTracker';
+import FriendCarouselNames from '../constants/friendCarouselNames';
 
 const FRIEND_TILE_WIDTH = 110;
 
@@ -8,16 +11,29 @@ const FriendsList = ({
   friendsList,
   isOwnUser,
   translate,
-  canChat
+  canChat,
+  carouselName,
+  eventContext,
+  homePageSessionInfo,
+  sortId,
+  sortPosition
 }: {
   friendsList: TFriend[] | null;
   isOwnUser: boolean;
   translate: (key: string) => string;
   canChat: boolean;
+  carouselName: FriendCarouselNames;
+  eventContext: EventContext;
+  homePageSessionInfo: string | undefined;
+  sortId: number | undefined;
+  sortPosition: number | undefined;
 }): JSX.Element => {
   const parentRef = useRef<HTMLElement | null>(null);
   const [visibleFriendsList, setVisibleFriendsList] = useState(friendsList);
+
   const [listIsFull, setListIsFull] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const totalWidth = parentRef.current?.offsetWidth;
@@ -27,6 +43,19 @@ const FriendsList = ({
       setVisibleFriendsList(friendsList.slice(0, visibleTileCount));
     }
   }, [parentRef.current?.offsetWidth, friendsList]);
+
+  useFriendsCarouselImpressionTracker(
+    containerRef,
+    // https://roblox.atlassian.net/browse/CLIGROW-2178
+    // Send friendsList instead of visibleFriendsList to workaround
+    // race condition where visibleFriendsList is not updated yet
+    friendsList,
+    carouselName,
+    eventContext,
+    homePageSessionInfo,
+    sortId,
+    sortPosition
+  );
 
   return (
     <div>
@@ -40,19 +69,27 @@ const FriendsList = ({
           <span className='spinner spinner-default' />
         ) : (
           <div
+            ref={containerRef}
             className={
               listIsFull
                 ? 'friends-carousel-list-container'
                 : 'friends-carousel-list-container-not-full'
             }>
-            {visibleFriendsList.map(item => {
+            {visibleFriendsList.map((item, index) => {
               return (
                 <div key={item.id}>
                   <FriendTile
                     friend={item}
+                    friendIndex={index}
                     translate={translate}
                     isOwnUser={isOwnUser}
                     canChat={canChat}
+                    carouselName={carouselName}
+                    eventContext={eventContext}
+                    homePageSessionInfo={homePageSessionInfo}
+                    sortId={sortId}
+                    sortPosition={sortPosition}
+                    totalNumberOfFriends={friendsList?.length ?? 0}
                   />
                 </div>
               );

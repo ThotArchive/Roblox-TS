@@ -130,7 +130,7 @@ export default function createItemPurchase({
     const [newPrice, setNewPrice] = useState(null);
     const [robuxNeeded, setRobuxNeeded] = useState(expectedPrice - userRobuxBalance);
     const [confirmData, setConfirmData] = useState(null);
-    const [currentRobuxBalance, setCurrentRobuxBalance] = useState(undefined);
+    const [currentRobuxBalance, setCurrentRobuxBalance] = useState(userRobuxBalance);
 
     const [isTwoStepVerificationActive, setIsTwoStepVerificationActive] = useState(false);
     const startTwoStepVerification = () => setIsTwoStepVerificationActive(true);
@@ -142,6 +142,7 @@ export default function createItemPurchase({
         .getCurrentUserBalance(CurrentUser.userId)
         .then(function handleResult(result) {
           setCurrentRobuxBalance(result.data.robux);
+          setRobuxNeeded(expectedPrice - result.data.robux);
         })
         .catch(() => {
           setCurrentRobuxBalance(undefined);
@@ -150,6 +151,9 @@ export default function createItemPurchase({
     useEffect(() => {
       if (CurrentUser.isAuthenticated && getMetaData().userRobuxBalance === undefined) {
         getCurrentUserBalance();
+      } else {
+        setCurrentRobuxBalance(getMetaData().userRobuxBalance);
+        setRobuxNeeded(expectedPrice - getMetaData().userRobuxBalance);
       }
     }, [productId, expectedPrice, expectedSellerId]);
 
@@ -420,6 +424,8 @@ export default function createItemPurchase({
               showDivId: errorTypeIds.transactionFailure
               // We dont reload here since it's already flooded
             });
+          } else if (data.errorMessage === 'InsufficientBalance') {
+            insufficientFundsModalService.open();
           } else {
             handleError({
               title: translate(resources.errorOccuredHeading),
@@ -538,11 +544,8 @@ export default function createItemPurchase({
           stopTwoStepVerification={stopTwoStepVerification}
           systemFeedbackService={twoStepVerificationSystemFeedbackService}
         />
-        {robuxNeeded > 0 ? (
-          <InsufficientFundsModal robuxNeeded={robuxNeeded} />
-        ) : (
-          purchaseVerificationModal
-        )}
+        <InsufficientFundsModal robuxNeeded={robuxNeeded} />
+        {(!robuxNeeded || robuxNeeded <= 0) && purchaseVerificationModal}
         {error && (
           <TransactionFailureModal
             title={error.title}

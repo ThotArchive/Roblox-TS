@@ -1,10 +1,10 @@
 import React from 'react';
 import { DeviceMeta, GameLauncher, ProtocolHandlerClientInterface } from 'Roblox';
+import { chatService } from 'core-roblox-utilities';
 import { TranslateFunction } from 'react-utilities';
 import { Button } from 'react-style-guide';
 import { Thumbnail2d, ThumbnailTypes, ThumbnailGameIconSize } from 'roblox-thumbnails';
 import { TFriend } from '../types/friendsCarouselTypes';
-import chatCorescriptsService from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/services/chatService/chatService';
 
 const FriendTileDropdown = ({
   friend,
@@ -49,7 +49,7 @@ const FriendTileDropdown = ({
   };
 
   const startChat = () => {
-    chatCorescriptsService.startDesktopAndMobileWebChat({ userId: friend.id });
+    chatService.startDesktopAndMobileWebChat({ userId: friend.id });
   };
 
   return (

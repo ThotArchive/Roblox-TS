@@ -12,6 +12,9 @@ const { resources } = itemPurchaseConstants;
 function BalanceAfterSaleText({ translate, expectedPrice, currentRobuxBalance }) {
   const currentBalance = currentRobuxBalance ?? getMetaData().userRobuxBalance;
   const balanceAfterSale = currentBalance - expectedPrice;
+  if (!currentRobuxBalance) {
+    return <span />;
+  }
   return (
     <span
       dangerouslySetInnerHTML={{

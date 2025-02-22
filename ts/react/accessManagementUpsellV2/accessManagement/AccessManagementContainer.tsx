@@ -22,6 +22,9 @@ import Epilogue from './components/Epilogue';
 import ParentalRequestContainer from '../recourses/parentalRequest/ParentalRequestContainer';
 import Prologue from './components/Prologue';
 import LoadingPage from './components/LoadingPage';
+import useExperiments from '../hooks/useExperiments';
+import vpcUpsellExperimentLayer from './constants/experimentConstants';
+import ExpNewChildModal from '../enums/ExpNewChildModal';
 
 function AccessManagementContainer({
   translate
@@ -41,6 +44,9 @@ function AccessManagementContainer({
 
   const [asyncExit, setAsyncExit] = useState<boolean>(false);
 
+  const expChildModalType =
+    (useExperiments(vpcUpsellExperimentLayer).expNewChildModal as ExpNewChildModal) ??
+    ExpNewChildModal.control;
   async function onAccessManagementCustomEvent(
     event: CustomEvent<AccessManagementUpsellEventParams>
   ) {
@@ -71,8 +77,15 @@ function AccessManagementContainer({
     if (ampRecourseData) {
       setRecourseParameters(ampRecourseData);
     }
-
-    if (usePrologue) {
+    // This experiment only applies to enable purchase
+    let usePrologueWithExp = usePrologue;
+    if (
+      (ampRecourseData as Record<string, any>)?.enablePurchases &&
+      expChildModalType !== ExpNewChildModal.control
+    ) {
+      usePrologueWithExp = false;
+    }
+    if (usePrologueWithExp) {
       dispatch(setStage(UpsellStage.Prologue));
     } else {
       dispatch(setStage(UpsellStage.Verification));
@@ -85,7 +98,7 @@ function AccessManagementContainer({
     window.addEventListener(ModalEvent.StartAccessManagementUpsell, handleEvent);
 
     return () => window.removeEventListener(ModalEvent.StartAccessManagementUpsell, handleEvent);
-  }, []);
+  }, [expChildModalType]);
 
   useEffect(() => {
     const noopAccessState = [Access.Granted, Access.Denied];
@@ -124,6 +137,7 @@ function AccessManagementContainer({
               translate={translate}
               onHidecallback={onHideFunction}
               value={recourseParameters}
+              expChildModalType={expChildModalType}
             />
           );
         }

@@ -22,7 +22,6 @@ import { useVerticalScrollTracker } from '../common/components/useVerticalScroll
 import { usePageSession, withPageSession } from '../common/utils/PageSessionContext';
 import personalizationTranslationConfig from './translation.config';
 import getDeviceFeatures from '../common/utils/deviceFeaturesUtils';
-import IconResolutionExperimentContextProvider from '../common/utils/IconResolutionExperimentContextProvider';
 import experimentConstants from '../common/constants/experimentConstants';
 import HomePageUpsellCardContainerEntry from '../../../js/react/homePageUpsellCard/App';
 import InterestCatcher from './interestCatcher/InterestCatcher';
@@ -220,27 +219,31 @@ export const HomePageOmniFeed = ({ translate }: WithTranslationsProps): JSX.Elem
             contentMetadata: recommendations.contentMetadata,
             appendContentMetadata
           }}>
-          <IconResolutionExperimentContextProvider>
-            <HomePageUpsellCardContainerEntry translate={translate} context={undefined} />
-            {shouldShowLocalFriendsCarousel && <FriendsCarousel />}
-            {recommendations.sorts.map((sort, positionId) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <React.Fragment key={positionId}>
-                <OmniFeedItem
-                  translate={translate}
-                  sort={sort}
-                  positionId={positionId}
-                  startingRow={startingRowNumbersMap.get(positionId)}
-                  currentPage={PageContext.HomePage}
-                  itemsPerRow={itemsPerRowMap.get(positionId)}
-                  gridRecommendations={gridRecommendationsMap.get(positionId) ?? []}
-                  isExpandHomeContentEnabled={isExpandHomeContentEnabled}
-                  isCarouselHorizontalScrollEnabled={isCarouselHorizontalScrollEnabled}
-                  isNewScrollArrowsEnabled={isNewScrollArrowsEnabled}
-                />
-              </React.Fragment>
-            ))}
-          </IconResolutionExperimentContextProvider>
+          <HomePageUpsellCardContainerEntry translate={translate} context={undefined} />
+          {shouldShowLocalFriendsCarousel && (
+            <FriendsCarousel
+              homePageSessionInfo={homePageSessionInfo}
+              sortId={undefined}
+              sortPosition={0}
+            />
+          )}
+          {recommendations.sorts.map((sort, positionId) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <React.Fragment key={positionId}>
+              <OmniFeedItem
+                translate={translate}
+                sort={sort}
+                positionId={positionId}
+                startingRow={startingRowNumbersMap.get(positionId)}
+                currentPage={PageContext.HomePage}
+                itemsPerRow={itemsPerRowMap.get(positionId)}
+                gridRecommendations={gridRecommendationsMap.get(positionId) ?? []}
+                isExpandHomeContentEnabled={isExpandHomeContentEnabled}
+                isCarouselHorizontalScrollEnabled={isCarouselHorizontalScrollEnabled}
+                isNewScrollArrowsEnabled={isNewScrollArrowsEnabled}
+              />
+            </React.Fragment>
+          ))}
         </ContentMetadataContext.Provider>
       </div>
     </div>

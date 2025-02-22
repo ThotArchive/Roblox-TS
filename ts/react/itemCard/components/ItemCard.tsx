@@ -22,6 +22,8 @@ export type TItemCardProps = {
   thumbnail2d: React.ReactElement;
   iconToRender?: JSX.Element;
   shoppingCartProps?: TItemCardShoppingCardProps;
+  containerClassName?: string;
+  enableThumbnailPrice?: boolean;
 };
 
 export function ItemCard({
@@ -41,12 +43,14 @@ export function ItemCard({
   thumbnail2d,
   translate,
   iconToRender,
-  shoppingCartProps
+  shoppingCartProps,
+  containerClassName,
+  enableThumbnailPrice
 }: TItemCardProps & WithTranslationsProps): JSX.Element {
   const [isHovered, setIsHovered] = useState(false);
   return (
     <div
-      className='list-item item-card grid-item-container'
+      className={containerClassName || 'list-item item-card grid-item-container'}
       key={name}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
@@ -65,6 +69,14 @@ export function ItemCard({
             translate={translate}
             isHovered={isHovered}
             shoppingCartProps={shoppingCartProps}
+            creatorName={creatorName}
+            creatorType={creatorType}
+            creatorTargetId={creatorTargetId}
+            price={price !== null ? price : undefined}
+            lowestPrice={lowestPrice !== null ? lowestPrice : undefined}
+            priceStatus={priceStatus !== null ? priceStatus : undefined}
+            premiumPricing={premiumPricing !== null ? premiumPricing : undefined}
+            enableThumbnailPrice={enableThumbnailPrice}
           />
           <ItemCardCaption
             name={name}
@@ -80,6 +92,7 @@ export function ItemCard({
             }
             translate={translate}
             iconToRender={iconToRender}
+            enableThumbnailPrice={enableThumbnailPrice}
           />
         </a>
       </div>

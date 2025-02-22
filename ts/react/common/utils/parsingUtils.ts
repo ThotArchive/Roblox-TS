@@ -340,6 +340,16 @@ export const splitArray = <T>(input: T[], maxSize: number): T[][] => {
 export const { parseQueryString } = urlService;
 export const { getNumberFormat } = numberFormat;
 
+export const getQueryParamIfString = (key: string): string | undefined => {
+  const queryParam = urlService.getQueryParam(key);
+
+  if (queryParam && typeof queryParam === 'string') {
+    return queryParam;
+  }
+
+  return undefined;
+};
+
 type TInputUniverseIdsRequestParameter =
   | {
       inputUniverseIds: {
@@ -380,5 +390,6 @@ export default {
   calculateImpressedIndexes,
   splitArray,
   GAME_STATS_PLACEHOLDER_STRING,
+  getQueryParamIfString,
   getInputUniverseIdsRequestParam
 };

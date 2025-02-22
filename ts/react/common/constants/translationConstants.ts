@@ -62,7 +62,9 @@ export const FeatureGameDetails = {
   ActionTranslate: 'Action.Translate',
   LabelNotSupported: 'Label.NotSupported',
   LabelSupported: 'Label.Supported',
-  LabelVoiceChat: 'Label.VoiceChat'
+  LabelVoiceChat: 'Label.VoiceChat',
+  HeadingRefund: 'Heading.Refund',
+  ActionRequestRefund: 'Action.RequestRefund'
 };
 
 export const FeatureCommunityLinks = {

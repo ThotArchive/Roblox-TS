@@ -14,7 +14,7 @@ const { resources } = itemPurchaseConstants;
 export default function createInsufficientFundsModal() {
   const [Modal, modalService] = createModal();
   function InsufficientFundsModal({ translate, robuxNeeded, source, onAccept }) {
-    const body = (
+    let body = (
       <div
         className='modal-message'
         dangerouslySetInnerHTML={{
@@ -24,6 +24,9 @@ export default function createInsufficientFundsModal() {
         }}
       />
     );
+    if (!robuxNeeded) {
+      body = <div> {translate(resources.additionalRobuxNeeded)}</div>;
+    }
     return (
       <Modal
         {...{

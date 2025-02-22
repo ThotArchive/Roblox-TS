@@ -9,6 +9,7 @@ const FriendTileContent = ({
   userProfileUrl,
   userPresence,
   hasVerifiedBadge,
+  sendClickEvent,
   translate
 }: {
   id: number;
@@ -16,12 +17,23 @@ const FriendTileContent = ({
   userProfileUrl: string;
   userPresence: string | null | undefined;
   hasVerifiedBadge: boolean;
+  sendClickEvent: () => void;
   translate: TranslateFunction;
 }): JSX.Element => {
   return (
     <div className='friend-tile-content'>
-      <AvatarHeadshot id={id} translate={translate} userProfileUrl={userProfileUrl} />
-      <a href={userProfileUrl} className='friends-carousel-tile-labels'>
+      <AvatarHeadshot
+        id={id}
+        translate={translate}
+        userProfileUrl={userProfileUrl}
+        handleImageClick={sendClickEvent}
+      />
+
+      <a
+        href={userProfileUrl}
+        onClick={sendClickEvent}
+        className='friends-carousel-tile-labels'
+        data-testid='friends-carousel-tile-labels'>
         <div className='friends-carousel-tile-label'>
           <div className='friends-carousel-tile-name'>
             <span className='friends-carousel-display-name'>{displayName}</span>

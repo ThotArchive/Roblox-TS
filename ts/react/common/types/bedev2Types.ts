@@ -312,4 +312,14 @@ export enum TSurveyIcon {
 
 export type TGuacAppPolicyBehaviorResponse = {
   shouldShowVpcPlayButtonUpsells: boolean;
+  EnableAggregateLikesFavoritesCount: boolean;
+};
+
+export type TProfile = {
+  userId: number;
+  names: { combinedName: string; username: string };
+};
+
+export type TGetProfilesResponse = {
+  profileDetails: TProfile[];
 };

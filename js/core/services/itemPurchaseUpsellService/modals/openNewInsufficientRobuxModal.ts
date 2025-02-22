@@ -45,6 +45,29 @@ function prepareAndStartAutoPurchaseFlow(
     `${UPGRADES_PAYMENT_METHODS_URL}?ap=${upsellProduct.roblox_product_id}&UpsellUuid=${upsellUuid}`
   );
 }
+function insufficientRobuxModalSendPurchaseFlowEvent(
+  viewMessage: string,
+  modalStartTime: number,
+  itemPurchaseAjaxData: ItemPurchaseAjaxDataObject,
+  itemDetail: ItemDetailObject
+) {
+  const modalEndTime = Date.now();
+  const elapsedTime = modalEndTime - modalStartTime;
+  paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
+    paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
+    true,
+    paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
+    paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
+    viewMessage,
+    {
+      userBalance: itemPurchaseAjaxData.userBalanceRobux.toString(),
+      itemCost: itemDetail.expectedItemPrice.toString(),
+      modalImpressionTimeInMs: elapsedTime.toString(),
+      modalStartTimeInMs: modalStartTime.toString(),
+      modalEndTimeInMs: modalEndTime.toString()
+    }
+  );
+}
 
 function autoPurchaseFlow(
   avatarPreview: string,
@@ -54,38 +77,79 @@ function autoPurchaseFlow(
   upsellProduct: UpsellProduct,
   intl: RobloxIntlInstance,
   translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance
+  intlProvider: RobloxTranslationResourceProviderInstance,
+  userVariant = 0
 ) {
+  const modalStartTime = Date.now();
   const termsOfUseTag = `<a class='text-link-secondary terms-of-use-link' target='_blank' href='${urlService.getUrlWithLocale(
     ROBLOX_TERMS_OF_USE_URL,
     intl.getRobloxLocale()
   )}'>`;
   const robuxNeeded = formattingRobux(errorObj.shortfallPrice, false);
   const robuxPackageAmount = formattingRobux(upsellProduct.robux_amount);
-  const dialogBody =
+  const originalRobuxPackageAmount = upsellProduct.robux_amount_before_bonus
+    ? formattingRobux(upsellProduct.robux_amount_before_bonus, false, true)
+    : '';
+  const dialogBodyNew =
     avatarPreview +
-    translationResource.get(LANG_KEYS.insufficientRobuxMessage, {
+    translationResource.get(LANG_KEYS.insufficientRobuxMessageNew, {
       divTagStart: "<div class='modal-message-block text-center border-top'>",
       divTagEnd: '</div>',
       robuxNeeded,
       robuxPackageAmount,
+      originalRobuxPackageAmount,
+      sentenceSplit: '<br>',
       lineBreak: '',
       aTagStart: termsOfUseTag,
-      aTagEnd: '</a>'
+      aTagEnd: '</a>',
+      divTagFooterStart:
+        "<div class='modal-message-block text-center border-top modal-legal-footer'>",
+      divTagFooterEnd: '</div>'
     });
+  const titleText = translationResource.get(LANG_KEYS.insufficientRobuxHeadingNew, {});
+  const robuxFooterAmount = upsellProduct.robux_amount_before_bonus
+    ? formattingRobux(
+        upsellProduct.robux_amount - upsellProduct.robux_amount_before_bonus,
+        true,
+        false,
+        true
+      ).toString()
+    : formattingRobux(upsellProduct.robux_amount, true, false, true).toString();
+  const footerText = (() => {
+    if (userVariant === 0) {
+      return '';
+    }
+    if (userVariant === 1) {
+      return translationResource.get(LANG_KEYS.insufficientRobuxModalBannerv1, {
+        robux: robuxFooterAmount
+      });
+    }
+    if (userVariant === 2) {
+      //
+      return translationResource.get(LANG_KEYS.insufficientRobuxModalBannerv2, {
+        robux: robuxFooterAmount
+      });
+    }
+    return '';
+  })();
+
+  const allowHtmlContentInFooter = userVariant !== 0;
+
   Dialog.open({
-    titleText: translationResource.get(LANG_KEYS.insufficientRobuxHeading, {}),
-    bodyContent: dialogBody,
+    titleText,
+    bodyContent: dialogBodyNew,
+    footerText: allowHtmlContentInFooter
+      ? `<div class='modal-footer-text'>${footerText}</div>`
+      : ``,
     declineText: translationResource.get(LANG_KEYS.cancelAction, {}),
     acceptText: translationResource.get(LANG_KEYS.buyRobuxAndItemAction, {}),
     acceptColor: 'btn-primary-md',
     onAccept: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.BUY_ROBUX_AND_ITEM
+      insufficientRobuxModalSendPurchaseFlowEvent(
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.BUY_ROBUX_AND_ITEM,
+        modalStartTime,
+        itemPurchaseAjaxData,
+        itemDetail
       );
       checkOrStartPurchaseWarning(
         // no await here, so that this modal field validation will be valid, and the current modal won't disappear until the next modal show up
@@ -116,12 +180,11 @@ function autoPurchaseFlow(
       return false;
     },
     onDecline: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+      insufficientRobuxModalSendPurchaseFlowEvent(
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        modalStartTime,
+        itemPurchaseAjaxData,
+        itemDetail
       );
       reportCounter(
         UPSELL_COUNTER_NAMES.UpsellCancelled,
@@ -129,12 +192,11 @@ function autoPurchaseFlow(
       );
     },
     onCancel: () => {
-      paymentFlowAnalyticsService.sendUserPurchaseFlowEvent(
-        paymentFlowAnalyticsService.ENUM_TRIGGERING_CONTEXT.WEB_CATALOG_ROBUX_UPSELL,
-        true,
-        paymentFlowAnalyticsService.ENUM_VIEW_NAME.ROBUX_UPSELL,
-        paymentFlowAnalyticsService.ENUM_PURCHASE_EVENT_TYPE.USER_INPUT,
-        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL
+      insufficientRobuxModalSendPurchaseFlowEvent(
+        paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.CANCEL,
+        modalStartTime,
+        itemPurchaseAjaxData,
+        itemDetail
       );
       reportCounter(
         UPSELL_COUNTER_NAMES.UpsellCancelled,
@@ -142,7 +204,7 @@ function autoPurchaseFlow(
       );
     },
     allowHtmlContentInBody: true,
-    allowHtmlContentInFooter: false,
+    allowHtmlContentInFooter, // If userVariant anything but 0 we display the footer
     fieldValidationRequired: true,
     dismissable: true,
     xToCancel: true
@@ -156,7 +218,8 @@ export default function openNewInsufficientRobuxModal(
   upsellProduct: UpsellProduct,
   intl: RobloxIntlInstance,
   translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance
+  intlProvider: RobloxTranslationResourceProviderInstance,
+  userVariant: number
 ): void {
   const robuxItemPrice = formattingRobux(itemDetail.expectedItemPrice);
   const avatarPreview = `<div class='item-card-container item-preview'>
@@ -184,6 +247,7 @@ export default function openNewInsufficientRobuxModal(
     upsellProduct,
     intl,
     translationResource,
-    intlProvider
+    intlProvider,
+    userVariant
   );
 }

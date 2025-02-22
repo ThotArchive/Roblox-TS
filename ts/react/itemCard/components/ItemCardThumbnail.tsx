@@ -2,6 +2,7 @@ import React from 'react';
 import { TranslateFunction } from 'react-utilities';
 import ItemCardStatus from './ItemCardStatus';
 import ItemCardRestrictions from './ItemCardRestrictions';
+import ItemCardPrice from './ItemCardPrice';
 
 export interface TItemCardShoppingCardProps {
   isItemInCart: boolean;
@@ -32,6 +33,15 @@ export type TItemCardThumbnailProps = {
   translate: TranslateFunction;
   isHovered: boolean;
   shoppingCartProps?: TItemCardShoppingCardProps;
+  price?: number;
+  lowestPrice?: number;
+  premiumPricing?: number;
+  creatorName: string;
+  creatorType: string;
+  creatorTargetId: number;
+  priceStatus?: string;
+  unitsAvailableForConsumption?: number;
+  enableThumbnailPrice?: boolean;
 };
 
 export function ItemCardThumbnail({
@@ -43,7 +53,14 @@ export function ItemCardThumbnail({
   thumbnail2d,
   translate,
   isHovered,
-  shoppingCartProps
+  shoppingCartProps,
+  premiumPricing,
+  lowestPrice,
+  price,
+  enableThumbnailPrice,
+  creatorTargetId,
+  priceStatus,
+  unitsAvailableForConsumption
 }: TItemCardThumbnailProps): JSX.Element {
   let shoppingCartButtons = null;
   if (shoppingCartProps && isHovered) {
@@ -89,6 +106,17 @@ export function ItemCardThumbnail({
   return (
     <div className='item-card-link'>
       <div className='item-card-thumb-container'>
+        {enableThumbnailPrice && (
+          <ItemCardPrice
+            price={price}
+            creatorTargetId={creatorTargetId}
+            lowestPrice={lowestPrice}
+            priceStatus={priceStatus}
+            premiumPricing={premiumPricing}
+            unitsAvailableForConsumption={unitsAvailableForConsumption}
+            enableThumbnailPrice={enableThumbnailPrice}
+          />
+        )}
         <div className='item-card-thumb-container-inner'>{thumbnail2d}</div>
         <ItemCardStatus itemStatus={itemStatus} translate={translate} />
         <ItemCardRestrictions type={itemType} itemRestrictions={itemRestrictions} />

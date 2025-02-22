@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+const DROPDOWN_EDGE_PADDING = 24;
+
 interface PopoverProps {
   trigger: React.ReactNode;
   content: React.ReactNode;
@@ -40,6 +42,24 @@ const FriendTilePopover: React.FC<PopoverProps> = ({ trigger, content, dropdownW
     };
   }, []);
 
+  const getPopoverLeftValue = () => {
+    const triggerLeft = triggerRef.current?.offsetLeft || 0;
+    const triggerWidth = triggerRef.current?.offsetWidth || 0;
+    const left = triggerLeft + triggerWidth / 2 - dropdownWidth / 2;
+
+    // If dropdown would overflow left edge, position on left edge
+    if (left < 0) {
+      return DROPDOWN_EDGE_PADDING;
+    }
+
+    // If dropdown would overflow right edge, position on right edge
+    if (left + dropdownWidth > window.innerWidth) {
+      return window.innerWidth - (dropdownWidth + DROPDOWN_EDGE_PADDING);
+    }
+
+    return left;
+  };
+
   return (
     <div>
       <div ref={triggerRef}>{trigger}</div>
@@ -49,10 +69,7 @@ const FriendTilePopover: React.FC<PopoverProps> = ({ trigger, content, dropdownW
           style={{
             position: 'absolute',
             top: (triggerRef.current?.offsetHeight || 0) + (triggerRef.current?.offsetTop || 0),
-            left:
-              (triggerRef.current?.offsetLeft || 0) +
-              (triggerRef.current?.offsetWidth || 0) / 2 -
-              dropdownWidth / 2,
+            left: getPopoverLeftValue(),
             zIndex: 1002,
             width: dropdownWidth
           }}

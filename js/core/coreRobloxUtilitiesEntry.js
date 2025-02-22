@@ -1,5 +1,6 @@
 import cryptoUtil from '../utilities/boundAuthTokens/crypto/cryptoUtil';
 import boundAuthTokensHttpUtil from '../utilities/boundAuthTokens/http/boundAuthTokensHttpUtil';
+import chatService from './services/chatService/chatService';
 import dataStores from './dataStoreManagement/stores/dataStores';
 import deepLinkService from './services/deepLinkService/deepLinkService';
 import eventStreamService from './services/eventStreamService/eventStreamService';
@@ -23,6 +24,7 @@ import pageHeartbeatInit from './pageHeartbeat/pageHeartbeatScheduler';
 window.CoreRobloxUtilities = {
   cryptoUtil,
   boundAuthTokensHttpUtil,
+  chatService,
   dataStores,
   entityUrl,
   eventStreamService,

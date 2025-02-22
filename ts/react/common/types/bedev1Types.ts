@@ -213,6 +213,13 @@ export type TGetOmniRecommendationsMetadataResponse = {
   };
 };
 
+export type TRefundPolicy = {
+  policyText: string;
+  learnMoreBaseUrl?: string;
+  locale: string;
+  articleId: string;
+};
+
 // GetGameList
 export type TGetGamesListResponse = {
   games: TGameData[];
@@ -271,6 +278,9 @@ export type TGetGameDetails = {
   sourceName?: string;
   sourceDescription?: string;
   licenseDescription?: string;
+  refundLink?: string;
+  localizedFiatPrice?: string;
+  refundPolicy?: TRefundPolicy;
 };
 
 // GetFriends

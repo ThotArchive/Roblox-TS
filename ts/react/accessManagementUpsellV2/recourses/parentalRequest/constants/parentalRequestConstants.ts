@@ -5,16 +5,22 @@ const parentalRequestConstants = {
   chargebackWizardSessionTokenLocalStorageKey: 'Roblox.ChargebackWizardSessionToken',
   defaultCooldownTimeInMs: 900000, // 15 minutes,
   emailRegex: '^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$',
-
+  isChildSubjectToPCFeatureName: 'IsChildSubjectToParentalControls',
   translationKeys: {
     gatherParentEmail: {
       title: 'Title.EnterParentEmailV2',
+      permissionNeededTitle: 'Title.PermissionNeeded',
+      askYourParentTitle: 'Title.AskYourParent',
       body: 'Description.EnterParentEmailV4',
+      combinedBody: 'Description.EnterParentEmailExp',
+      bodyWithoutPC: 'Description.EnterParentEmailWithoutParentalControl',
+      combinedBodyWithoutPC: 'Description.EnterParentEmailExpWithoutParentalControl',
       footer: 'Description.ParentalEmailFooter',
       unknownError: 'Message.SomethingWentWrong',
       invalidEmailError: 'Message.InvalidEmail',
       btnText: 'Action.SendEmail',
       emailPlaceholder: 'Label.EmailCapitalized',
+      parentEmailLabel: 'Label.ParentEmail',
       emailTooManyChildrenError: 'Message.EmailIneligible',
       childTooManyParentsError: 'Message.ExistAccountWithEmail',
       emailTooManyRequest: 'Message.TooManyAttempts',
@@ -92,6 +98,9 @@ const parentalRequestConstants = {
       ok: 'OK',
       requestSent: 'Request Sent'
     }
+  },
+  settingName: {
+    enablePurchases: 'enablePurchases'
   }
 };
 

@@ -4,9 +4,7 @@
 import {
   regex,
   uuidService,
-  PagingParameters,
   PagerError,
-  PageResponse,
   SortOrder,
   CursorPager as CoreCursorPager
 } from '@rbx/core';
@@ -64,9 +62,7 @@ window.CoreUtilities = {
   numberFormat,
   pageName,
   PagerError,
-  PageResponse,
   PaginationCache,
-  PagingParameters,
   quote,
   ready,
   regex,

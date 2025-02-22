@@ -1,10 +1,11 @@
 import { TValidHttpUrl } from 'core-utilities';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Loading } from 'react-style-guide';
 import { PlayButton as RobloxPlayButton } from 'Roblox';
 import experimentConstants from '../constants/experimentConstants';
-import useShouldShowVpcPlayButtonUpsells from '../hooks/useShouldShowVpcPlayButtonUpsells';
+import useGetAppPolicyData from '../hooks/useGetAppPolicyData';
 import bedev2Services from '../services/bedev2Services';
+import { ValueOf } from '../utils/typeUtils';
 
 export const GameTilePlayButtonV2 = ({
   universeId,
@@ -36,7 +37,7 @@ export const GameTilePlayButtonV2 = ({
   >(undefined);
   const [isFetchingIxp, setIsFetchingIxp] = useState<boolean>(false);
 
-  const { shouldShowVpcPlayButtonUpsells, isFetchingPolicy } = useShouldShowVpcPlayButtonUpsells();
+  const { shouldShowVpcPlayButtonUpsells, isFetchingPolicy } = useGetAppPolicyData();
 
   useEffect(() => {
     setIsFetchingIxp(true);
@@ -54,6 +55,18 @@ export const GameTilePlayButtonV2 = ({
         setIsFetchingIxp(false);
       });
   }, [layerNames.playButton, defaultValues.playButton]);
+
+  const isPurchaseRequired = useMemo((): boolean => {
+    if (!playabilityStatus) {
+      return false;
+    }
+    const allowedList = [
+      PlayabilityStatuses.PurchaseRequired,
+      PlayabilityStatuses.FiatPurchaseRequired
+    ] as ValueOf<typeof PlayabilityStatuses>[];
+
+    return allowedList.includes(playabilityStatus);
+  }, [playabilityStatus, PlayabilityStatuses]);
 
   if (isFetchingIxp || isFetchingPolicy) {
     if (!disableLoadingState) {
@@ -97,18 +110,13 @@ export const GameTilePlayButtonV2 = ({
       playabilityStatus={playabilityStatus}
       eventProperties={playButtonEventProperties}
       disableLoadingState={disableLoadingState}
-      buttonClassName={
-        playabilityStatus === PlayabilityStatuses.PurchaseRequired
-          ? 'btn-common-play-game-lg purchase-button'
-          : undefined
-      }
-      hideButtonText={playabilityStatus !== PlayabilityStatuses.PurchaseRequired}
+      buttonClassName={isPurchaseRequired ? 'btn-common-play-game-lg purchase-button' : undefined}
+      hideButtonText={!isPurchaseRequired}
       hasUpdatedPlayButtonsIxp={hasUpdatedPlayButtonsIxp}
       hasUpdatedPlayButtonsVpcIxp={hasUpdatedPlayButtonsVpcIxp}
       shouldShowVpcPlayButtonUpsells={shouldShowVpcPlayButtonUpsells}
-      redirectPurchaseUrl={
-        playabilityStatus === PlayabilityStatuses.PurchaseRequired ? redirectPurchaseUrl : undefined
-      }
+      redirectPurchaseUrl={isPurchaseRequired ? redirectPurchaseUrl : undefined}
+      showDefaultPurchaseText={playabilityStatus === PlayabilityStatuses.FiatPurchaseRequired}
     />
   );
 };

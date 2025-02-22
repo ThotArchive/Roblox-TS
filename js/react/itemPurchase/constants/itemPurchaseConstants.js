@@ -94,7 +94,8 @@ export default {
     continueToPaymentAction: 'Action.ContinueToPayment',
     leavingRobloxHeading: 'Heading.LeavingRoblox',
     pendingDeveloperProductLimitReachedMessage: 'Message.PendingDeveloperProductLimitReached',
-    pendingDeveloperProductLimitReachedHeading: 'Heading.PendingDeveloperProductLimitReached'
+    pendingDeveloperProductLimitReachedHeading: 'Heading.PendingDeveloperProductLimitReached',
+    additionalRobuxNeeded: 'Message.AdditionalRobux'
   },
   assetTypes: {
     // library catagory type
