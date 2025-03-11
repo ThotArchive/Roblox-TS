@@ -13,7 +13,7 @@ type ScrollEventProps = {
   startingPosition: number;
   currentPage: string;
   pageSession: string;
-  gameSetTypeId?: number;
+  gameSetTypeId?: number | string;
   gameSetTargetId?: number;
   sortPosition?: number;
 };

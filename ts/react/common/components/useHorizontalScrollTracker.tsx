@@ -7,7 +7,7 @@ import { usePageSession } from '../utils/PageSessionContext';
 type HorizontalScrollTrackerProps = {
   scrollPosition: number;
   page: string;
-  gameSetTypeId: number;
+  gameSetTypeId: number | string;
   gameSetTargetId?: number;
   sortPosition: number;
   wrapperRef: React.RefObject<HTMLDivElement>;

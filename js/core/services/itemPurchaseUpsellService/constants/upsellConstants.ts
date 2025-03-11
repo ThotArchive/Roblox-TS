@@ -58,8 +58,12 @@ export const LANG_KEYS = {
   cancelAction: 'Action.Cancel',
   equipMyAvatarAction: 'Action.EquipMyAvatar',
   goToRobuxStoreAction: 'Action.GoToRobuxStore',
-  insufficientRobuxHeading: 'Heading.InsufficientRobux',
-  insufficientRobuxMessage: 'Message.InsufficientRobux',
+  insufficientRobuxHeading: 'Heading.InsufficientRobux', // TODO:: Remove during Experiment Cleanup (EndDate: March 2025)
+  insufficientRobuxMessage: 'Message.InsufficientRobux', // TODO:: Remove during Experiment Cleanup (EndDate: March 2025)
+  insufficientRobuxModalBannerv1: 'Text.BonusBannerV1', // TODO:: Remove during Experiment Cleanup (EndDate: March 2025)
+  insufficientRobuxModalBannerv2: 'Text.BonusBannerV2', // TODO:: Remove during Experiment Cleanup (EndDate: March 2025)
+  insufficientRobuxHeadingNew: 'Heading.InsufficientRobuxNew',
+  insufficientRobuxMessageNew: 'Message.InsufficientRobuxNew',
   insufficientRobuxLeaveRobloxHeading: 'Heading.InsufficientRobuxLeaveRoblox',
   insufficientRobuxAskToPurchasePackageMessage: 'Message.InsufficientRobuxAskToPurchasePackage',
   insufficientRobuxExceedLargestPackageMessage: 'Message.InsufficientRobuxExceedLargestPackage',
@@ -104,6 +108,10 @@ export const ITEM_UPSELL_EVENTS = {
   }
 };
 
+// OPT-87: Upsell Modal Experiment Layer
+export const UPSELL_MODAL_EXPERIMENT_LAYER_ST1 = 'Optimization.UpsellModalBannerExperiment';
+export const UPSELL_MODAL_EXPERIMENT_LAYER = 'Optimization.PurchaseModalBonusBanner';
+
 export const UPSELL_COUNTER_CATALOG_PREFIX = 'WebCatalog';
 export const UPSELL_COUNTER_BUNDLE_PREFIX = 'WebBundle';
 export const UPSELL_COUNTER_GAME_PASS_PREFIX = 'WebGamePass';
@@ -138,6 +146,7 @@ export const UPSELL_COUNTER_NAMES = {
   UpsellFailed: 'UpsellFailed',
   UpsellFailedDueToNoAvailablePackage: 'UpsellFailedDueToNoAvailablePackage',
   UpsellFailedDueToFailedPackageRequest: 'UpsellFailedDueToFailedPackageRequest',
+  UpsellExperimentRetrivalFailed: 'UpsellExperimentRetrivalFailed',
 
   AutoPurchaseEntryPoint: 'AutoPurchaseEntryPoint',
   AutoPurchaseStarted: 'AutoPurchaseStarted',

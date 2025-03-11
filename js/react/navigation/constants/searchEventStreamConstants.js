@@ -3,10 +3,17 @@ import { eventStreamService } from 'core-roblox-utilities';
 
 const { eventTypes } = eventStreamService;
 const searchAutocompleteContext = 'searchAutocomplete';
-const actionTypes = { open: 'open', submit: 'submit', close: 'close' };
+const searchLandingPageContext = 'searchLandingPage';
+const actionTypes = { open: 'open', submit: 'submit', close: 'close', cancel: 'cancel' };
 const { generateRandomUuid: generateSessionInfo } = uuidService;
 
+const contexts = {
+  searchAutocomplete: searchAutocompleteContext,
+  searchLandingPage: searchLandingPageContext
+};
+
 const eventStreamCriterias = {
+  contexts,
   actionTypes,
   generateSessionInfo,
   searchTextTrim: (kwd, resultingKwd, searchType, sessionInfo) => [
@@ -89,11 +96,11 @@ const eventStreamCriterias = {
       isPersonalizedBasedOnPreviousQuery
     }
   ],
-  search: (kwd, actionType, sessionInfo) => [
+  search: (kwd, context, actionType, sessionInfo) => [
     {
       name: 'search',
       type: eventTypes.formInteraction,
-      context: searchAutocompleteContext
+      context
     },
     {
       kwd,

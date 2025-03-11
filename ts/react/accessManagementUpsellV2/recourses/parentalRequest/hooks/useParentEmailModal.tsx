@@ -4,7 +4,8 @@ import { TranslateFunction } from 'react-utilities';
 import { localStorageService } from 'core-roblox-utilities';
 import parentalRequestConstants from '../constants/parentalRequestConstants';
 import parentalRequestInlineErrorHandler, {
-  ParentalRequestError
+  ParentalRequestError,
+  defaultParentalRequestError
 } from '../utils/parentalRequestErrorHandler';
 import RequestType from '../enums/RequestType';
 import ExpNewChildModal from '../../../enums/ExpNewChildModal';
@@ -42,7 +43,9 @@ const useParentEmailModal = (
   const [description, setDescription] = useState<JSX.Element>(
     <span
       dangerouslySetInnerHTML={{
-        __html: translate(gatherParentEmail.body, { lineBreak: '<br /><br />' })
+        __html: translate(gatherParentEmail.bodyWithoutPC, {
+          lineBreak: '<br /><br />'
+        })
       }}
     />
   );
@@ -92,7 +95,6 @@ const useParentEmailModal = (
     setErrorTranslationKey('');
     // needs to clear the local cache before starting a new wizard session
     localStorageService.removeLocalStorage(chargebackWizardSessionTokenLocalStorageKey);
-
     try {
       const response = await parentalRequestService.sendRequestToNewParent({
         email: parentEmailInput,
@@ -110,7 +112,7 @@ const useParentEmailModal = (
     } catch (err) {
       setParentEmailInput('');
       setSendEmailBtnLoadingStatus(false);
-      const error = err as ParentalRequestError;
+      const error = (err as ParentalRequestError) ?? defaultParentalRequestError;
       const errorReason = parentalRequestInlineErrorHandler(
         error.data.code as ParentalRequestErrorReason
       );
@@ -173,6 +175,14 @@ const useParentEmailModal = (
             />
           );
       }
+    } else {
+      setDescription(
+        <span
+          dangerouslySetInnerHTML={{
+            __html: translate(descriptionTranslationKey, { lineBreak: '<br /><br />' })
+          }}
+        />
+      );
     }
   }, [expChildModalType, isChildSubjectToPC, settingName]);
 

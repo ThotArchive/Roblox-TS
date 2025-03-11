@@ -16,7 +16,8 @@ import {
   TGamePass,
   TSort,
   TGetUserLocaleResponse,
-  TSupportedLocale
+  TSupportedLocale,
+  TAssetDataResponse
 } from '../types/bedev1Types';
 
 const { url, defaultCacheCriteria } = bedev1Constants;
@@ -121,6 +122,14 @@ export const getUserLocale = (): Promise<TSupportedLocale | undefined> => {
     .then((res: TGetUserLocaleResponse) => res?.ugc ?? res?.signupAndLogin);
 };
 
+const getAssetDataFromAssetId = (assetId: string): Promise<TAssetDataResponse> => {
+  return httpService
+    .get<TAssetDataResponse>(bedev1Constants.url.getAssetDataFromAssetId(assetId))
+    .then(response => {
+      return response.data;
+    });
+};
+
 export default {
   getFriendsPresence,
   getGameDetails,
@@ -131,5 +140,6 @@ export default {
   getOmniRecommendationsMetadata,
   getVoiceStatus,
   getPlaceDetails,
-  getUserLocale
+  getUserLocale,
+  getAssetDataFromAssetId
 };

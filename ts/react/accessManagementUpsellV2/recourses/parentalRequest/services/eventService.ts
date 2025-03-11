@@ -59,6 +59,18 @@ const getContext = (requestType: RequestType, details?: Record<string, unknown>)
   return context;
 };
 
+const sendEventWithSilentError = (
+  eventName: string,
+  context: string,
+  additionalProperties: Record<string, string | number>
+) => {
+  try {
+    eventStreamService.sendEventWithTarget(eventName, context, additionalProperties);
+  } catch (error) {
+    // silent error
+  }
+};
+
 export const sendLoadRequestBroadcastEvent = ({
   requestType,
   sessionId,
@@ -66,14 +78,10 @@ export const sendLoadRequestBroadcastEvent = ({
   details
 }: TEventParams): void => {
   const context = getContext(requestType, details);
-  eventStreamService.sendEventWithTarget(
-    events.eventName.authPageLoad,
-    context.settingsRequestSent,
-    {
-      state: generateState(requestType, sessionId, extraState, details),
-      associatedText: events.text.requestSent
-    }
-  );
+  sendEventWithSilentError(events.eventName.authPageLoad, context.settingsRequestSent, {
+    state: generateState(requestType, sessionId, extraState, details),
+    associatedText: events.text.requestSent
+  });
 };
 
 export const sendClickRequestBroadcastConfirmEvent = ({
@@ -83,7 +91,7 @@ export const sendClickRequestBroadcastConfirmEvent = ({
   details
 }: TEventParams): void => {
   const context = getContext(requestType);
-  eventStreamService.sendEventWithTarget(events.eventName.authButtonClick, context.parentalEntry, {
+  sendEventWithSilentError(events.eventName.authButtonClick, context.parentalEntry, {
     btn: events.btn.continue,
     associatedText: events.text.ok,
     state: generateState(requestType, sessionId, extraState, details)
@@ -96,7 +104,7 @@ export const sendParentEmailSubmitEvent = ({
 }: TEventParams): void => {
   const context = getContext(requestType);
 
-  eventStreamService.sendEventWithTarget(events.eventName.authButtonClick, context.parentalEntry, {
+  sendEventWithSilentError(events.eventName.authButtonClick, context.parentalEntry, {
     btn: events.btn.submit,
     associatedText: events.text.sendEmail,
     state: generateState(requestType, sessionId, undefined, details)
@@ -105,13 +113,9 @@ export const sendParentEmailSubmitEvent = ({
 
 export const sendInteractParentEmailFormEvent = ({ requestType, details }: TEventParams): void => {
   const context = getContext(requestType);
-  eventStreamService.sendEventWithTarget(
-    events.eventName.authFormInteraction,
-    context.parentalEntry,
-    {
-      field: events.field.email,
-      associatedText: events.text.enterParentEmail,
-      state: generateState(requestType, undefined, undefined, details)
-    }
-  );
+  sendEventWithSilentError(events.eventName.authFormInteraction, context.parentalEntry, {
+    field: events.field.email,
+    associatedText: events.text.enterParentEmail,
+    state: generateState(requestType, undefined, undefined, details)
+  });
 };

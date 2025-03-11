@@ -36,9 +36,12 @@ export default function createPurchaseVerificationModal() {
       seller: escapeHtml()(sellerName),
       robux: renderToString(<PriceLabel {...{ price: expectedPrice }} />)
     };
-    const bodyMessageResource = isPlace
+    let bodyMessageResource = isPlace
       ? resources.promptBuyAccessMessage
       : resources.promptBuyMessage;
+    if (!isPlace && assetInfo.seller === '') {
+      bodyMessageResource = resources.promptBuySimplifiedMessage;
+    }
 
     if (expectedPrice === 0) {
       defaultTitle = translate(resources.getItemHeading);

@@ -1,0 +1,1 @@
+module.exports = "https://images.rbxcdn.com/06c814c14910d4d77d8e3c943252af16-Thumbnail_ESMX.png";

@@ -257,6 +257,17 @@ const getProfiles = async (userIds: number[]): Promise<TGetProfilesResponse> => 
   return data;
 };
 
+const getSearchLandingRecommendations = async (
+  sessionId: string
+): Promise<TExploreApiSortsResponse> => {
+  const params = { sessionId };
+  const { data } = await httpService.get<TExploreApiSortsResponse>(
+    bedev2Constants.url.getSearchLandingPage,
+    params
+  );
+  return data;
+};
+
 export default {
   getExperimentationValues,
   getOmniRecommendations,
@@ -268,5 +279,6 @@ export default {
   postSurveyResults,
   getThumbnailForAsset,
   getGuacAppPolicyBehaviorData,
-  getProfiles
+  getProfiles,
+  getSearchLandingRecommendations
 };

@@ -16,7 +16,6 @@ import GameLauncher from './gameLauncher';
 import {
   getDeferredDeeplinkQueryParams
 } from '../ts/deferredDeeplinks/deferredDeeplinkUtilities';
-
 const ProtocolHandlerClientInterface = {
   isInstalling: false,
   statusInterval: 0,
@@ -771,6 +770,20 @@ function protocolHandlerInstall(gameLaunchParams) {
       ProtocolHandlerClientInterface.attachManualDownloadToLink();
     }
 
+    if (gameLaunchParams.placeId && window.localStorage.getItem('ref_info') !== null) {
+      const refInfo = (() => {
+        const refInfoRaw = window.localStorage.getItem('ref_info');
+        window.localStorage.removeItem('ref_info');
+        if (!refInfoRaw) return {};
+        try {
+          return JSON.parse(atob(refInfoRaw));
+        } catch {
+          return {};
+        }
+      })();
+      // eslint-disable-next-line no-param-reassign
+      gameLaunchParams.referredByPlayerId = refInfo[gameLaunchParams.placeId];
+    }
     setTimeout(() => {
       $('.VisitButtonContinueGLI a')
         .removeClass('disabled')

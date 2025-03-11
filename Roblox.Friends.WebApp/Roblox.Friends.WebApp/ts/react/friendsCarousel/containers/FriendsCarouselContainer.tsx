@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EventContext } from '@rbx/unified-logging';
 import { WithTranslationsProps, withTranslations } from 'react-utilities';
+import { AccessManagementUpsellV2Service } from 'Roblox';
 import friendsService from '../services/friendsService';
 import chatService from '../services/chatService';
 import { translationConfig } from '../translation.config';
@@ -18,6 +19,35 @@ const allSettled = (promises: Promise<any>[]) => {
       }))
     )
   );
+};
+
+const mustHideConnectionsCheck = async (profileUserId: number, isMyProfile: boolean) => {
+  if (isMyProfile) {
+    return false;
+  }
+  const ampFeatureCheckData = [
+    {
+      name: 'vieweeUserId',
+      type: 'UserId',
+      value: profileUserId.toString()
+    }
+  ];
+  const ampRecourseData = {
+    mustHideConnections: true
+  };
+  let mustHide = ampRecourseData.mustHideConnections;
+  try {
+    mustHide = await AccessManagementUpsellV2Service.startAccessManagementUpsell({
+      featureName: 'MustHideConnections',
+      ampFeatureCheckData,
+      isAsyncCall: false,
+      usePrologue: true,
+      ampRecourseData
+    });
+  } catch (e) {
+    return ampRecourseData.mustHideConnections;
+  }
+  return mustHide;
 };
 
 const FriendsCarouselContainer = ({
@@ -42,15 +72,19 @@ const FriendsCarouselContainer = ({
   const [friendsCount, setFriendsCount] = useState<number | null>(null);
   const [friends, setFriends] = useState<TFriend[] | null>(null);
   const [canChat, setCanChat] = useState<boolean>(false);
+  const [mustHideConnections, setMustHideConnections] = useState<boolean>(true);
 
   useEffect(() => {
     const getData: () => Promise<void> = async () => {
       const promises = [
         friendsService.getFriendsCount(profileUserId),
         friendsService.getFriends(profileUserId, isOwnUser),
-        chatService.getChatSettings()
+        chatService.getChatSettings(),
+        mustHideConnectionsCheck(profileUserId, isOwnUser)
       ];
-      const [getFriendsCount, getFriends, getChatSettings] = await allSettled(promises);
+      const [getFriendsCount, getFriends, getChatSettings, mustHideFriends] = await allSettled(
+        promises
+      );
       const friendsCountValue = getFriendsCount.value as TGetFriendsCountResponse;
       const friendsValue = getFriends.value as TFriend[];
       const chatSettingsValue = getChatSettings.value as TGetChatSettings;
@@ -58,14 +92,15 @@ const FriendsCarouselContainer = ({
       setFriendsCount(getFriendsCount.status === 'fulfilled' ? friendsCountValue.count : 0);
       setFriends(getFriends.status === 'fulfilled' ? friendsValue : []);
       setCanChat(getChatSettings.status === 'fulfilled' ? chatSettingsValue.chatEnabled : false);
+      setMustHideConnections(mustHideFriends.status === 'fulfilled' ? mustHideFriends.value : true);
     };
 
     getData().catch(e => {
       throw e;
     });
-  }, [profileUserId]);
+  }, [profileUserId, isOwnUser]);
 
-  return friendsCount === 0 ? (
+  return mustHideConnections || friendsCount === 0 ? (
     <div className='friends-carousel-0-friends' />
   ) : (
     <div className='react-friends-carousel-container'>

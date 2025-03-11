@@ -1,0 +1,1 @@
+module.exports = "https://images.rbxcdn.com/658e1bad3342927f72cb901b6c796d8a-Thumbnail_TR.png";

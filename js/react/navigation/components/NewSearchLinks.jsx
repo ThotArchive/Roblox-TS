@@ -12,7 +12,7 @@ function NewSearchLinks({
   indexOfSelectedOption,
   searchSuggestions,
   autocompleteSessionInfo,
-  resetAutocompleteSessionInfo
+  resetSessionInfo
 }) {
   const onClick = (suggestionType, index) => () => {
     const suggestion = searchSuggestions[index];
@@ -27,7 +27,7 @@ function NewSearchLinks({
         autocompleteSessionInfo
       )
     );
-    resetAutocompleteSessionInfo();
+    resetSessionInfo();
 
     const isAutocomplete = suggestionType.includes('default') ? 0 : 1;
     eventStreamService.sendEvent(
@@ -102,7 +102,7 @@ NewSearchLinks.propTypes = {
     ])
   ).isRequired,
   autocompleteSessionInfo: PropTypes.string.isRequired,
-  resetAutocompleteSessionInfo: PropTypes.func.isRequired
+  resetSessionInfo: PropTypes.func.isRequired
 };
 
 export default NewSearchLinks;

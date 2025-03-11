@@ -13,7 +13,9 @@ import {
   TOmniRecommendationGame,
   TOmniRecommendationGameSort,
   TOmniRecommendationsContentMetadata,
-  TOmniRecommendationSort
+  TOmniRecommendationSduiSort,
+  TOmniRecommendationSort,
+  TTreatmentType
 } from '../../common/types/bedev2Types';
 
 export const hydrateOmniRecommendationGames = (
@@ -51,6 +53,12 @@ const isOmniRecommendationGameSort = (
   gameSort: TGameSort
 ): gameSort is TOmniRecommendationGameSort => {
   return 'recommendationList' in gameSort;
+};
+
+export const isOmniRecommendationSduiSort = (
+  sort: TOmniRecommendationSort
+): sort is TOmniRecommendationSduiSort => {
+  return sort.treatmentType === TTreatmentType.Sdui;
 };
 
 export const isGameSortFromOmniRecommendations = (
@@ -99,6 +107,7 @@ export const mapExploreApiGameSortResponse = (
 ): TExploreApiGameSort => {
   return {
     topic: sort.sortDisplayName,
+    // TODO CLIGROW-2270 Unify gameSetTypeId and sortId across SLP and Charts backend response
     topicId: sort.gameSetTypeId,
     treatmentType: sort.treatmentType,
     games: sort.games.map(game => {
@@ -152,6 +161,14 @@ export const mapExploreApiSortsResponse = (data: TExploreApiSortsResponse): TExp
 export const getSortTargetId = (sort: TGameSort | undefined): number | undefined => {
   if (sort && isExploreApiGameSort(sort)) {
     return sort.gameSetTargetId;
+  }
+
+  return undefined;
+};
+
+export const getSortId = (sort: TGameSort | undefined): string | undefined => {
+  if (sort && isExploreApiGameSort(sort)) {
+    return sort.sortId;
   }
 
   return undefined;

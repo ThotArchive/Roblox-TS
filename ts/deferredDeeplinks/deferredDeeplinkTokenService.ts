@@ -1,6 +1,7 @@
 import { AxiosResponse, httpService } from 'core-utilities';
 import { EnvironmentUrls } from 'Roblox';
 import { deferredDeeplinkGroupName } from './deferredDeeplinkConstants';
+import sendDeeplinkTokenCreateAttempt from './deferredDeeplinkEvents';
 
 const deferredDeeplinkTokenServiceUrl = `${EnvironmentUrls.apiGatewayUrl}/deferred-deep-link/token-api`;
 export type TCreateDeeplinkTokenResponse = {
@@ -26,7 +27,9 @@ const createDeeplinkToken = async (
       urlConfig,
       createDeeplinkTokenRequestBody
     );
-    return res.data.token ?? null;
+    const token = res.data.token ?? null;
+    sendDeeplinkTokenCreateAttempt(token, experienceAffiliateReferralUrl, res.status);
+    return token;
   } catch (err) {
     return null;
   }

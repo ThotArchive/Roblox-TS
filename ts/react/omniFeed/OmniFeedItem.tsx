@@ -7,12 +7,14 @@ import GameGridFeedItem from './GameGridFeedItem';
 import { PageContext } from '../common/types/pageContext';
 import FriendCarouselFeedItem from './FriendCarouselFeedItem';
 import FiltersFeedItem from './FiltersFeedItem';
+import SduiFeedItem from './SduiFeedItem';
+import { TOmniRecommendationSduiTree } from '../sdui/system/SduiTypes';
 
 type TOmniFeedItemProps = {
   translate: WithTranslationsProps['translate'];
   sort: TSort;
   positionId: number;
-  currentPage: PageContext.HomePage | PageContext.GamesPage;
+  currentPage: PageContext.HomePage | PageContext.GamesPage | PageContext.SearchLandingPage;
   itemsPerRow: number | undefined;
   startingRow: number | undefined;
   gridRecommendations?: TOmniRecommendationGame[];
@@ -22,6 +24,7 @@ type TOmniFeedItemProps = {
   isChartsPageRenameEnabled?: boolean;
   isCarouselHorizontalScrollEnabled?: boolean;
   isNewScrollArrowsEnabled?: boolean;
+  sduiRoot?: TOmniRecommendationSduiTree;
   fetchGamesPageData?: (filters: Map<string, string>) => void;
 };
 
@@ -39,6 +42,7 @@ export const OmniFeedItem = ({
   isChartsPageRenameEnabled,
   isCarouselHorizontalScrollEnabled,
   isNewScrollArrowsEnabled,
+  sduiRoot,
   fetchGamesPageData
 }: TOmniFeedItemProps): JSX.Element | null => {
   switch (sort.treatmentType) {
@@ -84,6 +88,8 @@ export const OmniFeedItem = ({
           fetchGamesPageData={fetchGamesPageData}
         />
       );
+    case TTreatmentType.Sdui:
+      return <SduiFeedItem sort={sort} sduiRoot={sduiRoot} currentPage={currentPage} />;
     default:
       return null;
   }

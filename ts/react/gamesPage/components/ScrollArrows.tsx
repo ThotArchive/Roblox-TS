@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import ScrollerBar from './ScrollerBar';
 
 type TScrollArrowsProps = {
+  hideScrollBackWhenDisabled?: boolean;
   isScrollBackDisabled: boolean;
   isScrollForwardDisabled: boolean;
   onScrollBack: () => void;
@@ -14,6 +15,7 @@ type TScrollArrowsProps = {
  * Renders the left and right scroll arrows on top of a scrollable carousel
  */
 const ScrollArrows = ({
+  hideScrollBackWhenDisabled = false,
   isScrollBackDisabled,
   isScrollForwardDisabled,
   onScrollBack,
@@ -49,13 +51,15 @@ const ScrollArrows = ({
 
   return (
     <React.Fragment>
-      <ScrollerBar
-        scrollClassNames={classNames('scroller', 'prev', { disabled: isScrollBackDisabled })}
-        scrollIconClassName='icon-games-carousel-left'
-        isDisabled={isScrollBackDisabled}
-        scroll={onScrollBack}
-        isNewScrollArrowsEnabled={false}
-      />
+      {hideScrollBackWhenDisabled && isScrollBackDisabled ? null : (
+        <ScrollerBar
+          scrollClassNames={classNames('scroller', 'prev', { disabled: isScrollBackDisabled })}
+          scrollIconClassName='icon-games-carousel-left'
+          isDisabled={isScrollBackDisabled}
+          scroll={onScrollBack}
+          isNewScrollArrowsEnabled={false}
+        />
+      )}
       <ScrollerBar
         scrollClassNames={classNames('scroller', 'next', { disabled: isScrollForwardDisabled })}
         scrollIconClassName='icon-games-carousel-right'

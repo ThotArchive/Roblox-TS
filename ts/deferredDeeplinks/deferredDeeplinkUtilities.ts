@@ -1,9 +1,4 @@
-import { ExperimentationService } from 'Roblox';
-import { jsClientDeviceIdentifier } from '@rbx/header-scripts';
 import {
-  deferredDeeplinkMacLayerName,
-  deferredDeeplinkWindowsLayerName,
-  isDeferredDeeplinkEnabledFlagName,
   supportedDeferredDeeplinkPathPatterns,
   deferredDeeplinkTokenQueryParameterKey
 } from './deferredDeeplinkConstants';

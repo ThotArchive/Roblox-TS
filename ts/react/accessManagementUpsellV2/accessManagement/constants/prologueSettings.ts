@@ -58,6 +58,17 @@ export function getPrologueTranslatedBodyText(
   if (recourseParameters?.enablePurchases !== undefined) {
     return translate(PrologueConstants.Description.VpcEnablePurchase);
   }
+  if (recourseParameters?.friendManagementAction === 'Unblock') {
+    return translate(PrologueConstants.Description.VpcUnblockUser, {
+      displayName: recourseParameters.displayName
+    });
+  }
+  if (recourseParameters?.experienceManagementAction === 'Unblock') {
+    return translate(PrologueConstants.Description.VpcUnblockExperience, {
+      experienceName: recourseParameters.experienceName
+    });
+  }
+
   const featurePromptLine = getProloguePromptLine(featureName, recourseParameters);
 
   const translatedBodyText = featurePromptLine

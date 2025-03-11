@@ -68,18 +68,18 @@ const VpcPrologue = ({
     actionButtonTranslateKey,
     neutralButtonTranslateKey,
     onAction: () => {
-      sendEmailParentClickEvent(featureName, true, settingName);
+      sendEmailParentClickEvent(featureName, true, settingName, recourseParameters);
       dispatch(setVerificationStageRecourse(recourseResponses[0]));
       dispatch(setStage(UpsellStage.Verification));
       requireVpcModalService.close();
     },
     size: 'sm',
     onHide: () => {
-      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName);
+      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName, recourseParameters);
       onHide();
     },
     onNeutral: () => {
-      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName);
+      sendVerifyCancelClickEvent(featureName, 'Vpc', settingName, recourseParameters);
       onHide();
     }
   });
@@ -87,7 +87,7 @@ const VpcPrologue = ({
   // Trigger the opening of the error modal in response to a user action or effect
   useEffect(() => {
     requireVpcModalService.open();
-    sendProloguePageLoadEvent(featureName, 'Vpc', settingName);
+    sendProloguePageLoadEvent(featureName, 'Vpc', settingName, recourseParameters);
   }, []);
 
   return [requireVpcModal, requireVpcModalService];

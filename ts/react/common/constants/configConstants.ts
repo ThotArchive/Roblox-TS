@@ -23,7 +23,8 @@ export const gamesPage = {
   adSortDiscoverId: 27,
   carouselContainerBufferWidth: 80,
   gameTileGutterWidth: 14,
-  wideGameTileGutterWidth: 16
+  wideGameTileGutterWidth: 16,
+  scrollerWidth: 30
 };
 
 export const gameDetailsPage = {
@@ -60,6 +61,17 @@ export const gameSearchPage = {
 
 export const surveyLocation = {
   experienceDetails: 'experienceDetails'
+};
+
+export const searchLandingPage = {
+  searchLandingPageFetchRecommendationsError: 'SearchLandingPageFetchRecommendationsError',
+  searchLandingPageFetchRecommendationsSuccess: 'SearchLandingPageFetchRecommendationsSuccess',
+  searchLandingPageMissingSessionInfoError: 'SearchLandingPageMissingSessionInfoError',
+  searchLandingPageUnexpectedTreatmentTypeError: 'SearchLandingPageUnexpectedTreatmentTypeError',
+  searchLandingPageMountError: 'SearchLandingPageMountError',
+  searchLandingMissingSortIdError: 'SearchLandingMissingSortIdError',
+  missingSortIdDefault: 'undefined',
+  numberOfTilesPerCarousel: 5
 };
 
 export default {

@@ -16,12 +16,12 @@ import GameCarouselSubtitle from './GameCarouselSubtitle';
 type TGameCarouselContainerHeaderProps = {
   sortTitle: string;
   sortSubtitle?: string;
-  seeAllLink: string;
-  subtitleLink: string;
+  seeAllLink: string | undefined;
+  subtitleLink: string | undefined;
   shouldShowSeparateSubtitleLink: boolean;
   isSortLinkOverrideEnabled: boolean;
   buildNavigateToSortLinkEventProperties?: TBuildNavigateToSortLinkEventProperties;
-  shouldShowSponsoredTooltip: boolean;
+  shouldShowSponsoredTooltip: boolean | undefined;
   tooltipInfoText?: string;
   titleContainerClassName: string;
   hideSeeAll?: boolean;

@@ -240,6 +240,7 @@ export const HomePageCarousel = ({
           loadMoreGames={undefined}
           isLoadingMoreGames={false}
           componentType={componentType}
+          sortId={sort.topicId}
           playerCountStyle={playerCountStyle}
           playButtonStyle={playButtonStyle}
           itemsPerRow={itemsPerRow}

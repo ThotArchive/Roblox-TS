@@ -139,7 +139,7 @@ function autoPurchaseFlow(
     titleText,
     bodyContent: dialogBodyNew,
     footerText: allowHtmlContentInFooter
-      ? `<div class='modal-footer-text'>${footerText}</div>`
+      ? `<div class='modal-robux-upsell'><div class='modal-footer-text'>${footerText}</div></div>`
       : ``,
     declineText: translationResource.get(LANG_KEYS.cancelAction, {}),
     acceptText: translationResource.get(LANG_KEYS.buyRobuxAndItemAction, {}),

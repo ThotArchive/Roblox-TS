@@ -258,7 +258,7 @@ export function BatchBuyItems({
           <LeaveRobloxWarningModal onContinueToPayment={handleLeaveRobloxWarningButtonClick} />
         </div>
       )}
-      <div id='multi-item-purchase-modal'>{purchaseModal}</div>
+      {purchaseModal && <div id='multi-item-purchase-modal'>{purchaseModal}</div>}
     </React.Fragment>
   );
 }

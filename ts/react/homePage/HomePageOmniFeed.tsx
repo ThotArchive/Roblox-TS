@@ -241,6 +241,7 @@ export const HomePageOmniFeed = ({ translate }: WithTranslationsProps): JSX.Elem
                 isExpandHomeContentEnabled={isExpandHomeContentEnabled}
                 isCarouselHorizontalScrollEnabled={isCarouselHorizontalScrollEnabled}
                 isNewScrollArrowsEnabled={isNewScrollArrowsEnabled}
+                sduiRoot={recommendations.sdui}
               />
             </React.Fragment>
           ))}

@@ -22,7 +22,7 @@ type TGamesPageGameCarouselProps = {
   gameData: TGameData[];
   sort: TGameSort;
   positionId: number;
-  page: PageContext.GamesPage | PageContext.HomePage;
+  page: PageContext.GamesPage | PageContext.HomePage | PageContext.SearchLandingPage;
   // Type union will be cleaned up with isCarouselHorizontalScrollEnabled
   gamesContainerRef: React.RefObject<HTMLUListElement | HTMLDivElement>;
   buildEventProperties: TBuildEventProperties;
@@ -40,13 +40,16 @@ type TGamesPageGameCarouselProps = {
   isExpandHomeContentEnabled?: boolean;
   isCarouselHorizontalScrollEnabled?: boolean;
   isNewScrollArrowsEnabled?: boolean;
+  hideScrollBackWhenDisabled?: boolean;
   translate: WithTranslationsProps['translate'];
+  sortId: string | number;
 };
 
 const {
   numGameCarouselLookAheadWindows,
   gameTileGutterWidth,
-  wideGameTileGutterWidth
+  wideGameTileGutterWidth,
+  scrollerWidth
 } = configConstants.gamesPage;
 
 const { wideTileHoverGrowWidthPx } = configConstants.common;
@@ -72,6 +75,8 @@ export const GameCarouselHorizontalScroll = ({
   isExpandHomeContentEnabled,
   isCarouselHorizontalScrollEnabled,
   isNewScrollArrowsEnabled,
+  hideScrollBackWhenDisabled,
+  sortId,
   translate
 }: TGamesPageGameCarouselProps): JSX.Element => {
   const tileRef = useRef<HTMLDivElement>(null);
@@ -194,7 +199,13 @@ export const GameCarouselHorizontalScroll = ({
         }
 
         if (carouselScrollWidth !== undefined) {
-          return Math.max(prevLeftValue - scrollDistance, -1 * carouselScrollWidth);
+          // If initially the scroll back button is hidden, we need to account for the scroller width
+          // when its shown after the first scroll to next so the first game tile is fully shown in the window.
+          const scrollerOffset: number =
+            hideScrollBackWhenDisabled && isScrollBackDisabled ? scrollerWidth : 0;
+          return (
+            Math.max(prevLeftValue - scrollDistance, -1 * carouselScrollWidth) + scrollerOffset
+          );
         }
 
         return prevLeftValue - scrollDistance;
@@ -204,14 +215,16 @@ export const GameCarouselHorizontalScroll = ({
       checkLoadMoreGames();
     }
   }, [
-    checkLoadMoreGames,
-    getScrollDistance,
     isScrollForwardDisabled,
-    numGamesFitted,
-    carouselWindowWidth,
-    carouselScrollWidth,
+    getScrollDistance,
+    checkLoadMoreGames,
+    isCarouselHorizontalScrollEnabled,
     page,
-    isCarouselHorizontalScrollEnabled
+    carouselScrollWidth,
+    carouselWindowWidth,
+    hideScrollBackWhenDisabled,
+    isScrollBackDisabled,
+    numGamesFitted
   ]);
 
   const getIsGameOnScreen = useCallback(
@@ -238,7 +251,7 @@ export const GameCarouselHorizontalScroll = ({
   useHorizontalScrollTracker({
     scrollPosition: -carouselLeftValue,
     page,
-    gameSetTypeId: sort.topicId,
+    gameSetTypeId: sortId,
     gameSetTargetId: getSortTargetId(sort),
     wrapperRef: carouselContainerRef,
     sortPosition: positionId
@@ -320,6 +333,7 @@ export const GameCarouselHorizontalScroll = ({
           </ul>
         </div>
         <ScrollArrows
+          hideScrollBackWhenDisabled={hideScrollBackWhenDisabled}
           isScrollBackDisabled={isScrollBackDisabled}
           isScrollForwardDisabled={isScrollForwardDisabled}
           onScrollBack={() => onScrollHandlerThrottled(onScrollToPrev)}
@@ -344,7 +358,8 @@ GameCarouselHorizontalScroll.defaultProps = {
   topicId: undefined,
   isExpandHomeContentEnabled: undefined,
   isCarouselHorizontalScrollEnabled: undefined,
-  isNewScrollArrowsEnabled: undefined
+  isNewScrollArrowsEnabled: undefined,
+  hideScrollBackWhenDisabled: false
 };
 
 export default GameCarouselHorizontalScroll;

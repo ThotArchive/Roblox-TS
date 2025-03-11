@@ -25,7 +25,9 @@ export const PlayabilityStatus = {
     'ContextualPlayabilityUnverifiedSeventeenPlusUser',
   FiatPurchaseRequired: 'FiatPurchaseRequired',
   ContextualPlayabilityUnrated: 'ContextualPlayabilityUnrated',
-  ContextualPlayabilityAgeGatedByDescriptor: 'ContextualPlayabilityAgeGatedByDescriptor'
+  ContextualPlayabilityAgeGatedByDescriptor: 'ContextualPlayabilityAgeGatedByDescriptor',
+  ContextualPlayabilityExperienceBlockedParentalControls:
+    'ContextualPlayabilityExperienceBlockedParentalControls'
 } as const;
 
 // NOTE: This does not override the true event name since it is set in:
@@ -74,7 +76,9 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
   [PlayabilityStatus.PlaceHasNoPublishedVersion]: 'UnplayableError.PlaceHasNoPublishedVersion',
   [PlayabilityStatus.ContextualPlayabilityUnrated]: 'UnplayableError.ContextualPlayabilityUnrated',
   [PlayabilityStatus.ContextualPlayabilityAgeGatedByDescriptor]:
-    'UnplayableError.ContextualPlayabilityAgeGatedByDescriptor'
+    'UnplayableError.ContextualPlayabilityAgeGatedByDescriptor',
+  [PlayabilityStatus.ContextualPlayabilityExperienceBlockedParentalControls]:
+    'UnplayableError.ContextualPlayabilityExperienceBlockedParentalControls'
 };
 
 const playButtonTextTranslationMap = {

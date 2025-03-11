@@ -35,6 +35,7 @@ export default {
     promptGetFreeMessage: 'Message.PromptGetFree',
     promptBuyAccessMessage: 'Message.PromptBuyAccess',
     promptBuyMessage: 'Message.PromptBuy',
+    promptBuySimplifiedMessage: 'Message.PromptBuySimplified',
     configureAction: 'Action.Customize',
     notNowAction: 'Action.NotNow',
     customizeAction: 'Action.Customize',

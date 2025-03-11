@@ -70,10 +70,10 @@ function buildRedirectUrlWithJoinData(url: string, joinData: ExperienceJoinData)
   const searchParams = new URLSearchParams(queryString);
   if (joinData) {
     if (joinData.launchData && joinData.launchData !== '') {
-      searchParams.append('launchData', encodeURIComponent(joinData.launchData));
+      searchParams.append('launchData', joinData.launchData);
     }
     if (joinData.experienceEventId && joinData.experienceEventId !== '') {
-      searchParams.append('eventId', encodeURIComponent(joinData.experienceEventId));
+      searchParams.append('eventId', joinData.experienceEventId);
     }
   }
   return `${baseUrl}?${searchParams.toString()}`;

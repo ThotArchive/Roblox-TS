@@ -9,8 +9,10 @@ export const EventConstants = {
   text: {
     IdvOrVpc: 'Verify Your Age/Parent Permission Needed',
     VPC: 'Parent Permission Needed',
+    AskYourParent: 'Ask Your Parent',
     VerifyId: 'Verify ID',
     EmailMyParent: 'Email My Parent',
+    AskNow: 'Ask Now',
     Cancel: 'X icon or "Cancel"'
   },
   btn: {
@@ -50,7 +52,8 @@ export function sendVerifyIdClickEvent(featureName: string, idvOnly: boolean): v
 export function sendEmailParentClickEvent(
   featureName: string,
   vpcOnly: boolean,
-  settingName?: string
+  settingName?: string,
+  recourseParameters?: Record<string, string>
 ): void {
   if (featureName === 'CanCorrectAge') {
     eventStreamService.sendEventWithTarget(
@@ -70,6 +73,16 @@ export function sendEmailParentClickEvent(
         btn: EventConstants.btn.EmailParent,
         state: generateState(undefined, settingName),
         associatedText: EventConstants.text.EmailMyParent
+      }
+    );
+  } else if (featureName === 'CanRemoveParentManagedUserBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.EmailParent,
+        state: `unblockUser ${recourseParameters?.friendUserId}`,
+        associatedText: EventConstants.text.AskNow
       }
     );
   }
@@ -96,7 +109,8 @@ function getEventStateForCanCorrectAge(prologue: string) {
 export function sendVerifyCancelClickEvent(
   featureName: string,
   prologue: string,
-  settingName?: string
+  settingName?: string,
+  recourseParameters?: Record<string, string>
 ): void {
   if (featureName === 'CanCorrectAge') {
     const currentState = getEventStateForCanCorrectAge(prologue);
@@ -120,13 +134,24 @@ export function sendVerifyCancelClickEvent(
         associatedText: EventConstants.text.Cancel
       }
     );
+  } else if (featureName === 'CanRemoveParentManagedUserBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.verifyCancel,
+        state: `unblockUser ${recourseParameters?.friendUserId}`,
+        associatedText: EventConstants.text.Cancel
+      }
+    );
   }
 }
 
 export function sendProloguePageLoadEvent(
   featureName: string,
   prologue: string,
-  settingName?: string
+  settingName?: string,
+  recourseParameters?: Record<string, string>
 ): void {
   if (featureName === 'CanCorrectAge') {
     const currentState = getEventStateForCanCorrectAge(prologue);
@@ -136,7 +161,6 @@ export function sendProloguePageLoadEvent(
       EventConstants.context.SettingsAgeChangeVerify,
       {
         state: currentState,
-
         associatedText: EventConstants.text.IdvOrVpc
       }
     );
@@ -147,6 +171,15 @@ export function sendProloguePageLoadEvent(
       {
         state: generateState(undefined, settingName),
         associatedText: EventConstants.text.VPC
+      }
+    );
+  } else if (featureName === 'CanRemoveParentManagedUserBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthPageload,
+      EventConstants.context.UpdateSetting,
+      {
+        state: `unblockUser ${recourseParameters?.friendUserId}`,
+        associatedText: EventConstants.text.AskYourParent
       }
     );
   }

@@ -2,38 +2,40 @@
 // the current platform event.
 
 import { getNavigationContainer } from './searchConstants';
-import logoVn from '../../../../images/The_Haunt__VN_1x1_400x400.png';
-import logoTr from '../../../../images/The_Haunt__TR_1x1_400x400.png';
-import logoTh from '../../../../images/The_Haunt__TH_1x1_400x400.png';
-import logoPtbr from '../../../../images/The_Haunt__PTBR_1x1_400x400.png';
-import logoPl from '../../../../images/The_Haunt__PL_1x1_400x400.png';
-import logoKo from '../../../../images/The_Haunt__KO_1x1_400x400.png';
-import logoJp from '../../../../images/The_Haunt__JP_1x1_400x400.png';
-import logoIt from '../../../../images/The_Haunt__IT_1x1_400x400.png';
+import logoVn from '../../../../images/Thumbnail_VN.png';
+import logoTr from '../../../../images/Thumbnail_TR.png';
+// import logoTh from '../../../../images/';
+import logoPtbr from '../../../../images/Thumbnail_PTBR.png';
+import logoPl from '../../../../images/Thumbnail_PL.png';
+import logoKo from '../../../../images/Thumbnail_KO.png';
+import logoJp from '../../../../images/Thumbnail_JP.png';
+// import logoIt from '../../../../images/';
 // import logoId from '../../../../images/';
 // import logoFr from '../../../../images/';
-import logoEs from '../../../../images/The_Haunt__ESMX_1x1_400x400.png';
-import logoEn from '../../../../images/The_Haunt__EN_1x1_400x400.png';
+import logoEs from '../../../../images/Thumbnail_ESMX.png';
+import logoEn from '../../../../images/Thumbnail_EN.png';
 // import logoDe from '../../../../images/';
-import logoCht from '../../../../images/The_Haunt__CHT_1x1_400x400.png';
-import logoChs from '../../../../images/The_Haunt__CHS_1x1_400x400.png';
+// import logoCht from '../../../../images/;
+import logoChs from '../../../../images/Thumbnail_CHS.png';
+import logoAr from '../../../../images/Thumbnail_AR.png';
 
 const thumbnails = {
   vi_vn: logoVn,
   tr_tr: logoTr,
-  th_th: logoTh,
+  // th_th: logoTh,
   pt_br: logoPtbr,
   pl_pl: logoPl,
   ko_kr: logoKo,
   ja_jp: logoJp,
-  it_it: logoIt,
+  // it_it: logoIt,
   // id_id: logoId,
   // fr_fr: logoFr,
   es_es: logoEs,
   en_us: logoEn,
   // de_de: logoDe,
-  zh_tw: logoCht,
-  zh_cn: logoChs
+  // zh_tw: logoCht,
+  zh_cn: logoChs,
+  ar_001: logoAr
 };
 
 export default {

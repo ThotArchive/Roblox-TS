@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { withTranslations, usePrevious, useDebounce } from 'react-utilities';
 import { httpService, pageName } from 'core-utilities';
 import { eventStreamService } from 'core-roblox-utilities';
+import { SearchLandingService, ExperimentationService, Endpoints } from 'Roblox';
+import { fireEvent } from 'roblox-event-tracker';
 import { translationConfig } from '../translation.config';
 import SearchInput from '../components/SearchInput';
 import layout from '../constants/layoutConstants';
@@ -12,6 +14,7 @@ import searchService, { GamesAutocompleteSuggestionEntryType } from '../services
 import events from '../constants/searchEventStreamConstants';
 import navigationUtil from '../util/navigationUtil';
 import searchUtil from '../util/searchUtil';
+import searchConfigConstants from '../constants/configConstants';
 
 export function UniversalSearch({ translate, isUniverseSearchShown }) {
   const [searchInput, setSearchInput] = useState(
@@ -24,6 +27,11 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
   const [autocompleteSessionInfo, setAutocompleteSessionInfo] = useState(
     events.generateSessionInfo()
   );
+  const [searchLandingPageSessionInfo, setSearchLandingPageSessionInfo] = useState(
+    events.generateSessionInfo()
+  );
+  const hasFetchedSearchLandingPageExperimentValuesRef = useRef(false);
+  const [isSearchLandingEnabled, setIsSearchLandingEnabled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInitialCall, setIsInitialCall] = useState(true);
   const [isMenuHover, setIsMenuHover] = useState(false);
@@ -127,13 +135,19 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     // prevents sending a search event when the component is just being mounted
     if (!isInitialCall) {
       eventStreamService.sendEvent(
-        ...events.search(searchInput, events.actionTypes.submit, autocompleteSessionInfo)
+        ...events.search(
+          searchInput,
+          events.contexts.searchAutocomplete,
+          events.actionTypes.submit,
+          autocompleteSessionInfo
+        )
       );
     }
     setIsInitialCall(false);
 
     const getAutocompleteSuggestion = async () => {
       if (
+        debouncedSearchInput !== undefined &&
         debouncedSearchInput !== '' &&
         debouncedSearchInput.length <= search.debouncedSearchInputMaxLength
       ) {
@@ -215,6 +229,17 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     setAutocompleteSessionInfo(events.generateSessionInfo());
   };
 
+  const resetSearchLandingPageSessionInfo = () => {
+    const newSearchLandingSessionInfo = events.generateSessionInfo();
+    setSearchLandingPageSessionInfo(newSearchLandingSessionInfo);
+    SearchLandingService.updateSessionInfo(newSearchLandingSessionInfo);
+  };
+
+  const resetSessionInfo = () => {
+    resetAutocompleteSessionInfo();
+    resetSearchLandingPageSessionInfo();
+  };
+
   const handleSearch = ({ target: { value } }) => {
     if (value.length < searchInput.length) {
       eventStreamService.sendEvent(
@@ -222,8 +247,33 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
       );
     }
 
-    if (value.length === 0) {
+    // Reset autocomplete session info when the search input goes from non-empty to empty
+    if (searchInput.length > 0 && value.length === 0) {
       resetAutocompleteSessionInfo();
+      if (isSearchLandingEnabled) {
+        SearchLandingService.showSearchLanding(searchLandingPageSessionInfo);
+        eventStreamService.sendEvent(
+          ...events.search(
+            undefined,
+            events.contexts.searchLandingPage,
+            events.actionTypes.open,
+            searchLandingPageSessionInfo
+          )
+        );
+      }
+    }
+    // Send autocomplete open event when the search input goes from empty to non-empty
+    if (searchInput.length === 0 && value.length > 0) {
+      const newAutoCompleteSessionInfo = events.generateSessionInfo();
+      eventStreamService.sendEvent(
+        ...events.search(
+          value,
+          events.contexts.searchAutocomplete,
+          events.actionTypes.open,
+          newAutoCompleteSessionInfo
+        )
+      );
+      setAutocompleteSessionInfo(newAutoCompleteSessionInfo);
     }
 
     setSelectedListOptions(0);
@@ -231,25 +281,86 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     setSearchInput(value);
   };
 
-  const openMenu = () => {
-    const newAutoCompleteSessionInfo = events.generateSessionInfo();
-    eventStreamService.sendEvent(
-      ...events.search(searchInput, events.actionTypes.open, newAutoCompleteSessionInfo)
-    );
-    setAutocompleteSessionInfo(newAutoCompleteSessionInfo);
+  const openSearchLandingOrAutocompleteResults = useCallback(
+    isSLPEnabled => {
+      // If the search input is empty, show the search landing page if its enabled
+      if (isSLPEnabled && searchInput.length === 0) {
+        const newSearchLandingSessionInfo = events.generateSessionInfo();
+        SearchLandingService.showSearchLanding(newSearchLandingSessionInfo);
+        eventStreamService.sendEvent(
+          ...events.search(
+            undefined,
+            events.contexts.searchLandingPage,
+            events.actionTypes.open,
+            newSearchLandingSessionInfo
+          )
+        );
+        setSearchLandingPageSessionInfo(newSearchLandingSessionInfo);
+      } else {
+        // else log an autocomplete open event and wait for user input to show autocomplete results
+        const newAutoCompleteSessionInfo = events.generateSessionInfo();
+        eventStreamService.sendEvent(
+          ...events.search(
+            searchInput,
+            events.contexts.searchAutocomplete,
+            events.actionTypes.open,
+            newAutoCompleteSessionInfo
+          )
+        );
+        setAutocompleteSessionInfo(newAutoCompleteSessionInfo);
+      }
+      if ((!isSLPEnabled && searchInput.length === 0) || isMenuHover) return;
+      // Set the menu to open if slp enabled and search input is empty or slp is disabled and search input is not empty (autocomplete results shown)
+      setIsMenuOpen(true);
+    },
+    [isMenuHover, searchInput]
+  );
 
-    if (searchInput.length === 0 || isMenuHover) return;
-    setIsMenuOpen(true);
-  };
+  const openMenu = useCallback(() => {
+    // On search bar click determine whether to show search landing page via experiment value
+    if (!hasFetchedSearchLandingPageExperimentValuesRef.current) {
+      ExperimentationService.getAllValuesForLayer('PlayerApp.HomePage.UX.WholePageRanking')
+        .then(values => {
+          const isEnabled = values?.shouldShowSearchLandingPageWeb ?? false;
+          setIsSearchLandingEnabled(isEnabled);
+          openSearchLandingOrAutocompleteResults(isEnabled);
+        })
+        .catch(() => {
+          fireEvent(searchConfigConstants.searchLandingPageExperimentFetchError);
+          openSearchLandingOrAutocompleteResults(false);
+        })
+        .finally(() => {
+          hasFetchedSearchLandingPageExperimentValuesRef.current = true;
+        });
+    } else {
+      openSearchLandingOrAutocompleteResults(isSearchLandingEnabled);
+    }
+  }, [isSearchLandingEnabled, openSearchLandingOrAutocompleteResults]);
 
   const closeMenu = () => {
     if (!isMenuOpen) {
       return;
     }
 
-    eventStreamService.sendEvent(
-      ...events.search(searchInput, events.actionTypes.close, autocompleteSessionInfo)
-    );
+    if (isSearchLandingEnabled && searchInput.length === 0) {
+      eventStreamService.sendEvent(
+        ...events.search(
+          null,
+          events.contexts.searchLandingPage,
+          events.actionTypes.cancel,
+          searchLandingPageSessionInfo
+        )
+      );
+    } else {
+      eventStreamService.sendEvent(
+        ...events.search(
+          searchInput,
+          events.contexts.searchAutocomplete,
+          events.actionTypes.close,
+          autocompleteSessionInfo
+        )
+      );
+    }
 
     setIsMenuOpen(false);
   };
@@ -269,6 +380,7 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     ) {
       e.stopPropagation();
       e.preventDefault();
+
       if (e.keyCode === keyCodes.arrowUp) {
         currentCursor -= 1;
       } else {
@@ -287,6 +399,8 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     if (e.keyCode === keyCodes.enter) {
       e.stopPropagation();
       e.preventDefault();
+      // Prevent form submits on enter when SLP is visible / nothing is typed
+      if (isSearchLandingEnabled && searchInput.length === 0) return;
 
       const suggestion = searchSuggestions[indexOfSelectedOption];
 
@@ -339,7 +453,10 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
 
         if (document.getElementById('routing')) {
           const url = new URL(redirectUrl);
-          if (url.origin === window.location.origin && url.pathname === '/catalog') {
+          if (
+            url.origin === window.location.origin &&
+            Endpoints.removeUrlLocale(url.pathname).toLowerCase() === '/catalog'
+          ) {
             const customEvent = new CustomEvent('externalNavigation', {
               detail: { url: redirectUrl }
             });
@@ -372,6 +489,7 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
       {...{
         searchInput,
         handleSearch,
+        isSearchLandingEnabled,
         openMenu,
         closeMenu,
         setIsMenuHover,
@@ -384,7 +502,7 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
         translate,
         searchSuggestions,
         autocompleteSessionInfo,
-        resetAutocompleteSessionInfo,
+        resetSessionInfo,
         isAvatarAutocompleteEnabled: showAvatarAutocompleteSuggestions
       }}
     />

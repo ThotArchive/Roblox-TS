@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TranslateFunction } from 'react-utilities';
 import parentalRequestService from '../services/parentalRequestService';
 import useModal from '../../../hooks/useModal';
 import parentalRequestConstants from '../constants/parentalRequestConstants';
 import parentalRequestInlineErrorHandler, {
-  ParentalRequestError
+  ParentalRequestError,
+  defaultParentalRequestError
 } from '../utils/parentalRequestErrorHandler';
 import ParentalRequestErrorReason from '../enums/ParentalRequestErrorReason';
 import { sendLoadRequestBroadcastEvent } from '../services/eventService';
@@ -62,7 +63,7 @@ const ParentalRequestBroadcast = ({
       });
       successCallBack(response.sessionId);
     } catch (e) {
-      const error = e as ParentalRequestError;
+      const error = (e as ParentalRequestError) ?? defaultParentalRequestError;
 
       const errorReason = parentalRequestInlineErrorHandler(
         error.data.code as ParentalRequestErrorReason

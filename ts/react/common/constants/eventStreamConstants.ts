@@ -15,6 +15,7 @@ export enum EventStreamMetadata {
   Algorithm = 'algorithm',
   AppliedFilters = 'appliedFilters',
   AttributionId = 'attributionId',
+  ComponentType = 'componentType',
   Direction = 'direction',
   Distance = 'distance',
   HttpReferrer = 'httpReferrer',
@@ -95,7 +96,8 @@ export enum EventType {
 export enum SessionInfoType {
   HomePageSessionInfo = 'homePageSessionInfo',
   GameSearchSessionInfo = 'gameSearchSessionInfo',
-  DiscoverPageSessionInfo = 'discoverPageSessionInfo'
+  DiscoverPageSessionInfo = 'discoverPageSessionInfo',
+  SearchLandingPageSessionInfo = 'searchLandingPageSessionInfo'
 }
 
 export type TDiscoverySessionInfo = {
@@ -146,7 +148,7 @@ type TBaseGameImpressions = {
   [EventStreamMetadata.RootPlaceIds]: number[];
   [EventStreamMetadata.AbsPositions]: number[];
   [EventStreamMetadata.UniverseIds]: number[];
-  [EventStreamMetadata.GameSetTypeId]?: number;
+  [EventStreamMetadata.GameSetTypeId]?: number | string;
   [EventStreamMetadata.AdsPositions]?: number[];
   [EventStreamMetadata.AdFlags]?: number[];
   [EventStreamMetadata.AdIds]?: string[];
@@ -155,6 +157,7 @@ type TBaseGameImpressions = {
   [EventStreamMetadata.NavigationUids]?: string[];
   [EventStreamMetadata.TileBadgeContexts]?: string[];
   [EventStreamMetadata.AppliedFilters]?: string;
+  [EventStreamMetadata.ComponentType]?: string;
 };
 
 export type TGridGameImpressions = TBaseGameImpressions & {
@@ -186,7 +189,7 @@ export type TFeedScroll = {
   [EventStreamMetadata.Distance]: number;
   [EventStreamMetadata.Direction]: ScrollDirection;
   [EventStreamMetadata.PageSession]: string;
-  [EventStreamMetadata.GameSetTypeId]?: number;
+  [EventStreamMetadata.GameSetTypeId]?: number | string;
   [EventStreamMetadata.GameSetTargetId]?: number;
   [EventStreamMetadata.SortPos]?: number;
   [EventStreamMetadata.ScrollDepth]: number;
@@ -212,12 +215,14 @@ export type TCarouselGameImpressions = TBaseGameImpressions & {
   [EventStreamMetadata.SortPos]: number;
   [SessionInfoType.HomePageSessionInfo]?: string;
   [SessionInfoType.DiscoverPageSessionInfo]?: string;
+  [SessionInfoType.SearchLandingPageSessionInfo]?: string;
   [EventStreamMetadata.Page]:
     | PageContext.SortDetailPageDiscover
     | PageContext.SortDetailPageHome
     | PageContext.HomePage
     | PageContext.GamesPage
-    | PageContext.GameDetailPage;
+    | PageContext.GameDetailPage
+    | PageContext.SearchLandingPage;
 };
 
 export type TGameImpressions = TCarouselGameImpressions | TGridGameImpressions;
@@ -235,23 +240,40 @@ export type TSortDetailReferral =
     }
   | Record<string, never>;
 
+// Common params for both gameDetailReferral and playGameClicked events
+export type TCommonReferralParams = {
+  [EventStreamMetadata.IsAd]?: boolean | string;
+  [EventStreamMetadata.Position]: number;
+  [EventStreamMetadata.SortPos]?: number;
+  [EventStreamMetadata.NumberOfLoadedTiles]?: number;
+  [EventStreamMetadata.GameSetTypeId]?: number | string;
+  [EventStreamMetadata.AttributionId]?: string;
+  [SessionInfoType.DiscoverPageSessionInfo]?: string;
+  [SessionInfoType.GameSearchSessionInfo]?: string;
+  [SessionInfoType.HomePageSessionInfo]?: string;
+  [EventStreamMetadata.Page]:
+    | PageContext.SearchPage
+    | PageContext.SortDetailPageDiscover
+    | PageContext.SortDetailPageHome
+    | PageContext.HomePage
+    | PageContext.GamesPage
+    | PageContext.GameDetailPage
+    | PageContext.PeopleListInHomePage
+    | PageContext.SearchLandingPage;
+};
+
 export type TGameDetailReferral =
-  | {
+  | (TCommonReferralParams & {
       [EventStreamMetadata.PlaceId]: number;
       [EventStreamMetadata.UniverseId]: number;
-      [EventStreamMetadata.IsAd]?: boolean;
       [EventStreamMetadata.NativeAdData]?: string;
-      [EventStreamMetadata.Position]: number;
-      [EventStreamMetadata.SortPos]?: number;
-      [EventStreamMetadata.NumberOfLoadedTiles]?: number;
-      [EventStreamMetadata.GameSetTypeId]?: number;
       [EventStreamMetadata.GameSetTargetId]?: number;
       [EventStreamMetadata.FriendId]?: number;
-      [EventStreamMetadata.AttributionId]?: string;
       [EventStreamMetadata.AppliedFilters]?: string;
       [SessionInfoType.DiscoverPageSessionInfo]?: string;
       [SessionInfoType.GameSearchSessionInfo]?: string;
       [SessionInfoType.HomePageSessionInfo]?: string;
+      [SessionInfoType.SearchLandingPageSessionInfo]?: string;
       [EventStreamMetadata.Page]:
         | PageContext.SearchPage
         | PageContext.SortDetailPageDiscover
@@ -259,11 +281,19 @@ export type TGameDetailReferral =
         | PageContext.HomePage
         | PageContext.GamesPage
         | PageContext.GameDetailPage
-        | PageContext.PeopleListInHomePage;
+        | PageContext.PeopleListInHomePage
+        | PageContext.SearchLandingPage;
       [EventStreamMetadata.ShareLinkType]?: string;
       [EventStreamMetadata.ShareLinkId]?: string;
-    }
+    })
   | Record<string, never>;
+
+export type TPlayGameClicked = TCommonReferralParams & {
+  [EventStreamMetadata.PlaceId]: number;
+  [EventStreamMetadata.UniverseId]: number;
+  [EventStreamMetadata.IsAd]: string;
+  [EventStreamMetadata.PlayContext]: PageContext.HomePage | PageContext.GameDetailPage;
+};
 
 export type TRequestRefundClick =
   | {

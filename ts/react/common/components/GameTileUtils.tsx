@@ -119,8 +119,8 @@ export const GameTileStats = ({
   totalUpVotes,
   playerCount
 }: {
-  totalUpVotes: number;
-  totalDownVotes: number;
+  totalUpVotes: number | undefined;
+  totalDownVotes: number | undefined;
   playerCount: number;
 }): JSX.Element => {
   const votes = parsingUtils.getVotePercentage(totalUpVotes, totalDownVotes);
@@ -144,8 +144,8 @@ export const GameTileRatingFooter = ({
   totalUpVotes,
   translate
 }: {
-  totalUpVotes: number;
-  totalDownVotes: number;
+  totalUpVotes: number | undefined;
+  totalDownVotes: number | undefined;
   translate: TranslateFunction;
 }): JSX.Element => {
   const { RatingPercentageText } = common;
@@ -440,12 +440,12 @@ export const ShimmedPlayerInteractionModal = withTranslations<TShimmedPlayerInte
 );
 
 export const getNumCarouselTiles = (
-  page: PageContext.HomePage | PageContext.GamesPage,
+  page: PageContext.HomePage | PageContext.GamesPage | PageContext.SearchLandingPage,
   componentType: TComponentType | undefined
 ): number | undefined => {
   const { maxWideGameTilesPerCarouselPage, maxTilesPerCarouselPage } = homePage;
 
-  if (page === PageContext.GamesPage) {
+  if (page === PageContext.GamesPage || page === PageContext.SearchLandingPage) {
     return undefined;
   }
 

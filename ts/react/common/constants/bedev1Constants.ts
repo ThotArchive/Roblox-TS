@@ -35,6 +35,12 @@ const url = {
   getVoiceOptInStatus: {
     withCredentials: true,
     url: `${EnvironmentUrls.voiceApi}/v1/settings/user-opt-in`
+  },
+  getAssetDataFromAssetId: (assetId: string): TUrl => {
+    return {
+      url: `${EnvironmentUrls.assetDeliveryApi}/v2/assetId/${assetId}`,
+      withCredentials: true
+    };
   }
 };
 

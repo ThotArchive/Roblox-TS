@@ -7,6 +7,12 @@ export interface ParentalRequestError {
     sessionId?: string;
   };
 }
+
+export const defaultParentalRequestError: ParentalRequestError = {
+  data: {
+    code: 'UnknownError'
+  }
+};
 const { gatherParentEmail } = parentalRequestConstants.translationKeys;
 const parentalRequestInlineErrorHandler = (errorReason: ParentalRequestErrorReason): string => {
   switch (errorReason) {

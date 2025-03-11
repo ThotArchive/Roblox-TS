@@ -1,6 +1,9 @@
 const deferredDeeplinkMacLayerName = 'ExperienceDetailsPage.ClientDownload';
 const deferredDeeplinkWindowsLayerName = 'ExperienceDetailsPage.Windows.ClientDownload';
-const isDeferredDeeplinkEnabledFlagName = 'isDeferredDeeplinkTokenCreationEnabled';
+
+const deferredDeeplinkDownloadInstallerContext = 'EdpDownloadRobloxInstaller';
+const deferredDeeplinkCreateTokenEventName = 'tokenAction';
+const deferredDeeplinkCreateTokenAction = 'create-token-attempt';
 
 const deferredDeeplinkTokenQueryParameterKey = 'token';
 
@@ -19,8 +22,10 @@ const supportedDeferredDeeplinkPathPatterns = supportedDeferredDeeplinkPaths.map
 export {
   deferredDeeplinkMacLayerName,
   deferredDeeplinkWindowsLayerName,
+  deferredDeeplinkCreateTokenEventName,
+  deferredDeeplinkDownloadInstallerContext,
+  deferredDeeplinkCreateTokenAction,
   deferredDeeplinkGroupName,
-  isDeferredDeeplinkEnabledFlagName,
   deferredDeeplinkTokenQueryParameterKey,
   supportedDeferredDeeplinkPathPatterns
 };

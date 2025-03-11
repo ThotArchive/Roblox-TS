@@ -12,7 +12,7 @@ function SearchLinks({
   searchInput,
   indexOfSelectedOption,
   autocompleteSessionInfo,
-  resetAutocompleteSessionInfo
+  resetSessionInfo
 }) {
   const universalSearchLinks = navigationUtil.getUniversalSearchLinks();
   return (
@@ -40,7 +40,7 @@ function SearchLinks({
                     autocompleteSessionInfo
                   )
                 );
-                resetAutocompleteSessionInfo();
+                resetSessionInfo();
               }}>
               {translate('Label.sSearchPhrase', {
                 phrase: searchInput,
@@ -59,7 +59,7 @@ SearchLinks.propTypes = {
   searchInput: PropTypes.string.isRequired,
   indexOfSelectedOption: PropTypes.number.isRequired,
   autocompleteSessionInfo: PropTypes.string.isRequired,
-  resetAutocompleteSessionInfo: PropTypes.func.isRequired
+  resetSessionInfo: PropTypes.func.isRequired
 };
 
 export default SearchLinks;

@@ -141,6 +141,9 @@ export type TPlayButtonProps = {
     | TPlayabilityStatuses['GuestProhibited']
     | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']; // remove when cleaning up hasUpdatedPlayButtonsIxp as true
   disableLoadingState?: boolean;
+  buttonText?: string | undefined;
+  hideIcon?: boolean;
+  analyticsCallback?: () => void;
 };
 
 export const PlayButton = ({
@@ -154,7 +157,10 @@ export const PlayButton = ({
   iconClassName = 'icon-common-play',
   buttonWidth = Button.widths.full,
   buttonClassName = 'btn-common-play-game-lg',
-  disableLoadingState = false
+  disableLoadingState = false,
+  buttonText = undefined,
+  hideIcon = false,
+  analyticsCallback = undefined
 }: TPlayButtonProps): JSX.Element => {
   const [isExperienceVoiceEnabled, setIsExperienceVoiceEnabled] = useState<boolean | undefined>(
     undefined
@@ -298,8 +304,13 @@ export const PlayButton = ({
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const success = await startAccessManagementUpsellFlow();
           }
+
+          if (analyticsCallback) {
+            analyticsCallback();
+          }
         }}>
-        <span className={iconClassName} />
+        {!hideIcon && <span className={iconClassName} />}
+        {buttonText && <span className='play-button-text'>{buttonText}</span>}
       </Button>
       <div id='id-verification-container' />
       <div id='access-management-upsell-container-v1' />

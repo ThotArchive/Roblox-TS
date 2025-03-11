@@ -67,6 +67,10 @@ export function handleResultFromPurchases(result, startTwoStepVerification) {
   let successCount = 0;
   const errorResults = [];
 
+  if (!result) {
+    return { success: false, message: resources.purchaseErrorFailureMessage };
+  }
+
   if (result.status === 200) {
     result.data.fulfillmentGroups[0].lineItems.forEach(itemResult => {
       if (itemResult.status === 'SUCCEEDED') {
@@ -442,7 +446,9 @@ export default function createMultiItemPurchaseModal() {
 
         let count = 0;
         itemResults.forEach(item => {
-          itemResults[count].data.reason = result.data.message;
+          if (result) {
+            itemResults[count].data.reason = result?.data.message;
+          }
           count += 1;
         });
       }

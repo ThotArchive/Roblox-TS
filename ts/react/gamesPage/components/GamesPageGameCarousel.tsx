@@ -172,6 +172,7 @@ export const GamesPageGameCarousel = ({
         sort={sort}
         positionId={positionId}
         loadMoreGames={loadMoreGames}
+        sortId={sort.topicId}
         isLoadingMoreGames={isLoadingMoreGames}
         buildEventProperties={buildEventProperties}
         translate={translate}

@@ -1,3 +1,4 @@
+import { TOmniRecommendationSduiTree } from '../../sdui/system/SduiTypes';
 import { TGameData } from './bedev1Types';
 
 export enum TContentType {
@@ -12,7 +13,8 @@ export enum TTreatmentType {
   SortlessGrid = 'SortlessGrid',
   FriendCarousel = 'FriendCarousel',
   InterestGrid = 'InterestGrid',
-  Pills = 'Pills'
+  Pills = 'Pills',
+  Sdui = 'sdui'
 }
 
 export enum TSortTopic {
@@ -95,6 +97,14 @@ type TSharedGameSort = {
     | TTreatmentType.InterestGrid;
   subtitle?: string;
   topicLayoutData?: TTopicLayoutData;
+};
+
+export type TOmniRecommendationSduiSort = {
+  topicId: number;
+  treatmentType: TTreatmentType.Sdui;
+  numberOfRows?: number;
+
+  feedItemKey: string;
 };
 
 export type TOmniRecommendationGameSort = TSharedGameSort & {
@@ -193,13 +203,15 @@ export type TGameSort = TExploreApiGameSort | TOmniRecommendationGameSort;
 export type TOmniRecommendationSort =
   | TOmniRecommendationGameSort
   | TOmniRecommendationCatalogSort
-  | TOmniRecommendationFriendSort;
+  | TOmniRecommendationFriendSort
+  | TOmniRecommendationSduiSort;
 
 export type TSort =
   | TGameSort
   | TOmniRecommendationCatalogSort
   | TOmniRecommendationFriendSort
-  | TExploreApiFiltersSort;
+  | TExploreApiFiltersSort
+  | TOmniRecommendationSduiSort;
 
 export type TGetOmniRecommendationsMetadataResponse = {
   contentMetadata: TOmniRecommendationsContentMetadata;
@@ -213,6 +225,7 @@ export type TOmniRecommendationsContentMetadata = {
 
 export type TGetOmniRecommendationsResponse = {
   sorts: TOmniRecommendationSort[];
+  sdui?: TOmniRecommendationSduiTree;
 } & TGetOmniRecommendationsMetadataResponse;
 
 export enum TOmniSearchPageType {

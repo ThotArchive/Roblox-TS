@@ -135,8 +135,8 @@ type TLayoutDataBySort = {
 };
 
 export type TGameData = {
-  totalUpVotes: number;
-  totalDownVotes: number;
+  totalUpVotes: number | undefined;
+  totalDownVotes: number | undefined;
   universeId: number;
   name: string;
   placeId: number;
@@ -317,4 +317,21 @@ export type TGetUserLocaleResponse = {
   signupAndLogin?: TSupportedLocale;
   generalExperience?: TSupportedLocale;
   ugc?: TSupportedLocale;
+};
+
+// Types for fetching Asset CDN urls by assetId
+type TAssetMetadata = {
+  metadataType: number;
+  value: string;
+};
+
+type TAssetLocation = {
+  assetFormat: string;
+  // Asset CDN URL
+  location: string;
+  assetMetadatas: TAssetMetadata[];
+};
+
+export type TAssetDataResponse = {
+  locations: TAssetLocation[];
 };

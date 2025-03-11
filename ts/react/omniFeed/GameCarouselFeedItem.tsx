@@ -9,12 +9,14 @@ import { getNumCarouselTiles } from '../common/components/GameTileUtils';
 import { getHydratedGameData } from './utils/gameSortUtils';
 import GamesPageGameCarousel from '../gamesPage/components/GamesPageGameCarousel';
 import { PageContext } from '../common/types/pageContext';
+import SearchLandingPageGamesCarousel from '../searchLandingPage/SearchLandingPageCarousel';
+import { searchLandingPage } from '../common/constants/configConstants';
 
 type THomePageDiscoveryApiProps = {
   translate: WithTranslationsProps['translate'];
   sort: TGameSort;
   positionId: number;
-  page: PageContext.HomePage | PageContext.GamesPage;
+  page: PageContext.HomePage | PageContext.GamesPage | PageContext.SearchLandingPage;
   itemsPerRow: number | undefined;
   startingRow: number | undefined;
   loadMoreGames?: () => void;
@@ -100,6 +102,19 @@ export const GameCarouselFeedItem = ({
         subtitleLinkPath={sort.topicLayoutData?.subtitleLinkPath}
         itemsPerRow={itemsPerRow}
         isChartsPageRenameEnabled={isChartsPageRenameEnabled}
+      />
+    );
+  }
+
+  if (page === PageContext.SearchLandingPage) {
+    return (
+      <SearchLandingPageGamesCarousel
+        key={sort.topic}
+        sort={sort}
+        gameData={carouselData}
+        translate={translate}
+        positionId={positionId}
+        itemsPerRow={searchLandingPage.numberOfTilesPerCarousel}
       />
     );
   }

@@ -81,7 +81,11 @@ export enum ThumbnailGamePassIconSize {
 
 export enum ThumbnailAssetsSize {
   size150 = '150x150',
-  size420 = '420x420'
+  size420 = '420x420',
+  size700 = '700x700',
+  width1320 = '1320x440',
+  width660 = '660x220',
+  width330 = '330x110'
 }
 
 export enum ThumbnailAvatarsSize {

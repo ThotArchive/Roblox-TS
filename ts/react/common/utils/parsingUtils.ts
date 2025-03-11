@@ -45,8 +45,14 @@ export const getFriendVisits = (
   );
 };
 
-export const getVotePercentageValue = (upvotes: number, downvotes: number): number | undefined => {
+export const getVotePercentageValue = (
+  upvotes: number | undefined,
+  downvotes: number | undefined
+): number | undefined => {
   let percentUp = 0;
+  if (upvotes === undefined || downvotes === undefined) {
+    return undefined;
+  }
   if (!Number.isNaN(upvotes) && !Number.isNaN(downvotes)) {
     if (upvotes === 0 && downvotes === 0) {
       return undefined;
@@ -63,7 +69,10 @@ export const getVotePercentageValue = (upvotes: number, downvotes: number): numb
   return percentUp;
 };
 
-export const getVotePercentage = (upvotes: number, downvotes: number): string | undefined => {
+export const getVotePercentage = (
+  upvotes: number | undefined,
+  downvotes: number | undefined
+): string | undefined => {
   const votePercentageValue = getVotePercentageValue(upvotes, downvotes);
 
   return votePercentageValue !== undefined ? `${votePercentageValue}%` : undefined;
@@ -187,7 +196,7 @@ type TGameImpressionsEventThumbnailIdData = {
 
 export const getThumbnailAssetIdImpressionsData = (
   gameData: TGameData[],
-  topicId: number,
+  topicId: number | string,
   impressedIndexes: number[],
   componentType?: TComponentType
 ): TGameImpressionsEventThumbnailIdData | {} => {
@@ -246,7 +255,7 @@ export const getTileBadgeContext = (
 
 export const getTileBadgeContextsImpressionsData = (
   gameData: TGameData[],
-  topicId: number,
+  topicId: number | string,
   impressedIndexes: number[],
   componentType?: TComponentType
 ): TGameImpressionsEventTileBadgeContextsData | {} => {
