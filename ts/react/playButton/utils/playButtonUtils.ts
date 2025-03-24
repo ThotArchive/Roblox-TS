@@ -249,9 +249,7 @@ export const getMinimumAgeFromAgeRecommendationResponse = (
 };
 
 export const shouldShowUnplayableButton = (
-  playabilityStatus: TPlayabilityStatus | undefined,
-  shouldShowVpcPlayButtonUpsells?: boolean,
-  hasUpdatedPlayButtonsVpcIxp?: boolean
+  playabilityStatus: TPlayabilityStatus | undefined
 ): playabilityStatus is TPlayabilityStatusWithUnplayableError => {
   // playability is loading
   if (playabilityStatus === undefined) {
@@ -264,18 +262,10 @@ export const shouldShowUnplayableButton = (
     playabilityStatus === PlayabilityStatus.GuestProhibited ||
     playabilityStatus === PlayabilityStatus.PurchaseRequired ||
     playabilityStatus === PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser ||
-    playabilityStatus === PlayabilityStatus.FiatPurchaseRequired
-  ) {
-    return false;
-  }
-
-  // this status is not fully unplayable if action needed button is enabled for vpc cases
-  if (
+    playabilityStatus === PlayabilityStatus.FiatPurchaseRequired ||
     playabilityStatus === PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls
   ) {
-    if (shouldShowVpcPlayButtonUpsells && hasUpdatedPlayButtonsVpcIxp) {
-      return false;
-    }
+    return false;
   }
 
   return true;

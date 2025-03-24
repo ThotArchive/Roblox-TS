@@ -96,7 +96,7 @@ const eventStreamCriterias = {
       isPersonalizedBasedOnPreviousQuery
     }
   ],
-  search: (kwd, context, actionType, sessionInfo) => [
+  search: (kwd, context, actionType, autocompleteSessionInfo, searchLandingPageSessionInfo) => [
     {
       name: 'search',
       type: eventTypes.formInteraction,
@@ -105,7 +105,8 @@ const eventStreamCriterias = {
     {
       kwd,
       actionType,
-      sessionInfo
+      sessionInfo: autocompleteSessionInfo,
+      searchLandingPageSessionInfo
     }
   ],
   catalogSearch: (autocompleteFlag, previousPage) => [

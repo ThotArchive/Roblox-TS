@@ -16,7 +16,7 @@ import {
 } from '../common/utils/parsingUtils';
 import SearchLandingPageSessionContext from './SearchLandingPageSessionContext';
 import useFriendsPresence from '../common/hooks/useFriendsPresence';
-import { getSortId, getSortTargetIdMetadata } from '../omniFeed/utils/gameSortUtils';
+import { getSortTargetIdMetadata } from '../omniFeed/utils/gameSortUtils';
 import { TGameSort } from '../common/types/bedev2Types';
 import { TGameData } from '../common/types/bedev1Types';
 import { searchLandingPage } from '../common/constants/configConstants';
@@ -42,12 +42,9 @@ const SearchLandingPageGamesCarousel = ({
   const friendsPresence = useFriendsPresence();
 
   const sortId = useMemo(() => {
-    const possibleSortId = getSortId(sort);
-    if (!possibleSortId) {
-      fireEvent(searchLandingPage.searchLandingMissingSortIdError);
-    }
-    return possibleSortId ?? searchLandingPage.missingSortIdDefault;
-  }, [sort]);
+    // TODO CLIGROW-2294 Update this to be int sort id provided by BE
+    return searchLandingPage.missingSortIdDefault;
+  }, []);
 
   const buildEventProperties: TBuildEventProperties = useCallback(
     (data, id) => ({
@@ -64,7 +61,7 @@ const SearchLandingPageGamesCarousel = ({
       [SessionInfoType.SearchLandingPageSessionInfo]: sessionInfo,
       [EventStreamMetadata.PlayContext]: PageContext.SearchLandingPage
     }),
-    [positionId, gameData.length, sort, sessionInfo, sortId]
+    [positionId, gameData.length, sortId, sort, sessionInfo]
   );
 
   const buildGameImpressionsProperties: TBuildCarouselGameImpressionsEventProperties = useCallback(

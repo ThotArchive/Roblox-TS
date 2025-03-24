@@ -22,6 +22,9 @@ type THeroUnitProps = {
 
   gradient: TSduiGradient;
 
+  gradientHeightPercent?: number;
+  gradientWidthPercent?: number;
+
   // Component containing the foreground image
   foregroundImage: React.ReactNode;
 
@@ -35,6 +38,9 @@ type THeroUnitProps = {
   asset?: THeroUnitAsset;
 
   ctaButtonComponent?: React.ReactNode;
+
+  minForegroundHeightPercent?: number;
+  maxForegroundHeightPercent?: number;
 
   /**
   TODO https://roblox.atlassian.net/browse/CLIGROW-2197:
@@ -50,11 +56,7 @@ type THeroUnitProps = {
   backgroundOverflow?: number;
   foregroundAspectRatio?: number;
 
-  foregroundHeightPercent?: number;
-
   contentPadding?: number;
-
-  gradientHeightPercent?: number;
   */
 } & TSduiCommonProps & {
     children: React.ReactNode[];
@@ -63,16 +65,18 @@ type THeroUnitProps = {
 const HeroUnit = ({
   title,
   subtitle,
-
   bottomRowComponent,
   gradient,
+  gradientHeightPercent,
+  gradientWidthPercent,
   foregroundImage,
   backgroundImage,
   onActivated,
   badgeText,
   asset,
   ctaButtonComponent,
-
+  minForegroundHeightPercent,
+  maxForegroundHeightPercent,
   children
 }: THeroUnitProps): JSX.Element => {
   const attributionRow = useMemo(() => {
@@ -106,9 +110,13 @@ const HeroUnit = ({
         foregroundImageComponent={foregroundImage}
         backgroundImageComponent={backgroundImage}
         gradient={gradient}
+        gradientHeightPercent={gradientHeightPercent}
+        gradientWidthPercent={gradientWidthPercent}
         overlayPillComponent={overlayComponent}
         backgroundClickAction={onActivated}
-        bottomRowComponent={bottomRowComponent ?? attributionRow}>
+        bottomRowComponent={bottomRowComponent ?? attributionRow}
+        minForegroundHeightPercent={minForegroundHeightPercent}
+        maxForegroundHeightPercent={maxForegroundHeightPercent}>
         {children}
       </HeroUnitContainer>
     );
@@ -119,10 +127,14 @@ const HeroUnit = ({
     attributionRow,
     foregroundImage,
     gradient,
+    gradientHeightPercent,
+    gradientWidthPercent,
     subtitle,
     title,
     children,
-    overlayComponent
+    overlayComponent,
+    minForegroundHeightPercent,
+    maxForegroundHeightPercent
   ]);
 
   return heroUnit;

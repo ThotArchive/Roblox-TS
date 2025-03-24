@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { SearchLandingService } from 'Roblox';
@@ -14,9 +14,8 @@ function SearchInput({
   translate,
   searchInput,
   isMenuOpen,
-  openMenu,
+  handleSearchOpenOrInputChange,
   closeMenu,
-  handleSearch,
   setIsMenuHover,
   indexOfSelectedOption,
   onSubmit,
@@ -33,8 +32,24 @@ function SearchInput({
   const dropdownRef = createRef();
   const searchLandingRef = useRef();
   const [isFocused, setIsFocused] = useState(false);
+  const [isSearchLandingEmpty, setIsSearchLandingEmpty] = useState(true);
 
-  const clearSearch = () => {
+  useEffect(() => {
+    const onSetSearchLandingHasContent = () => {
+      setIsSearchLandingEmpty(false);
+    };
+    // Sent from SearchLandingOmniFeed if there are recommendations to show
+    // as we don't want the search overlay to show if there are no recommendations
+    // and the user is just focused on the search input
+    // Copied event name from Roblox.Games.WebApp/ts/react/searchLandingPage/service/modalConstants.ts
+    window.addEventListener('SetSearchLandingHasContent', onSetSearchLandingHasContent);
+    return () => {
+      window.removeEventListener('SetSearchLandingHasContent', onSetSearchLandingHasContent);
+    };
+  }, []);
+
+  const isClearingInputRef = useRef(false);
+  const clearSearch = useCallback(() => {
     eventStreamService.sendEvent(
       ...events.searchClear(
         searchInput,
@@ -43,16 +58,32 @@ function SearchInput({
         pageName?.PageNameProvider?.getInternalPageName()
       )
     );
+    isClearingInputRef.current = true;
     inputRef?.current?.focus();
-    handleSearch({ target: { value: '' } });
-  };
-  const onFocus = () => {
-    openMenu();
+    handleSearchOpenOrInputChange('');
+  }, [autocompleteSessionInfo, inputRef, handleSearchOpenOrInputChange, searchInput]);
+
+  const onFocus = useCallback(() => {
     setIsFocused(true);
-  };
+    // clearSearch already calls handleSearchOpenOrInputChange so skip the onFocus event
+    if (isClearingInputRef.current) {
+      isClearingInputRef.current = false;
+      return;
+    }
+    handleSearchOpenOrInputChange();
+  }, [handleSearchOpenOrInputChange]);
+
   const onBlur = () => {
     setIsFocused(false);
   };
+
+  const onChange = useCallback(
+    e => {
+      handleSearchOpenOrInputChange(e.target.value);
+    },
+    [handleSearchOpenOrInputChange]
+  );
+
   const menuClassName = classNames(
     'navbar-left navbar-search col-xs-5 col-sm-6 col-md-2 col-lg-3',
     {
@@ -67,8 +98,11 @@ function SearchInput({
     'search-landing-root-open': isSearchLandingEnabled && searchInput.length === 0 && isFocused
   });
 
+  // Only show the search overlay if the SLP has recommendations or autocomplete results are being shown
+  const showOverlay =
+    isFocused && ((!isSearchLandingEmpty && searchInput.length === 0) || searchInput.length > 0);
   const searchOverlayClassName = classNames('search-overlay', {
-    'search-overlay-show': isSearchLandingEnabled && isFocused
+    'search-overlay-show': showOverlay
   });
 
   // jpark 3/4/2022 Avatar Shop Autocomplete is fully enabled - this check can be removed when this IXP test code is cleaned up
@@ -107,7 +141,7 @@ function SearchInput({
                   data-testid='navigation-search-input-field'
                   className='form-control input-field new-input-field'
                   value={searchInput}
-                  onChange={handleSearch}
+                  onChange={onChange}
                   placeholder={translate('Label.sSearch')}
                   maxLength='120'
                   onFocus={onFocus}
@@ -141,7 +175,7 @@ function SearchInput({
                 data-testid='navigation-search-input-field'
                 className='form-control input-field'
                 value={searchInput}
-                onChange={handleSearch}
+                onChange={onChange}
                 placeholder={translate('Label.sSearch')}
                 maxLength='120'
                 onFocus={onFocus}
@@ -214,9 +248,8 @@ SearchInput.propTypes = {
   translate: PropTypes.func.isRequired,
   searchInput: PropTypes.string.isRequired,
   isMenuOpen: PropTypes.bool.isRequired,
-  openMenu: PropTypes.func.isRequired,
+  handleSearchOpenOrInputChange: PropTypes.func.isRequired,
   closeMenu: PropTypes.func.isRequired,
-  handleSearch: PropTypes.func.isRequired,
   setIsMenuHover: PropTypes.func.isRequired,
   indexOfSelectedOption: PropTypes.number.isRequired,
   onSubmit: PropTypes.func.isRequired,

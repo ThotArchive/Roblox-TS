@@ -69,8 +69,6 @@ const playButtonErrorStatusTranslationMap: Record<TPlayabilityStatusWithUnplayab
     'UnplayableError.ContextualPlayabilityRegionalAvailability',
   [PlayabilityStatus.ContextualPlayabilityRegionalCompliance]:
     'UnplayableError.ContextualPlayabilityRegionalCompliance',
-  [PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls]:
-    'UnplayableError.ContextualPlayabilityAgeRecommendationParentalControls',
   [PlayabilityStatus.ContextualPlayabilityAgeGated]:
     'UnplayableError.ContextualPlayabilityAgeGated',
   [PlayabilityStatus.PlaceHasNoPublishedVersion]: 'UnplayableError.PlaceHasNoPublishedVersion',
@@ -91,8 +89,6 @@ const counterEvents = {
   ActionNeeded: 'ActionNeededButtonShown',
   Unplayable: 'UnplayableErrorShown',
   SeventeenPlusInPlayable: 'ReachedSeventeenPlusCaseInPlayable',
-  PlayButtonIXPError: 'PlayButtonIXPIssueCaught',
-  PlayButtonExposureError: 'PlayButtonExposureLoggingIssueCaught',
   PlayButtonUpsellSelfUpdateSettingTriggered: 'PlayButtonUpsellSelfUpdateSettingTriggered',
   PlayButtonUpsellAskYourParentTriggered: 'PlayButtonUpsellAskYourParentTriggered',
   PlayButtonUpsellRestrictedUnplayableTriggered: 'PlayButtonUpsellRestrictedUnplayableTriggered',

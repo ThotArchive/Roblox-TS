@@ -39,9 +39,7 @@ export const buildBaseActionParams = (
     // incremented to match app
     [ItemActionMetadata.ItemPosition]: entryIndex + 1,
     [ItemActionMetadata.PositionInTopic]: entryIndex + 1,
-    // TODO https://roblox.atlassian.net/browse/CLIGROW-2235
-    // Add and consume [ItemActionMetadata.ActionType] from @rbx/unified-logging
-    actionType
+    [ItemActionMetadata.ActionType]: actionType
   };
 };
 

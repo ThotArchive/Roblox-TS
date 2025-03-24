@@ -240,51 +240,16 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     resetSearchLandingPageSessionInfo();
   };
 
-  const handleSearch = ({ target: { value } }) => {
-    if (value.length < searchInput.length) {
-      eventStreamService.sendEvent(
-        ...events.searchTextTrim(searchInput, value, undefined, autocompleteSessionInfo)
-      );
-    }
-
-    // Reset autocomplete session info when the search input goes from non-empty to empty
-    if (searchInput.length > 0 && value.length === 0) {
-      resetAutocompleteSessionInfo();
-      if (isSearchLandingEnabled) {
-        SearchLandingService.showSearchLanding(searchLandingPageSessionInfo);
-        eventStreamService.sendEvent(
-          ...events.search(
-            undefined,
-            events.contexts.searchLandingPage,
-            events.actionTypes.open,
-            searchLandingPageSessionInfo
-          )
+  const fetchExperimentAndShowSearchLandingPage = useCallback(async () => {
+    let isSLPEnabled = isSearchLandingEnabled;
+    try {
+      if (!hasFetchedSearchLandingPageExperimentValuesRef.current) {
+        const values = await ExperimentationService.getAllValuesForLayer(
+          'PlayerApp.HomePage.UX.WholePageRanking'
         );
+        isSLPEnabled = values?.shouldShowSearchLandingPageWeb ?? false;
       }
-    }
-    // Send autocomplete open event when the search input goes from empty to non-empty
-    if (searchInput.length === 0 && value.length > 0) {
-      const newAutoCompleteSessionInfo = events.generateSessionInfo();
-      eventStreamService.sendEvent(
-        ...events.search(
-          value,
-          events.contexts.searchAutocomplete,
-          events.actionTypes.open,
-          newAutoCompleteSessionInfo
-        )
-      );
-      setAutocompleteSessionInfo(newAutoCompleteSessionInfo);
-    }
-
-    setSelectedListOptions(0);
-    setIsMenuOpen(value.length > 0);
-    setSearchInput(value);
-  };
-
-  const openSearchLandingOrAutocompleteResults = useCallback(
-    isSLPEnabled => {
-      // If the search input is empty, show the search landing page if its enabled
-      if (isSLPEnabled && searchInput.length === 0) {
+      if (isSLPEnabled) {
         const newSearchLandingSessionInfo = events.generateSessionInfo();
         SearchLandingService.showSearchLanding(newSearchLandingSessionInfo);
         eventStreamService.sendEvent(
@@ -292,50 +257,66 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
             undefined,
             events.contexts.searchLandingPage,
             events.actionTypes.open,
+            undefined,
             newSearchLandingSessionInfo
           )
         );
+        setIsSearchLandingEnabled(isSLPEnabled);
         setSearchLandingPageSessionInfo(newSearchLandingSessionInfo);
-      } else {
-        // else log an autocomplete open event and wait for user input to show autocomplete results
-        const newAutoCompleteSessionInfo = events.generateSessionInfo();
+      }
+    } catch {
+      fireEvent(searchConfigConstants.searchLandingPageExperimentFetchError);
+    }
+    hasFetchedSearchLandingPageExperimentValuesRef.current = true;
+    return isSLPEnabled;
+  }, [isSearchLandingEnabled]);
+
+  const handleSearchOpenOrInputChange = useCallback(
+    // If the search input is not provided, its a search open from clicking the search bar
+    // not from a user typing or hitting clear search ("")
+    async (newSearchInput = searchInput) => {
+      setSearchInput(newSearchInput);
+
+      // If the search input is trimmed, send a search text trim event
+      if (newSearchInput.length < searchInput.length) {
+        eventStreamService.sendEvent(
+          ...events.searchTextTrim(searchInput, newSearchInput, undefined, autocompleteSessionInfo)
+        );
+      }
+
+      let isSLPEnabled = isSearchLandingEnabled;
+      if (newSearchInput.length === 0) {
+        // If search input is empty, show the SLP if enabled
+        isSLPEnabled = await fetchExperimentAndShowSearchLandingPage();
+        // Log a new autocomplete session anytime the search input is empty
+        const newAutocompleteSessionInfo = events.generateSessionInfo();
         eventStreamService.sendEvent(
           ...events.search(
-            searchInput,
+            newSearchInput,
             events.contexts.searchAutocomplete,
             events.actionTypes.open,
-            newAutoCompleteSessionInfo
+            newAutocompleteSessionInfo
           )
         );
-        setAutocompleteSessionInfo(newAutoCompleteSessionInfo);
+        setAutocompleteSessionInfo(newAutocompleteSessionInfo);
+        // Reset any previously selected autocomplete suggestions
+        setSelectedListOptions(0);
       }
-      if ((!isSLPEnabled && searchInput.length === 0) || isMenuHover) return;
-      // Set the menu to open if slp enabled and search input is empty or slp is disabled and search input is not empty (autocomplete results shown)
-      setIsMenuOpen(true);
-    },
-    [isMenuHover, searchInput]
-  );
 
-  const openMenu = useCallback(() => {
-    // On search bar click determine whether to show search landing page via experiment value
-    if (!hasFetchedSearchLandingPageExperimentValuesRef.current) {
-      ExperimentationService.getAllValuesForLayer('PlayerApp.HomePage.UX.WholePageRanking')
-        .then(values => {
-          const isEnabled = values?.shouldShowSearchLandingPageWeb ?? false;
-          setIsSearchLandingEnabled(isEnabled);
-          openSearchLandingOrAutocompleteResults(isEnabled);
-        })
-        .catch(() => {
-          fireEvent(searchConfigConstants.searchLandingPageExperimentFetchError);
-          openSearchLandingOrAutocompleteResults(false);
-        })
-        .finally(() => {
-          hasFetchedSearchLandingPageExperimentValuesRef.current = true;
-        });
-    } else {
-      openSearchLandingOrAutocompleteResults(isSearchLandingEnabled);
-    }
-  }, [isSearchLandingEnabled, openSearchLandingOrAutocompleteResults]);
+      if (isMenuHover) return;
+
+      // If SLP is enabled, SLP menu will be shown for empty input and autocomplete menu shown for non-empty input
+      // If SLP is disabled, the menu should only be shown if the search input is not empty
+      setIsMenuOpen(isSLPEnabled ? true : newSearchInput.length > 0);
+    },
+    [
+      autocompleteSessionInfo,
+      fetchExperimentAndShowSearchLandingPage,
+      isMenuHover,
+      isSearchLandingEnabled,
+      searchInput
+    ]
+  );
 
   const closeMenu = () => {
     if (!isMenuOpen) {
@@ -348,6 +329,7 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
           null,
           events.contexts.searchLandingPage,
           events.actionTypes.cancel,
+          undefined,
           searchLandingPageSessionInfo
         )
       );
@@ -488,9 +470,8 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
     <SearchInput
       {...{
         searchInput,
-        handleSearch,
+        handleSearchOpenOrInputChange,
         isSearchLandingEnabled,
-        openMenu,
         closeMenu,
         setIsMenuHover,
         isMenuOpen,

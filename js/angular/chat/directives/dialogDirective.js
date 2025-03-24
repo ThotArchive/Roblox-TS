@@ -27,6 +27,8 @@ function dialog(
       dialogData: '=',
       chatLibrary: '=',
       chatUser: '=',
+      timeoutExpiresAt: '@',
+      showTimeoutModal: '&',
       closeDialog: '&',
       sendInvite: '&',
       openConversationFromFriendId: '&',
@@ -546,6 +548,17 @@ function dialog(
           );
         }
       };
+
+      scope.showTimedOutInputBar = false;
+      scope.refreshShowTimedOutInputBar = function () {
+        scope.showTimedOutInputBar = scope.timeoutExpiresAt && Date.now() < parseInt(scope.timeoutExpiresAt);
+      };
+      scope.$watch('timeoutExpiresAt', function (newValue, oldValue) {
+        if (newValue !== oldValue) {
+          scope.refreshShowTimedOutInputBar();
+        }
+      });
+
       // // ----------------------------------- CODE TO RUN --------------------------------
       init();
       scope.isOverLoaded();

@@ -257,9 +257,7 @@ function dialogController(
   // // ----------------------------------- PUBLIC ---------------------------------
   $scope.dialogParams = { ...chatUtility.dialogParams };
   $scope.userPresenceTypes = chatUtility.userPresenceTypes;
-  $scope.dialogData.messageForSend = $scope.dialogData.isConversationUnavailableWithUser
-    ? dialogAttributes.messageForConversationUnavailableWithUser
-    : '';
+  $scope.dialogData.messageForSend = '';
   $scope.dialogLayout.scrollbarElm = chatUtility.getScrollBarSelector(
     $scope.dialogData,
     chatUtility.scrollBarType.MESSAGE
@@ -694,6 +692,15 @@ function dialogController(
       );
     }
   });
+
+  if ($scope.dialogData.isConversationUnavailableWithUser) {
+    chatUtility.setResizeInputLayout(
+      $scope.chatLibrary,
+      dialogAttributes.dialogLayout.maxHeightOfDisabledInput,
+      $scope.dialogData,
+      $scope.dialogLayout
+    );
+  }
 
   $scope.init = function () {
     $scope.getLimitLinkNameForMemberList();

@@ -1,6 +1,7 @@
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { fireEvent } from 'roblox-event-tracker';
+import { SearchLandingService } from 'Roblox';
 import bedev2Services from '../common/services/bedev2Services';
 import { translationConfig } from './app.config';
 import { mapExploreApiSortsResponse } from '../omniFeed/utils/gameSortUtils';
@@ -10,7 +11,6 @@ import {
   UpdateSearchSessionInfoEventParams,
   ShowSearchLandingEventParams
 } from './service/modalConstants';
-import { LoadingGameTile } from '../common/components/LoadingGameTile';
 import SearchLandingPageSessionContext from './SearchLandingPageSessionContext';
 import { searchLandingPage } from '../common/constants/configConstants';
 import OmniFeedItem from '../omniFeed/OmniFeedItem';
@@ -19,8 +19,8 @@ import { PageContext } from '../common/types/pageContext';
 function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.Element | null {
   const [showSearchLanding, setShowSearchLanding] = useState<boolean>(false);
   const [sessionInfo, setSesssionInfo] = useState<string>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recommendations, setRecommendations] = useState<TExploreApiSorts | undefined>(undefined);
+  const [prevHasRecommendations, setPrevHasRecommendations] = useState(false);
 
   useEffect(() => {
     const isValidUpdateSessionInfoEvent = (
@@ -61,7 +61,6 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
       fireEvent(searchLandingPage.searchLandingPageMissingSessionInfoError);
       return;
     }
-    setIsLoading(true);
     bedev2Services
       .getSearchLandingRecommendations(sessionInfo)
       .then(data => {
@@ -73,13 +72,24 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
           }
         });
         setRecommendations(recs);
+        setPrevHasRecommendations((currValue: boolean) => {
+          const hasRecommendations =
+            recs?.sorts.some(
+              sort => sort.treatmentType === TTreatmentType.Carousel && sort.games.length > 0
+            ) ?? false;
+          // Needed for users who have no experiences in the recently visited section
+          if (currValue !== hasRecommendations && hasRecommendations) {
+            // setSearchLandingHasContent never has any rejection/failure cases so OK to ignore
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            SearchLandingService.setSearchLandingHasContent();
+            return true;
+          }
+          return currValue;
+        });
       })
       .catch(() => {
         fireEvent(searchLandingPage.searchLandingPageFetchRecommendationsError);
         setRecommendations(undefined);
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   }, [sessionInfo]);
 
@@ -88,31 +98,8 @@ function SearchLandingPageOmniFeed({ translate }: WithTranslationsProps): JSX.El
     fetchLandingRecommendations();
   }, [fetchLandingRecommendations, showSearchLanding]);
 
-  // Needed for users who have no experiences in the recently visited section
-  const hasRecommendations = useMemo(
-    () =>
-      recommendations?.sorts.some(
-        sort => sort.treatmentType === TTreatmentType.Carousel && sort.games.length > 0
-      ) ?? false,
-    [recommendations]
-  );
-
   // If the SLP is disabled or the recommendations are empty, don't render the SLP
-  if (!showSearchLanding || (!isLoading && !hasRecommendations)) return null;
-
-  // If the SLP is loading, show the loading state
-  if (isLoading || !recommendations) {
-    return (
-      <div className='search-landing-container' data-testid='SearchLandingPageOmniFeedTestId'>
-        <div className='search-landing-loading-title shimmer' />
-        <div className='search-landing-loading-carousel'>
-          {Array.from({ length: searchLandingPage.numberOfTilesPerCarousel }, (_, id) => (
-            <LoadingGameTile key={id} />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (!showSearchLanding || !prevHasRecommendations || !recommendations) return null;
 
   return (
     <SearchLandingPageSessionContext.Provider value={sessionInfo}>

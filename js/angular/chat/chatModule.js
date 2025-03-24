@@ -25,8 +25,9 @@ const chat = angular.module('chat', dependencies).config([
     msdElasticConfig.append = '\n';
     const translationProvider = new TranslationResourceProvider();
     const chatResources = translationProvider.getTranslationResource('Feature.Chat');
+    const inExperienceInterventionResources = translationProvider.getTranslationResource('Feature.InExperienceIntervention');
 
-    languageResourceProvider.setTranslationResources([chatResources]);
+    languageResourceProvider.setTranslationResources([chatResources, inExperienceInterventionResources]);
   }
 ]);
 

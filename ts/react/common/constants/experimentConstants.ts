@@ -52,10 +52,7 @@ const defaultValues = {
     IsChartsPageRenameEnabled: true
   },
   tileLayer: {},
-  playButton: {
-    HasUpdatedPlayButtons: false,
-    HasUpdatedPlayButtonsVpc: false
-  }
+  playButton: {}
 };
 
 export default {

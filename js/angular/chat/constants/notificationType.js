@@ -18,7 +18,9 @@ const notificationType = {
   conversationUniverseChanged: 'ConversationUniverseChanged',
   userTagUpdate: 'UserTagUpdate',
   conversationBackfilled: 'ConversationBackfilled',
-  conversationReset: 'ConversationReset'
+  conversationReset: 'ConversationReset',
+  featureInterventionTypeNudge: 'nudge',
+  featureInterventionTypeTimeout: 'timeout'
 };
 
 chatModule.constant('notificationType', notificationType);

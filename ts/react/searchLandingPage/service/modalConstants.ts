@@ -1,7 +1,8 @@
 export const ModalEvent = {
   MountSearchLanding: 'MountSearchLanding',
   ShowSearchLanding: 'ShowSearchLanding',
-  UpdateSearchSessionInfo: 'UpdateSearchSessionInfo'
+  UpdateSearchSessionInfo: 'UpdateSearchSessionInfo',
+  SetSearchLandingHasContent: 'SetSearchLandingHasContent'
 };
 
 export type ShowSearchLandingEventParams = {

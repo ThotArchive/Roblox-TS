@@ -21,6 +21,7 @@ function dialogAttributes(languageResource) {
   const dialogLayoutResetConstant = {
     maxHeightOfTextInput: 16 * 5 - 8 * 2,
     maxHeightOfInput: 16 * 5, // four lines of input text
+    maxHeightOfDisabledInput: 48,
     paddingOfInput: 16,
     typing: {
       isTypingAsSender: false,
@@ -105,6 +106,7 @@ function dialogAttributes(languageResource) {
       heightOfInput: 32,
       maxHeightOfTextInput: dialogLayoutResetConstant.maxHeightOfTextInput,
       maxHeightOfInput: dialogLayoutResetConstant.maxHeightOfInput,
+      maxHeightOfDisabledInput: dialogLayoutResetConstant.maxHeightOfDisabledInput,
       paddingOfInput: dialogLayoutResetConstant.paddingOfInput,
       limitCharacterCount: 160,
       heightOfBanner: 40,
@@ -184,8 +186,7 @@ function dialogAttributes(languageResource) {
     systemMessage: {
       isSystemMessage: true,
       isErrorMsg: false
-    },
-    messageForConversationUnavailableWithUser: lang.get('Message.ChatUnavailableWithUser')
+    }
   };
 }
 

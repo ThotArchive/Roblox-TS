@@ -35,6 +35,7 @@ const useFriendsCarouselClickTracker = (
       [SharedEventMetadata.CollectionId]: sortId,
       [SharedEventMetadata.CollectionPosition]: sortPosition !== undefined ? sortPosition + 1 : -1,
       [ItemActionMetadata.TotalNumberOfItems]: totalNumberOfItems,
+      [ItemActionMetadata.ActionType]: 'OpenProfile',
       [ItemActionMetadata.ItemId]: friendData.id.toString(),
       [ItemActionMetadata.ItemPosition]: friendIndex + 1,
       [ItemActionMetadata.PositionInTopic]: friendIndex + 1,

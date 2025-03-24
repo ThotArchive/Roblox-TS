@@ -51,7 +51,7 @@ export const PurchaseButtonContainer = ({
   placeId,
   iconClassName = 'icon-robux-white',
   buttonWidth = Button.widths.full,
-  buttonClassName = 'btn-common-play-game-lg',
+  buttonClassName = 'btn-economy-robux-white-lg',
   refetchPlayabilityStatus,
   hideButtonText = false,
   redirectPurchaseUrl,

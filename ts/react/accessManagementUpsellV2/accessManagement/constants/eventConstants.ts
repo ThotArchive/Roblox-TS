@@ -85,6 +85,16 @@ export function sendEmailParentClickEvent(
         associatedText: EventConstants.text.AskNow
       }
     );
+  } else if (featureName === 'CanRemoveParentManagedExperienceBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.EmailParent,
+        state: `unblockExperience ${recourseParameters?.universeId}`,
+        associatedText: EventConstants.text.AskNow
+      }
+    );
   }
 }
 
@@ -144,6 +154,16 @@ export function sendVerifyCancelClickEvent(
         associatedText: EventConstants.text.Cancel
       }
     );
+  } else if (featureName === 'CanRemoveParentManagedExperienceBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthButtonClick,
+      EventConstants.context.UpdateSetting,
+      {
+        btn: EventConstants.btn.verifyCancel,
+        state: `unblockExperience ${recourseParameters?.universeId}`,
+        associatedText: EventConstants.text.Cancel
+      }
+    );
   }
 }
 
@@ -179,6 +199,15 @@ export function sendProloguePageLoadEvent(
       EventConstants.context.UpdateSetting,
       {
         state: `unblockUser ${recourseParameters?.friendUserId}`,
+        associatedText: EventConstants.text.AskYourParent
+      }
+    );
+  } else if (featureName === 'CanRemoveParentManagedExperienceBlocks') {
+    eventStreamService.sendEventWithTarget(
+      EventConstants.eventName.AuthPageload,
+      EventConstants.context.UpdateSetting,
+      {
+        state: `unblockExperience ${recourseParameters?.experienceId}`,
         associatedText: EventConstants.text.AskYourParent
       }
     );

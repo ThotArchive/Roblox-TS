@@ -99,6 +99,11 @@ function chatService(
         retryable: true,
         withCredentials: true
       };
+      this.apiSets.getChatModerationStatuses = {
+        url: `${chatDomain}/v1/get-chat-moderation-statuses`,
+        retryable: true,
+        withCredentials: true
+      };
       this.apiSets.startOneToOneConversationApi = {
         url: `${chatDomain}/v1/create-conversations`,
         retryable: true,
@@ -143,7 +148,9 @@ function chatService(
             noCache: true
           }
         : apiParamsInitialization.apiSets.getMetaData;
-      const params = {};
+      const params = {
+        userId: CurrentUser?.userId ?? ''
+      };
       return httpService.httpGet(urlConfig, params);
     },
 
@@ -292,6 +299,13 @@ function chatService(
         conversation_ids: conversationIds
       };
       return httpService.httpPost(this.apiSets.getConversationsParticipantsMetadataApi, params);
+    },
+
+    getChatModerationStatuses(conversationIds) {
+      const params = {
+        ids: conversationIds
+      };
+      return httpService.httpPost(this.apiSets.getChatModerationStatuses, params);
     },
 
     markAsRead(conversationId) {

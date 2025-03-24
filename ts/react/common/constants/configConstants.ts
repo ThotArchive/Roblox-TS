@@ -70,7 +70,7 @@ export const searchLandingPage = {
   searchLandingPageUnexpectedTreatmentTypeError: 'SearchLandingPageUnexpectedTreatmentTypeError',
   searchLandingPageMountError: 'SearchLandingPageMountError',
   searchLandingMissingSortIdError: 'SearchLandingMissingSortIdError',
-  missingSortIdDefault: 'undefined',
+  missingSortIdDefault: -1,
   numberOfTilesPerCarousel: 5
 };
 

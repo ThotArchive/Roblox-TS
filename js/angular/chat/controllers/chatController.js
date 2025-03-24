@@ -1,4 +1,4 @@
-import { RealTime, EnvironmentUrls, CurrentUser, DisplayNames } from 'Roblox';
+import { RealTime, EnvironmentUrls, CurrentUser, DisplayNames, EventStream } from 'Roblox';
 import { UserProfileField } from 'roblox-user-profiles';
 import angular from 'angular';
 import chatModule from '../chatModule';
@@ -36,7 +36,11 @@ function chatController(
   analyticsService,
   eventNames,
   diagActionList,
-  guacService
+  guacService,
+  languageResource,
+  countdownTimerService,
+  featureInterventionAnalytics,
+  systemFeedbackService
 ) {
   'ngInject';
 
@@ -70,6 +74,14 @@ function chatController(
     $log.debug(
       ` -------------availableNumberOfDialogs = -------------- ${$scope.chatLibrary.chatLayout.availableNumberOfDialogs}`
     );
+  };
+
+  const getOpenConversationIds = function () {
+    return $scope.preSetChatLibrary.dialogIdList
+      .filter(
+        dialogId => dialogId !== chatUtility.newGroup.layoutId && $scope.chatUserDict[dialogId]
+      )
+      .map(dialogId => $scope.chatUserDict[dialogId].id);
   };
 
   const dialogsFitWindow = function () {
@@ -368,6 +380,8 @@ function chatController(
         }
       });
       $scope.maybeCloseNewGroupDialog();
+
+      applyChatModerationStatuses(getOpenConversationIds());
     }
   };
 
@@ -386,6 +400,7 @@ function chatController(
     $scope.userPresenceTypes = { ...chatUtility.userPresenceTypes };
     $scope.newGroup = { ...dialogAttributes.newGroup };
     $scope.selectedFriendIds = [];
+    $scope.chatTimeouts = {};
     $scope.chatLibrary = { ...libraryInitialization.chatLibrary };
     if (angular.isDefined(RealTime)) {
       realTimeClient = RealTime.Factory.GetClient();
@@ -853,7 +868,7 @@ function chatController(
           break;
         case chatUtility.channelsNotificationType.participantTyping:
           var typing = {
-            status: true, 
+            status: true,
             userId: parseInt(data.Actor.Id)
           };
           $scope.updateConverationTypingStatus(channelId, typing);
@@ -1021,6 +1036,206 @@ function chatController(
       );
     }
   };
+
+  $scope.handleFeatureInterventions = function (data) {
+    $log.debug(
+      `--------- this is ${chatUtility.notificationsName.FeatureIntervention} subscription ----------- ${data.type}`
+    );
+    try {
+      if (data.abuseVector !== 'party_chat') {
+        return;
+      }
+      const type = data.type;
+      switch (type) {
+        case chatUtility.notificationType.featureInterventionTypeNudge:
+          showNudgeModal(data.decisionEventId);
+          break;
+        case chatUtility.notificationType.featureInterventionTypeTimeout:
+          // calculate timeout end time
+          const startTimestamp = new Date(data.timeoutStartTime).getTime();
+          const endTime = new Date(startTimestamp + data.timeoutDurationSeconds * 1000);
+          const msUntilStartTime = startTimestamp - Date.now();
+          // delay until start time if applicable
+          $timeout(function () {
+            // if present, vectorTargetId is the conversation ID to time out
+            registerChatTimeout({
+              conversationId: data.vectorTargetId,
+              timeout: {
+                endTime,
+                durationSeconds: data.timeoutDurationSeconds,
+                eventId: data.decisionEventId
+              }
+            });
+            $scope.showTimeoutModal(data.vectorTargetId);
+          }, Math.max(0, msUntilStartTime));
+          break;
+      }
+    } catch (e) {
+      let message = `${chatUtility.notificationsName.FeatureIntervention}:${data.type}: `;
+      if (e && e.message) {
+        message += e.message;
+      }
+      googleAnalyticsEventsService.fireEvent(
+        $scope.chatLibrary.googleAnalyticsEvent.category,
+        $scope.chatLibrary.googleAnalyticsEvent.action,
+        message
+      );
+    }
+  };
+
+  const showNudgeModal = function (eventId) {
+    var renderedTimestamp = Date.now();
+    var sendEvent = function (eventType) {
+      analyticsService.sendInterventionEvent({
+        eventType,
+        interventionType: featureInterventionAnalytics.interventionTypes.partyChatNudge,
+        renderedTimestamp,
+        eventId
+      });
+    }
+
+    Roblox.Dialog.open({
+      titleText: languageResource.get('Heading.DontSharePersonalInformation'),
+      bodyContent: languageResource.get('Description.PartyChatMayBeSuspended'),
+      xToCancel: true,
+      acceptText: languageResource.get('Action.Understand'),
+      acceptColor: Roblox.Dialog.green,
+      onAccept() {
+        sendEvent(featureInterventionAnalytics.eventTypes.ctaClicked);
+      },
+      declineText: languageResource.get('Action.LearnMore'),
+      onDecline() {
+        sendEvent(featureInterventionAnalytics.eventTypes.learnClicked);
+        $window.open($scope.chatLibrary.chatTimeoutsLearnMoreUrl, '_blank');
+      },
+      allowHtmlContentInFooter: true,
+      footerText: `<a id="intervention-mistake-btn">${languageResource.get('Description.Mistake')}</a>`,
+      cssClass: 'chat-intervention-modal'
+    });
+
+    sendEvent(featureInterventionAnalytics.eventTypes.modalAppeared);
+
+    angular.element('#intervention-mistake-btn').bind('click', function () {
+      systemFeedbackService.showSystemFeedback(`${languageResource.get('Heading.TakeALook')} - ${languageResource.get('Description.FeedbackHelps')}`);
+      sendEvent(featureInterventionAnalytics.eventTypes.appealClicked);
+      Roblox.Dialog.close();
+    });
+  };
+
+  $scope.showTimeoutModal = function (conversationId) {
+    // close any existing timeout modal to deregister outdated timers
+    Roblox.Dialog.close();
+
+    const timeout = getPrimaryTimeout(conversationId);
+    // if no applicable timeout, no need to show modal
+    if (!timeout) {
+      return;
+    }
+
+    let timerRef;
+
+    const update = function (remainingDuration) {
+      angular.element('.chat-timeout-modal .modal-title').text(
+        languageResource.get('Heading.PartyChatSuspended', {
+          remainingTime: countdownTimerService.format(remainingDuration)
+        })
+      );
+      if (remainingDuration <= 0) {
+        Roblox.Dialog.close();
+      }
+    };
+
+    const unwatch = $scope.$watch(
+      () => $scope.getTimeoutExpiresAt(conversationId),
+      function (newValue, oldValue) {
+        if (newValue === oldValue) {
+          return;
+        }
+        countdownTimerService.cancel(timerRef);
+        if (newValue) {
+          timerRef = countdownTimerService.start(newValue, update);
+        } else {
+          Roblox.Dialog.close();
+        }
+      }
+    );
+
+    var renderedTimestamp = Date.now();
+    var sendEvent = function (eventType) {
+      analyticsService.sendInterventionEvent({
+        eventType,
+        interventionType: featureInterventionAnalytics.interventionTypes.partyChatTimeout,
+        renderedTimestamp,
+        eventId: timeout.eventId,
+        durationSeconds: timeout.durationSeconds
+    });
+    }
+
+    // open modal
+    Roblox.Dialog.open({
+      titleText: languageResource.get('Heading.PartyChatSuspended', {
+        remainingTime: ''
+      }),
+      bodyContent: languageResource.get('Description.CantUsePartyChat'),
+      xToCancel: true,
+      acceptText: languageResource.get('Action.Understand'),
+      acceptColor: Roblox.Dialog.green,
+      onAccept() {
+        sendEvent(featureInterventionAnalytics.eventTypes.ctaClicked);
+      },
+      declineText: languageResource.get('Action.LearnMore'),
+      onDecline() {
+        sendEvent(featureInterventionAnalytics.eventTypes.learnClicked);
+        $window.open($scope.chatLibrary.chatTimeoutsLearnMoreUrl, '_blank');
+      },
+      allowHtmlContentInFooter: true,
+      footerText: `<a id="intervention-mistake-btn">${languageResource.get('Description.Mistake')}</a>`,
+      onCloseCallback() {
+        countdownTimerService.cancel(timerRef);
+        unwatch();
+      },
+      cssClass: 'chat-intervention-modal chat-timeout-modal'
+    });
+
+    timerRef = countdownTimerService.start(timeout.endTime.getTime(), update);
+
+    sendEvent(featureInterventionAnalytics.eventTypes.modalAppeared);
+
+    angular.element('#intervention-mistake-btn').bind('click', function () {
+      systemFeedbackService.showSystemFeedback(`${languageResource.get('Heading.TakeALook')} - ${languageResource.get('Description.FeedbackHelps')}`);
+      sendEvent(featureInterventionAnalytics.eventTypes.appealClicked);
+      Roblox.Dialog.close();
+    });
+  };
+
+  // registers the given timeout under the given conversationId
+  // if conversationId is not given, registers a user-level timeout
+  const registerChatTimeout = function ({ conversationId, timeout }) {
+    const timeoutKey = conversationId ?? 'user';
+    $scope.chatTimeouts[timeoutKey] = timeout;
+  };
+
+  // if conversationId is given, returns the later of the conversation-level timeout and the user-level timeout
+  // if conversationId is not given, returns the user-level timeout
+  const getPrimaryTimeout = function (conversationId) {
+    const userTimeout = $scope.chatTimeouts['user'];
+    const conversationTimeout = conversationId ? $scope.chatTimeouts[conversationId] : null;
+    if (userTimeout && conversationTimeout) {
+      return userTimeout.endTime > conversationTimeout.endTime ? userTimeout : conversationTimeout;
+    }
+    if (userTimeout) {
+      return userTimeout;
+    }
+    if (conversationTimeout) {
+      return conversationTimeout;
+    }
+    return undefined;
+  }
+
+  // get the primary timeout expiry timestamp, if active, for the given conversationId
+  $scope.getTimeoutExpiresAt = function (conversationId) {
+    return getPrimaryTimeout(conversationId)?.endTime?.getTime();
+  }
 
   $scope.handleFriendshipNotifications = function (data) {
     $log.debug(`--------- this is FriendshipNotifications subscription -----------${data.Type}`);
@@ -1251,8 +1466,8 @@ function chatController(
   };
   $scope.unsubscribeRealTimeForChat = function () {
     realTimeClient.Unsubscribe(
-        chatUtility.notificationsName.CommunicationChannelsNotifications,
-        $scope.handleChannelsNotifications
+      chatUtility.notificationsName.CommunicationChannelsNotifications,
+      $scope.handleChannelsNotifications
     );
     realTimeClient.Unsubscribe(
       chatUtility.notificationsName.ChatMigrationNotifications,
@@ -1265,6 +1480,14 @@ function chatController(
     realTimeClient.Unsubscribe(
       chatUtility.notificationsName.ChatNotifications,
       $scope.handleChatNotifications
+    );
+    realTimeClient.Unsubscribe(
+      chatUtility.notificationsName.ExperienceIntervention,
+      $scope.handleFeatureInterventions
+    );
+    realTimeClient.Unsubscribe(
+      chatUtility.notificationsName.FeatureIntervention,
+      $scope.handleFeatureInterventions
     );
     realTimeClient.Unsubscribe(
       chatUtility.notificationsName.FriendshipNotifications,
@@ -1306,6 +1529,7 @@ function chatController(
           } else if (!oldIsChatEnabled && newIsChatEnabled) {
             $scope.handleSignalRSuccess(true);
             $scope.initializeRealTimeSubscriptionsForChat();
+            applyChatModerationStatuses(getOpenConversationIds());
           }
 
           $scope.maybeCloseNewGroupDialog();
@@ -1349,8 +1573,8 @@ function chatController(
       );
 
       realTimeClient.Subscribe(
-          chatUtility.notificationsName.CommunicationChannelsNotifications,
-          $scope.handleChannelsNotifications
+        chatUtility.notificationsName.CommunicationChannelsNotifications,
+        $scope.handleChannelsNotifications
       );
 
       realTimeClient.Subscribe(
@@ -1367,6 +1591,18 @@ function chatController(
         chatUtility.notificationsName.ChatNotifications,
         $scope.handleChatNotifications
       );
+
+      if ($scope.chatLibrary.useChatTimeouts) {
+        realTimeClient.Subscribe(
+          chatUtility.notificationsName.ExperienceIntervention,
+          $scope.handleFeatureInterventions
+        );
+
+        realTimeClient.Subscribe(
+          chatUtility.notificationsName.FeatureIntervention,
+          $scope.handleFeatureInterventions
+        );
+      }
 
       realTimeClient.Subscribe(
         chatUtility.notificationsName.FriendshipNotifications,
@@ -2030,7 +2266,42 @@ function chatController(
         $scope.chatLibrary.shouldRespectConversationHasUnreadMessageToMarkAsRead
       );
     }
+
+    applyChatModerationStatuses(conversation ? [conversation.id] : undefined);
   };
+
+  const applyChatModerationStatuses = async function (conversationIds) {
+    if (!$scope.chatLibrary.useChatTimeouts) {
+      return;
+    }
+
+    const response = await chatService.getChatModerationStatuses(conversationIds ?? []);
+    var userTimeoutRange = response['user_timeout_range'];
+    var conversationTimeoutRanges = response['conversation_timeout_ranges'];
+    if (userTimeoutRange) {
+      registerChatTimeout({
+        timeout: constructTimeout(userTimeoutRange)
+      });
+    }
+    if (conversationTimeoutRanges) {
+      for (const conversationTimeoutRange of conversationTimeoutRanges) {
+        registerChatTimeout({
+          conversationId: conversationTimeoutRange['id'],
+          timeout: constructTimeout(conversationTimeoutRange['timeout_range'])
+        });
+      }
+    }
+  }
+
+  const constructTimeout = function(moderationTimeoutRange) {
+    var startTime = new Date(moderationTimeoutRange['start_time']);
+    var endTime = new Date(moderationTimeoutRange['end_time']);
+    return {
+      endTime,
+      durationSeconds: (endTime.getTime() - startTime.getTime()) / 1000,
+      eventId: moderationTimeoutRange['decision_event_id']
+    };
+  }
 
   $scope.closeDialog = function (layoutId) {
     const conversation = $scope.chatUserDict[layoutId];
@@ -2406,6 +2677,9 @@ function chatController(
     $scope.chatLibrary.userId = parseInt(CurrentUser.userId);
     $scope.chatLibrary.usePaginatedFriends =
       $scope.chatLibrary.userId % 100 <= chatUiPoliciesResponse.usePaginatedFriends;
+    $scope.chatLibrary.useChatTimeouts =
+      $scope.chatLibrary.userId % 100 <= (chatUiPoliciesResponse.useChatTimeouts ?? 0);
+    $scope.chatLibrary.chatTimeoutsLearnMoreUrl = chatUiPoliciesResponse.chatTimeoutsLearnMoreUrl ?? '#';
     $scope.chatLibrary.username = CurrentUser.name;
     let eventAction = googleAnalyticsEventsService.eventActions.Chat;
     eventAction += `: ${googleAnalyticsEventsService.getUserAgent()}`;

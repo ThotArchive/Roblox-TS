@@ -2,23 +2,25 @@ import { ready } from 'core-utilities';
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import Roblox from 'Roblox';
-import App from './App';
-import PhoneUpsellApp from './PhoneUpsellApp';
-import {
-  emailRootElementId,
-  phoneRootElementId,
-  contactMethodPromptRootElementId
-} from './app.config';
 import '../../../css/verificationUpsellModal/verificationUpsellModal.scss';
+import AgeEstimationPromptApp from './AgeEstimationPromptApp';
+import App from './App';
 import {
-  handleUserEmailUpsellAtLogout,
-  handleUserEmailUpsellAtBuyRobux,
-  handleUserEmailUpsellOnHomePage,
-  handleUserEmailVerificationRequiredByPurchaseWarning,
-  handleUserEmailUpsellAtPremiumSubscription,
-  handleUserEmailVerificationRequiredByBan
-} from './emailUpsellModal/services/emailServices';
+  ageEstimationPromptRootElementId,
+  contactMethodPromptRootElementId,
+  emailRootElementId,
+  phoneRootElementId
+} from './app.config';
 import ContactMethodPromptApp from './ContactMethodPromptApp';
+import {
+  handleUserEmailUpsellAtBuyRobux,
+  handleUserEmailUpsellAtLogout,
+  handleUserEmailUpsellAtPremiumSubscription,
+  handleUserEmailUpsellOnHomePage,
+  handleUserEmailVerificationRequiredByBan,
+  handleUserEmailVerificationRequiredByPurchaseWarning
+} from './emailUpsellModal/services/emailServices';
+import PhoneUpsellApp from './PhoneUpsellApp';
 
 const renderPhoneUpsell = ({
   onClose,
@@ -80,10 +82,21 @@ const renderContactMethodPromptModal = ({ origin, section }) => {
   });
 };
 
+const renderAgeEstimationPromptModal = () => {
+  ready(() => {
+    const element = document.getElementById(ageEstimationPromptRootElementId);
+    if (element) {
+      unmountComponentAtNode(element);
+      render(<AgeEstimationPromptApp />, element);
+    }
+  });
+};
+
 Roblox.UpsellService = {
   renderEmailUpsell,
   renderPhoneUpsell,
-  renderContactMethodPromptModal
+  renderContactMethodPromptModal,
+  renderAgeEstimationPromptModal
 };
 
 // Expose service to external apps

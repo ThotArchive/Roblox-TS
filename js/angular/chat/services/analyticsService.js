@@ -1,7 +1,7 @@
 import chatModule from '../chatModule';
-import { EventStream } from 'Roblox';
+import { CurrentUser, EventStream } from 'Roblox';
 
-function analyticsService($log, chatUtility) {
+function analyticsService($log, chatUtility, featureInterventionAnalytics) {
   'ngInject';
 
   const EventTracker = window.EventTracker;
@@ -32,6 +32,35 @@ function analyticsService($log, chatUtility) {
       }
 
       return conversation?.id;
+    },
+    sendInterventionEvent({ eventType, interventionType, renderedTimestamp, eventId, durationSeconds }) {
+      if (!EventStream) {
+        return;
+      }
+      const userId = parseInt(CurrentUser.userId);
+      const interactedTimestamp = Date.now();
+
+      const eventProperties = {
+        user_id: userId,
+        timestamp_milliseconds: interactedTimestamp,
+        event_type: eventType,
+        interventionType: interventionType,
+        event_id: eventId,
+        timeout_duration_seconds: durationSeconds
+      };
+      if (
+        eventType === featureInterventionAnalytics.eventTypes.appealClicked ||
+        eventType === featureInterventionAnalytics.eventTypes.ctaClicked
+      ) {
+        eventProperties.time_to_interact_seconds = (interactedTimestamp - renderedTimestamp) / 1000;
+      }
+
+      EventStream.SendEventWithTarget(
+        featureInterventionAnalytics.eventName,
+        featureInterventionAnalytics.eventContext,
+        eventProperties,
+        EventStream.TargetTypes.WWW
+      );
     }
   };
 }

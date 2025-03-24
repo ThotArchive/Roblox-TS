@@ -30,10 +30,19 @@ function updateSessionInfo(sessionInfo: string): Promise<void> {
   });
 }
 
+// Called from the SearchLandingPageOmniFeed (Roblox.Games.WebApp) and subscribed to by SearchInput (Roblox.Navigation.WebApp)
+function setSearchLandingHasContent(): Promise<void> {
+  return new Promise(() => {
+    const event = new CustomEvent(ModalEvent.SetSearchLandingHasContent, {});
+    window.dispatchEvent(event);
+  });
+}
+
 const SearchLandingService: SearchLandingServiceInterface = {
   mountSearchLanding,
   showSearchLanding,
-  updateSessionInfo
+  updateSessionInfo,
+  setSearchLandingHasContent
 };
 
 export default SearchLandingService;

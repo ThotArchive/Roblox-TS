@@ -136,10 +136,7 @@ export type TPlayButtonProps = {
   buttonWidth?: ValueOf<typeof Button.widths>;
   buttonClassName?: string;
   eventProperties?: Record<string, string | number | undefined>;
-  status:
-    | TPlayabilityStatuses['Playable']
-    | TPlayabilityStatuses['GuestProhibited']
-    | TPlayabilityStatuses['ContextualPlayabilityUnverifiedSeventeenPlusUser']; // remove when cleaning up hasUpdatedPlayButtonsIxp as true
+  status: TPlayabilityStatuses['Playable'] | TPlayabilityStatuses['GuestProhibited'];
   disableLoadingState?: boolean;
   buttonText?: string | undefined;
   hideIcon?: boolean;
@@ -295,14 +292,6 @@ export const PlayButton = ({
             } else {
               launchLogin(placeId);
             }
-          } else if (
-            // remove this case when cleaning up hasUpdatedPlayButtonsIxp as true
-            status === PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser
-          ) {
-            fireEvent(counterEvents.SeventeenPlusInPlayable);
-            // can be used for success/failure callback cases in the future
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const success = await startAccessManagementUpsellFlow();
           }
 
           if (analyticsCallback) {
@@ -313,7 +302,6 @@ export const PlayButton = ({
         {buttonText && <span className='play-button-text'>{buttonText}</span>}
       </Button>
       <div id='id-verification-container' />
-      <div id='access-management-upsell-container-v1' />
     </React.Fragment>
   );
 };
@@ -331,22 +319,8 @@ export type TDefaultPlayButtonProps = {
   eventProperties?: Record<string, number | string | undefined>;
   disableLoadingState?: boolean;
   buttonClassName?: string;
-  hasUpdatedPlayButtonsIxp?: boolean;
-  hasUpdatedPlayButtonsVpcIxp?: boolean;
-  shouldShowVpcPlayButtonUpsells?: boolean;
   redirectPurchaseUrl?: TValidHttpUrl;
   showDefaultPurchaseText?: boolean;
-};
-
-const logPlayButtonExposure = () => {
-  if (ExperimentationService.getAllValuesForLayer) {
-    const ixpPromise = ExperimentationService.getAllValuesForLayer(playButtonLayer);
-    ixpPromise
-      .then(() => {
-        ExperimentationService.logLayerExposure(playButtonLayer);
-      })
-      .catch(() => fireEvent(counterEvents.PlayButtonExposureError));
-  }
 };
 
 export const DefaultPlayButton = ({
@@ -361,9 +335,6 @@ export const DefaultPlayButton = ({
   eventProperties = {},
   disableLoadingState,
   buttonClassName,
-  hasUpdatedPlayButtonsIxp,
-  hasUpdatedPlayButtonsVpcIxp,
-  shouldShowVpcPlayButtonUpsells,
   redirectPurchaseUrl,
   showDefaultPurchaseText
 }: TDefaultPlayButtonProps): JSX.Element => {
@@ -403,28 +374,11 @@ export const DefaultPlayButton = ({
       );
     case PlayabilityStatus.ContextualPlayabilityUnverifiedSeventeenPlusUser:
       fireEvent(counterEvents.ActionNeeded);
-      logPlayButtonExposure();
-
-      if (hasUpdatedPlayButtonsIxp) {
-        return (
-          <SeventeenPlusActionNeededButton
-            universeId={universeId}
-            hideButtonText={hideButtonText}
-            buttonClassName={buttonClassName}
-          />
-        );
-      }
 
       return (
-        <PlayButton
+        <SeventeenPlusActionNeededButton
           universeId={universeId}
-          placeId={placeId}
-          rootPlaceId={rootPlaceId}
-          privateServerLinkCode={privateServerLinkCode}
-          gameInstanceId={gameInstanceId}
-          status={playabilityStatus}
-          eventProperties={eventProperties}
-          disableLoadingState={disableLoadingState}
+          hideButtonText={hideButtonText}
           buttonClassName={buttonClassName}
         />
       );
@@ -443,45 +397,23 @@ export const DefaultPlayButton = ({
         />
       );
     case PlayabilityStatus.ContextualPlayabilityAgeRecommendationParentalControls:
-      logPlayButtonExposure();
+      fireEvent(counterEvents.ActionNeeded);
 
-      if (shouldShowVpcPlayButtonUpsells && hasUpdatedPlayButtonsVpcIxp) {
-        fireEvent(counterEvents.ActionNeeded);
-
-        return (
-          <ParentalControlsActionNeededButton
-            universeId={universeId}
-            hideButtonText={hideButtonText}
-            buttonClassName={buttonClassName}
-            placeId={placeId}
-            rootPlaceId={rootPlaceId}
-            privateServerLinkCode={privateServerLinkCode}
-            gameInstanceId={gameInstanceId}
-            eventProperties={eventProperties}
-          />
-        );
-      }
-
-      // If policy is false, fallback to existing Unplayable behavior
-      fireEvent(counterEvents.Unplayable);
-
-      if (hasUpdatedPlayButtonsIxp) {
-        return (
-          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
-        );
-      }
-
-      return <React.Fragment />;
+      return (
+        <ParentalControlsActionNeededButton
+          universeId={universeId}
+          hideButtonText={hideButtonText}
+          buttonClassName={buttonClassName}
+          placeId={placeId}
+          rootPlaceId={rootPlaceId}
+          privateServerLinkCode={privateServerLinkCode}
+          gameInstanceId={gameInstanceId}
+          eventProperties={eventProperties}
+        />
+      );
     default:
       fireEvent(counterEvents.Unplayable);
-      logPlayButtonExposure();
 
-      if (hasUpdatedPlayButtonsIxp) {
-        return (
-          <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />
-        );
-      }
-
-      return <React.Fragment />;
+      return <UnplayableButton hideButtonText={hideButtonText} buttonClassName={buttonClassName} />;
   }
 };
