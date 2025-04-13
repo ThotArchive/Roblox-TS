@@ -17,12 +17,14 @@ const ParentalRequestContainer = ({
   translate,
   recourse,
   onHidecallback,
+  isPrologueUsed,
   value = null,
   expChildModalType = null
 }: {
   translate: WithTranslationsProps['translate'];
   recourse: RecourseResponse;
   onHidecallback: () => void;
+  isPrologueUsed: boolean;
   value: Record<string, string> | null;
   expChildModalType?: ExpNewChildModal;
 }): JSX.Element => {
@@ -120,6 +122,7 @@ const ParentalRequestContainer = ({
           onHidecallback={onHidecallback}
           value={value}
           expChildModalType={expChildModalType}
+          isPrologueUsed={isPrologueUsed}
         />
       )}
       {confirmationModal}

@@ -1,4 +1,3 @@
-import { httpService } from 'core-utilities';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { HomePageUpsellCardService, UpsellService } from 'Roblox';
@@ -8,13 +7,6 @@ import {
   contactMethodPromptOrigins,
   contactMethodPromptSections
 } from '../constants/upsellCardEventStreamConstants';
-import { shouldNotShowAgeEstimationModalUrlConfig } from '../constants/urlConstants';
-import {
-  ageEstimationModalAlreadyShown,
-  setAgeEstimationModalNotShown,
-  setAgeEstimationModalShown,
-  shouldShowModal
-} from '../services/ageEstimationStatusService';
 import isCardTypeSupported from '../utils/upsellCardUtils';
 
 function HomePageUpsellCardContainer({ translate }) {
@@ -24,12 +16,6 @@ function HomePageUpsellCardContainer({ translate }) {
   const [bodyTextOverride, setBodyTextOverride] = useState('');
   const [requireExplicitVoiceConsent, setRequireExplicitVoiceConsent] = useState(false);
   const [ageEstimationModalVisible, setAgeEstimationModalVisible] = useState(false);
-
-  const getFAEEnablement = async () => {
-    const urlConfig = shouldNotShowAgeEstimationModalUrlConfig();
-    const { data } = await httpService.get(urlConfig);
-    return data;
-  };
 
   useEffect(() => {
     const updateUpsellCardContext = async () => {
@@ -72,29 +58,6 @@ function HomePageUpsellCardContainer({ translate }) {
       });
     }
   }, [upsellCardContext]);
-
-  useEffect(() => {
-    if (!ageEstimationModalAlreadyShown()) {
-      getFAEEnablement()
-        .then(data => {
-          if (shouldShowModal(data?.access)) {
-            setAgeEstimationModalVisible(true);
-          } else {
-            setAgeEstimationModalNotShown();
-          }
-        })
-        .catch(error => {
-          console.error(`Error determining if we need to show experimental modal ${error}`);
-        });
-    }
-  });
-
-  useEffect(() => {
-    if (ageEstimationModalVisible) {
-      UpsellService?.renderAgeEstimationPromptModal();
-      setAgeEstimationModalShown();
-    }
-  }, [ageEstimationModalVisible]);
 
   if (isCardTypeSupported(upsellCardContext)) {
     return (

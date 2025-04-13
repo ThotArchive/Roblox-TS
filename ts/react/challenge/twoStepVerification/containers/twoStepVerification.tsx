@@ -27,6 +27,7 @@ import SecurityKeyInput from './securityKeyInput';
 import SmsInput from './smsInput';
 import CD2SVInput from './cd2svInput';
 import PasskeyInput from './passkeyInput';
+import PasswordInput from './passwordInput';
 
 /**
  * A container element for the 2SV UI.
@@ -344,6 +345,11 @@ const TwoStepVerification: React.FC = () => {
           <PasskeyInput requestInFlight={requestInFlight} setRequestInFlight={setRequestInFlight}>
             {children}
           </PasskeyInput>
+        </Route>
+        <Route path={mediaTypeToPath(MediaType.Password)}>
+          <PasswordInput requestInFlight={requestInFlight} setRequestInFlight={setRequestInFlight}>
+            {children}
+          </PasswordInput>
         </Route>
         <Route>
           <MediaTypeList

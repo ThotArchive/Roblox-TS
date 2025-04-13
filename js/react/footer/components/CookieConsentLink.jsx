@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-style-guide';
-import cookieUtils from '../utils/cookieUtils';
+import { Cookies } from 'Roblox';
 import cookieConsentConstants from '../constants/cookieConsentConstants';
 import cookieBannerServices from '../services/cookieBannerServices';
-import ConsentTool from '../../../../../../Roblox.CookieBanner.WebApp/Roblox.CookieBanner.WebApp/ts/react/cookieBannerV3/containers/ConsentTool';
 
 function CookieConsentLink({ translate }) {
   const [nonEssentialCookieList, updateNonEssentialCookieList] = useState([]);
   const [essentialCookieList, updateEssentialCookieList] = useState([]);
-  const [showConsentTool, updateConsentToolVisibility] = useState(false);
-
-  const openConsentTool = () => {
-    updateConsentToolVisibility(true);
-  };
 
   useEffect(() => {
     const updateCookiePolicy = async () => {
@@ -25,19 +19,16 @@ function CookieConsentLink({ translate }) {
     };
     updateCookiePolicy();
   }, []);
-  const consentTool = showConsentTool ? (
-    <ConsentTool
-      nonEssentialCookieList={nonEssentialCookieList}
-      essentialCookieList={essentialCookieList}
-      translate={translate}
-      closeConsentTool={() => updateConsentToolVisibility()}
-    />
-  ) : null;
+  const [consentTool, consentToolService] = Cookies.useConsentTool({
+    nonEssentialCookieList,
+    essentialCookieList,
+    translate
+  });
   if (essentialCookieList.length > 0) {
     return (
       <div>
         <Button
-          onClick={openConsentTool}
+          onClick={consentToolService.open}
           className='btn text-footer-nav cookie-consent-link'
           variant={null}
           size={null}

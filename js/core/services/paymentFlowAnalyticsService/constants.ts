@@ -20,7 +20,10 @@ export enum TRIGGERING_CONTEXT {
   WEB_PRIVATE_SERVER_ROBUX_UPSELL = 'WebPrivateServerRobuxUpsell',
   WEB_CATALOG_CART_ROBUX_UPSELL = 'WebCatalogCartRobuxUpsell',
   WEBVIEW_ROBUX_PURCHASE = 'WebViewRobuxPurchase',
-  WEBVIEW_PREMIUM_PURCHASE = 'WebViewPremiumPurchase'
+  WEBVIEW_PREMIUM_PURCHASE = 'WebViewPremiumPurchase',
+  WEB_ROBUX_GIFT_PURCHASE = 'WebRobuxGiftPurchase',
+  WEB_ROBUX_GIFT_POST_CHECKOUT = 'WebRobuxGiftPostCheckout',
+  WEB_GIFT_CARD_PURCHASE = 'WebGiftCardPurchase'
 }
 
 export enum VIEW_NAME {
@@ -57,7 +60,18 @@ export enum VIEW_NAME {
   ROBLOX_CREDIT_SETTING_BILLING_PAGE = 'RobloxCreditBillingPage',
   REDEEM_ROBLOX_CARD_PAGE = 'RedeemRobloxCardPage',
   PURCHASE_VPC_MODAL = 'PurchaseVpcModal',
-  OPTIMIZED_PURCHASE_VPC_MODAL = 'OptimizedPurchaseVpcModal'
+  OPTIMIZED_PURCHASE_VPC_MODAL = 'OptimizedPurchaseVpcModal',
+  ROBUX_GIFT_LANDING_PAGE = 'RobuxGiftLandingPage',
+  ROBUX_GIFT_BUNDLE_MESSAGE_PAGE = 'RobuxGiftBundleMessagePage',
+  ROBUX_GIFT_PRODUCT_SELECTION = 'RobuxGiftProductSelection',
+  ROBUX_GIFT_MESSAGE_SELECTION = 'RobuxGiftMessageSelection',
+  ROBUX_GIFT_PHONE_SUBMISSION = 'RobuxGiftPhoneSubmission',
+  ROBUX_GIFT_PHONE_AUTHENTICATION = 'RobuxGiftPhoneAuthentication',
+  ROBUX_GIFT_POST_CHECKOUT_SUCCESS = 'RobuxGiftPostCheckoutSuccess',
+  ROBUX_GIFT_POST_CHECKOUT_FAILURE = 'RobuxGiftPostCheckoutFailure',
+  ROBUX_GIFT_REQUEST_BANNER = 'WebRobuxGiftRequestBanner',
+  GIFT_CARD = 'GiftCard',
+  SHOP_GIFT_CARDS = 'ShopGiftCards'
 }
 
 export enum PURCHASE_EVENT_TYPE {
@@ -109,7 +123,13 @@ export enum VIEW_MESSAGE {
   PREPARE_PAYMENT_REQUEST_FLOOD_CHECKED = 'PreparePaymentRequestFloodChecked',
   PREPARE_PAYMENT_REQUEST_REDIRECTED = 'PreparePaymentRequestRedirected',
   PAYMENT_METHOD_DROPDOWN = 'Payment Method Dropdown',
-  USE_DIFFERENT_PAYMENT_METHOD = 'Use Different Payment Method'
+  USE_DIFFERENT_PAYMENT_METHOD = 'Use Different Payment Method',
+  GIFT_NOW = 'Gift now',
+  CHECKOUT = 'Checkout',
+  VERIFY = 'Verify',
+  REQUEST_ROBUX = 'Request Robux',
+  BUY_NOW = 'Buy Now',
+  ADD_TO_CART = 'Add to Cart'
 }
 
 export enum PURCHASE_STATUS {

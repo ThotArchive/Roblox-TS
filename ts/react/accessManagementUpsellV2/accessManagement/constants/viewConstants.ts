@@ -20,7 +20,7 @@ export const PrologueConstants = {
     Cancel: 'Action.Cancel',
     EmailMyParent: 'Action.EmailMyParent',
     VerifyID: 'Action.VerifyID',
-    AskNow: 'Action.AskNow'
+    AskNow: 'Action.AskNowLowercase'
   },
   Title: {
     AskYourParent: 'Title.AskYourParent',

@@ -17,7 +17,7 @@ import {
   getPrologueTranslatedTitle
 } from '../../constants/prologueSettings';
 import {
-  sendProloguePageLoadEvent,
+  sendInitialUpsellPageLoadEvent,
   sendEmailParentClickEvent,
   sendVerifyCancelClickEvent
 } from '../../constants/eventConstants';
@@ -87,7 +87,7 @@ const VpcPrologue = ({
   // Trigger the opening of the error modal in response to a user action or effect
   useEffect(() => {
     requireVpcModalService.open();
-    sendProloguePageLoadEvent(featureName, 'Vpc', settingName, recourseParameters);
+    sendInitialUpsellPageLoadEvent(featureName, 'Vpc', settingName, recourseParameters);
   }, []);
 
   return [requireVpcModal, requireVpcModalService];

@@ -21,11 +21,14 @@ export class MetricsServiceDefault {
 
   private solveTimeSequenceName: string;
 
+  private challengeId: string;
+
   constructor(
     actionType: ActionType,
     provider: string,
     applicationType: string | null,
-    requestServiceDefault: RequestServiceDefault
+    requestServiceDefault: RequestServiceDefault,
+    challengeId: string
   ) {
     this.applicationType = applicationType;
     this.requestServiceDefault = requestServiceDefault;
@@ -33,6 +36,7 @@ export class MetricsServiceDefault {
     this.eventTimer = new EventTimer();
     this.provider = provider;
     this.solveTimeSequenceName = `${this.actionType}${this.provider}_${METRICS_CONSTANTS.sequence.solveTime}`;
+    this.challengeId = challengeId;
   }
 
   fireTriggeredEvent(): void {
@@ -102,7 +106,8 @@ export class MetricsServiceDefault {
           event_type: `${this.provider}_${metricName}`,
           application_type: this.applicationType || 'unknown',
           version: FUNCAPTCHA_VERSION_V2
-        }
+        },
+        identifier: this.challengeId
       })
       // Swallow errors if metrics failed to send; this should not be fatal.
       // eslint-disable-next-line @typescript-eslint/no-empty-function

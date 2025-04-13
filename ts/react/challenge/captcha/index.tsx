@@ -52,7 +52,8 @@ export const renderChallenge: RenderChallenge = async ({
       actionType,
       'FunCaptcha',
       appType,
-      requestServiceDefault
+      requestServiceDefault,
+      unifiedCaptchaId
     );
 
     // Query for captcha metadata, which is necessary to render the challenge.

@@ -46,11 +46,13 @@ function analyticsService($log, chatUtility, featureInterventionAnalytics) {
         event_type: eventType,
         interventionType: interventionType,
         event_id: eventId,
-        timeout_duration_seconds: durationSeconds
+        timeout_duration_seconds: durationSeconds,
+        placement: 'Web'
       };
       if (
         eventType === featureInterventionAnalytics.eventTypes.appealClicked ||
-        eventType === featureInterventionAnalytics.eventTypes.ctaClicked
+        eventType === featureInterventionAnalytics.eventTypes.ctaClicked ||
+        eventType === featureInterventionAnalytics.eventTypes.learnClicked
       ) {
         eventProperties.time_to_interact_seconds = (interactedTimestamp - renderedTimestamp) / 1000;
       }

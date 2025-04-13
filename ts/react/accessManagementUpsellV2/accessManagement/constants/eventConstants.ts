@@ -167,7 +167,7 @@ export function sendVerifyCancelClickEvent(
   }
 }
 
-export function sendProloguePageLoadEvent(
+export function sendInitialUpsellPageLoadEvent(
   featureName: string,
   prologue: string,
   settingName?: string,

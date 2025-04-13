@@ -57,6 +57,7 @@ export const getResources = (translate: TranslateFunction) =>
       EmailMediaType: translate('Label.EmailMediaType'),
       EnterAuthenticatorCode: translate('Label.EnterAuthenticatorCode'),
       EnterEmailCode: translate('Label.EnterEmailCode'),
+      EnterPassword: translate('Label.EnterPassword'),
       EnterRecoveryCode: translate('Label.EnterRecoveryCode'),
       EnterTextCode: translate('Label.EnterTextCode'),
       LearnMore: translate('Label.LearnMore'),
@@ -72,6 +73,8 @@ export const getResources = (translate: TranslateFunction) =>
       NewLogin: translate('Label.NewLogin'),
       PasskeyDirections: translate('Label.PasskeyDirections'),
       PasskeyMediaType: translate('Label.PasskeyMediaType'),
+      PasswordMediaType: translate('Label.Password'),
+      PasswordPlaceholder: translate('Label.PasswordPlaceholder'),
       RecoveryCodeMediaType: translate('Label.RecoveryCodeMediaType'),
       RobloxSupport: translate('Label.RobloxSupport'),
       SecurityKeyDirections: translate('Label.SecurityKeyDirections'),
@@ -88,6 +91,7 @@ export const getResources = (translate: TranslateFunction) =>
       DefaultError: translate('Response.DefaultError'),
       FeatureNotAvailable: translate('Response.FeatureNotAvailable'),
       InvalidCode: translate('Response.InvalidCode'),
+      InvalidPassword: translate('Response.InvalidPassword'),
       SessionExpired: translate('Response.SessionExpired'),
       SystemErrorSwitchingToEmail: translate('Response.SystemErrorSwitchingToEmail'),
       TooManyAttempts: translate('Response.TooManyAttempts'),
@@ -124,6 +128,8 @@ export const mapTwoStepVerificationErrorToResource = (
       return resources.Response.SessionExpired;
     case TwoStepVerification.TwoStepVerificationError.AUTHENTICATOR_CODE_ALREADY_USED:
       return resources.Response.AuthenticatorCodeAlreadyUsed;
+    case TwoStepVerification.TwoStepVerificationError.INVALID_PASSWORD:
+      return resources.Response.InvalidPassword;
     default:
       return resources.Response.DefaultError;
   }

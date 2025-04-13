@@ -5,7 +5,6 @@ import { authenticatedUser } from 'header-scripts';
 import { withTranslations } from 'react-utilities';
 import { createSystemFeedback } from 'react-style-guide';
 import { localStorageService } from 'core-roblox-utilities';
-import { CurrentUser } from 'Roblox';
 import navigationService from '../services/navigationService';
 import NotificationStreamPopover from '../components/NotificationStreamPopover';
 import SettingsPopover from '../components/SettingsPopover';
@@ -17,6 +16,8 @@ import useHeuristicCreditConversionModal from '../../../../../../Roblox.Payments
 import '../../../../../../Roblox.Payments.WebApp/Roblox.Payments.WebApp/css/redeemGiftCard/convertCredit.scss';
 import { redeemTranslationConfig } from '../translation.config';
 import layoutConstants from '../constants/layoutConstants';
+import RobuxBadgeType from '../constants/robuxBadgeConstants';
+import { getRobuxBadgeLocalStorage } from '../util/robuxBadgeUtil';
 
 const { getAccountNotificationCount } = navigationUtil;
 const [SystemFeedback, systemFeedbackService] = createSystemFeedback();
@@ -28,7 +29,7 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
   const [robuxAmount, setRobuxAmount] = useState(0);
   const [isEligibleForVng, setIsEligibleForVng] = useState(false);
   const [canAccessStream, setCanAccessStream] = useState(true);
-  const [showRobuxBadge, setShowRobuxBadge] = useState(false);
+  const [robuxBadgeType, setRobuxBadgeType] = useState(null);
   const [robuxError, setRobuxError] = useState('');
   const [creditDisplayConfig, setCreditDisplayConfig] = useState(
     layoutConstants.creditDisplayConfigVariants.control
@@ -92,17 +93,23 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
   const getRobuxBadge = () => {
     if (isAuthenticated) {
       navigationService.getRobuxBadge().then(({ data: robuxBadgeData }) => {
-        if (robuxBadgeData.is_virtual_item_available) {
-          const prevLocalVirtualItemStartTimeSeconds =
-            localStorageService.getLocalStorage(
-              `prevLocalVirtualItemStartTimeSeconds${CurrentUser.userId}`
-            ) || -1;
-          if (
-            prevLocalVirtualItemStartTimeSeconds <
-            robuxBadgeData.active_virtual_item_start_time_seconds_utc
-          ) {
-            setShowRobuxBadge(true);
-          }
+        const shouldShowRobuxUpdateBadge =
+          getRobuxBadgeLocalStorage(RobuxBadgeType.UPDATE) !== 'true';
+
+        // interpret is_virtual_item_available as indicating we should
+        // show the 'New Update' badge, overriding the virtual item badge in all cases.
+
+        // const prevLocalVirtualItemStartTimeSeconds =
+        //   getRobuxBadgeLocalStorage(RobuxBadgeType.VIRTUAL_ITEM) || -1;
+
+        if (
+          robuxBadgeData.is_virtual_item_available &&
+          shouldShowRobuxUpdateBadge
+          // prevLocalVirtualItemStartTimeSeconds <
+          //   robuxBadgeData.active_virtual_item_start_time_seconds_utc
+        ) {
+          setRobuxBadgeType(RobuxBadgeType.UPDATE);
+          // setRobuxBadgeType(RobuxBadgeType.VIRTUAL_ITEM);
         }
       });
     }
@@ -200,37 +207,30 @@ function HeaderIconsGroup({ translate, toggleUniverseSearch }) {
     <ul className='nav navbar-right rbx-navbar-icon-group'>
       <SystemFeedback />
       <AgeBracketDisplay />
-      <UniverseSearchIcon {...{ translate, toggleUniverseSearch }} />
+      <UniverseSearchIcon translate={translate} toggleUniverseSearch={toggleUniverseSearch} />
       {canAccessStream && notificationStream}
       <BuyRobuxPopover
-        {...{
-          translate,
-          robuxAmount,
-          robuxError,
-          creditAmount,
-          currencyCode,
-          creditError,
-          creditDisplayConfig,
-          isEligibleForVng,
-          isExperimentCallDone,
-          isGetCurrencyCallDone,
-          openConvertCreditModal,
-          showRobuxBadge
-        }}
+        translate={translate}
+        robuxAmount={robuxAmount}
+        robuxError={robuxError}
+        creditAmount={creditAmount}
+        currencyCode={currencyCode}
+        creditError={creditError}
+        creditDisplayConfig={creditDisplayConfig}
+        isEligibleForVng={isEligibleForVng}
+        isExperimentCallDone={isExperimentCallDone}
+        isGetCurrencyCallDone={isGetCurrencyCallDone}
+        openConvertCreditModal={openConvertCreditModal}
+        robuxBadgeType={robuxBadgeType}
       />
-      <SettingsPopover {...{ translate, accountNotificationCount }} />
+      <SettingsPopover translate={translate} accountNotificationCount={accountNotificationCount} />
       <HeuristicCreditConversionModal />
     </ul>
   );
 }
 
-HeaderIconsGroup.defaultProps = {
-  accountNotificationCount: 0
-};
-
 HeaderIconsGroup.propTypes = {
   translate: PropTypes.func.isRequired,
-  accountNotificationCount: PropTypes.number,
   toggleUniverseSearch: PropTypes.func.isRequired
 };
 

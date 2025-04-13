@@ -12,9 +12,9 @@ function withTranslations(WrappedComponent, translationConfig) {
       this.intl = new Intl();
       this.translate = this.translate.bind(this);
 
-      const { common, feature } = validatedConfig;
+      const { common, feature, features } = validatedConfig;
       const translationProvider = new TranslationResourceProvider(this.intl);
-      const languageResources = [...common, feature]
+      const languageResources = [...common, feature, ...(features ?? [])]
         .filter(namespace => !!namespace)
         .map(namespace => translationProvider.getTranslationResource(namespace));
 

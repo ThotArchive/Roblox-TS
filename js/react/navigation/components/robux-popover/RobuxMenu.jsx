@@ -1,12 +1,13 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { numberFormat } from 'core-utilities';
-import { paymentFlowAnalyticsService, localStorageService } from 'core-roblox-utilities';
+import { paymentFlowAnalyticsService } from 'core-roblox-utilities';
 import { Link } from 'react-style-guide';
-import { CurrentUser } from 'Roblox';
 import links from '../../constants/linkConstants';
 import layoutConstant from '../../constants/layoutConstants';
 import navigationService from '../../services/navigationService';
+import RobuxBadgeType from '../../constants/robuxBadgeConstants';
+import { mapRobuxBadgeTypeToStr, setRobuxBadgeLocalStorage } from '../../util/robuxBadgeUtil';
 
 const { buyRobuxUrl, redeemUrl, buyGiftCardUrl } = links;
 
@@ -24,7 +25,7 @@ function RobuxMenu({
   openConvertCreditModal,
   onBuyGiftCardClick,
   onBuyRobuxExternalClick,
-  showRobuxBadge,
+  robuxBadgeType,
   translate
 }) {
   const [isWalletDisplayed, setIsWalletDisplayed] = useState(true);
@@ -47,15 +48,10 @@ function RobuxMenu({
 
   const onBuyRobuxClicked = () => {
     sendViewMessageEvent(paymentFlowAnalyticsService.ENUM_VIEW_MESSAGE.BUY_ROBUX);
-    // Set local storage to hide robux badge for current virtual item when badge is acknowledged.
-    if (showRobuxBadge) {
-      const currentEpochSeconds = Math.floor(Date.now() / 1000);
-      localStorageService.setLocalStorage(
-        `prevLocalVirtualItemStartTimeSeconds${CurrentUser.userId}`,
-        currentEpochSeconds
-      );
-    }
+    setRobuxBadgeLocalStorage(robuxBadgeType);
   };
+
+  const robuxBadgeStr = mapRobuxBadgeTypeToStr(robuxBadgeType);
 
   useEffect(() => {
     // if none of creditAmount or robuxAmount is truncated, then don't display wallet balance
@@ -153,9 +149,9 @@ function RobuxMenu({
             onClick={onBuyRobuxClicked}>
             <span className='buy-robux-link-container'>
               {translate(buyRobuxUrl.buyRobux.label)}
-              {showRobuxBadge && (
+              {robuxBadgeStr && (
                 <div className='new-item-pill small'>
-                  <span className='new-item-pill-text'>{translate('Labels.NewItem')}</span>
+                  <span className='new-item-pill-text'>{translate(robuxBadgeStr)}</span>
                 </div>
               )}
             </span>
@@ -202,7 +198,7 @@ RobuxMenu.defaultProps = {
   creditAmount: 0,
   currencyCode: '',
   creditError: '',
-  showRobuxBadge: false
+  robuxBadgeType: null
 };
 
 RobuxMenu.propTypes = {
@@ -213,7 +209,7 @@ RobuxMenu.propTypes = {
   creditAmount: PropTypes.number,
   currencyCode: PropTypes.string,
   creditError: PropTypes.string,
-  showRobuxBadge: PropTypes.bool,
+  robuxBadgeType: PropTypes.oneOf(Object.values(RobuxBadgeType)),
   creditDisplayConfig: PropTypes.string.isRequired,
   openConvertCreditModal: PropTypes.func.isRequired,
   onBuyGiftCardClick: PropTypes.func.isRequired,

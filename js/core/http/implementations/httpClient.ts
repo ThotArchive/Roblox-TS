@@ -1,3 +1,10 @@
+import { RenderChallenge } from '@rbx/generic-challenge-types';
+import {
+  interceptChallenge,
+  Migrate,
+  parseChallengeSpecificProperties,
+  renderChallenge
+} from '@rbx/generic-challenges';
 import axios, { AxiosPromise } from 'axios';
 import Roblox, { Endpoints, XsrfToken } from 'Roblox';
 import {
@@ -178,18 +185,37 @@ axios.interceptors.response.use(
         challengeTypeRaw !== undefined &&
         challengeMetadataJsonBase64 !== undefined;
       if (challengeAvailable) {
-        if (Roblox && Roblox.AccountIntegrityChallengeService) {
-          return Roblox.AccountIntegrityChallengeService.Generic.interceptChallenge({
-            retryRequest: (challengeIdInner, redemptionMetadataJsonBase64) => {
-              config.headers[GENERIC_CHALLENGE_ID_HEADER] = challengeIdInner;
-              config.headers[GENERIC_CHALLENGE_TYPE_HEADER] = challengeTypeRaw;
-              config.headers[GENERIC_CHALLENGE_METADATA_HEADER] = redemptionMetadataJsonBase64;
-              return axios.request(config);
-            },
+        const retryRequest = (challengeIdInner: string, redemptionMetadataJsonBase64: string) => {
+          config.headers ??= {};
+          config.headers[GENERIC_CHALLENGE_ID_HEADER] = challengeIdInner;
+          config.headers[GENERIC_CHALLENGE_TYPE_HEADER] = challengeTypeRaw;
+          config.headers[GENERIC_CHALLENGE_METADATA_HEADER] = redemptionMetadataJsonBase64;
+          return axios.request(config);
+        };
+
+        // Always attempt the new grasshopper-centralized challenge middleware first.
+        if (Migrate.isSupportedByGrasshopper(challengeTypeRaw)) {
+          return interceptChallenge({
+            retryRequest,
             containerId: GENERIC_CHALLENGE_CONTAINER_ID,
             challengeId,
             challengeTypeRaw,
-            challengeMetadataJsonBase64
+            challengeMetadataJsonBase64,
+            legacyGenericRender: (Roblox?.AccountIntegrityChallengeService?.Generic
+              .renderChallenge as unknown) as RenderChallenge
+          });
+        }
+        if (Roblox && Roblox.AccountIntegrityChallengeService) {
+          return Roblox.AccountIntegrityChallengeService.Generic.interceptChallenge({
+            retryRequest,
+            containerId: GENERIC_CHALLENGE_CONTAINER_ID,
+            challengeId,
+            challengeTypeRaw,
+            challengeMetadataJsonBase64,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            newParseChallenge: parseChallengeSpecificProperties,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            newRenderChallenge: (renderChallenge as unknown) as Roblox.AccountIntegrityChallengeService.Generic.RenderChallenge
           });
         }
         // eslint-disable-next-line no-console

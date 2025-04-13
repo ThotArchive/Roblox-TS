@@ -102,6 +102,26 @@ const HeroUnit = ({
     return <React.Fragment />;
   }, [badgeText]);
 
+  const finalGradientHeightPercent = useMemo(() => {
+    if (gradientHeightPercent !== undefined) {
+      return gradientHeightPercent;
+    }
+    if (gradient.degree === 90 || gradient.degree === 270) {
+      return 1;
+    }
+    return 0.5;
+  }, [gradientHeightPercent, gradient]);
+
+  const finalGradientWidthPercent = useMemo(() => {
+    if (gradientWidthPercent !== undefined) {
+      return gradientWidthPercent;
+    }
+    if (gradient.degree === 90 || gradient.degree === 270) {
+      return 0.5;
+    }
+    return 1;
+  }, [gradientWidthPercent, gradient]);
+
   const heroUnit = useMemo(() => {
     return (
       <HeroUnitContainer
@@ -110,8 +130,8 @@ const HeroUnit = ({
         foregroundImageComponent={foregroundImage}
         backgroundImageComponent={backgroundImage}
         gradient={gradient}
-        gradientHeightPercent={gradientHeightPercent}
-        gradientWidthPercent={gradientWidthPercent}
+        gradientHeightPercent={finalGradientHeightPercent}
+        gradientWidthPercent={finalGradientWidthPercent}
         overlayPillComponent={overlayComponent}
         backgroundClickAction={onActivated}
         bottomRowComponent={bottomRowComponent ?? attributionRow}
@@ -127,8 +147,8 @@ const HeroUnit = ({
     attributionRow,
     foregroundImage,
     gradient,
-    gradientHeightPercent,
-    gradientWidthPercent,
+    finalGradientHeightPercent,
+    finalGradientWidthPercent,
     subtitle,
     title,
     children,

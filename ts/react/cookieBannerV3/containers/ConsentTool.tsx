@@ -26,7 +26,8 @@ export const ConsentTool = ({
   translate: TranslateFunction;
   closeConsentTool: React.Dispatch<React.SetStateAction<string | null>>;
 }): JSX.Element => {
-  const [acceptAnalyticsCookie, updateConsent] = useState<boolean>(false);
+  const isAnalyticsCookieAccepted = consentCookieHandler.isAnalyticsCookieAccepted();
+  const [acceptAnalyticsCookie, updateConsent] = useState<boolean>(isAnalyticsCookieAccepted);
   const [isEssentialCookieListVisible, updateEssentialCookieListVisibility] = useState<boolean>(
     false
   );
@@ -114,7 +115,11 @@ export const ConsentTool = ({
     </div>
   );
   const essentialCookieElementList = essentialCookieList.map(cookie => (
-    <CookieItem cookieName={cookie.cookieName} description={translate(cookie.description)} />
+    <CookieItem
+      key={cookie.cookieName}
+      cookieName={cookie.cookieName}
+      description={translate(cookie.description)}
+    />
   ));
 
   const customerServicelinks = (

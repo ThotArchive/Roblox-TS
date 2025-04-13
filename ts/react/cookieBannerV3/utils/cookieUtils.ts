@@ -21,4 +21,8 @@ const setCookie = (cname: string, cvalue: string, exdays: number): void => {
   document.cookie = `${cname}=${cvalue};${expires}`;
 };
 
-export default { getCookie, setCookie };
+const deleteCookie = (cname: string): void => {
+  document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+export default { getCookie, setCookie, deleteCookie };

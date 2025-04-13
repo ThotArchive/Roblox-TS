@@ -20,16 +20,5 @@ const getVoicePolicyConfig = () => ({
   url: `${EnvironmentUrls.apiGatewayUrl}/universal-app-configuration/v1/behaviors/free-communication-infographics/content`
 });
 
-const shouldNotShowAgeEstimationModalUrlConfig = () => ({
-  retryable: true,
-  withCredentials: true,
-  url: `${EnvironmentUrls.apiGatewayUrl}/access-management/v1/upsell-feature-access?featureName=ShouldNotShowFaeModalForExperiment`
-});
-
 // eslint-disable-next-line import/prefer-default-export
-export {
-  getUpsellCardTypeUrlConfig,
-  getVoicePolicyConfig,
-  optUserInToVoiceChatConfig,
-  shouldNotShowAgeEstimationModalUrlConfig
-};
+export { getUpsellCardTypeUrlConfig, getVoicePolicyConfig, optUserInToVoiceChatConfig };

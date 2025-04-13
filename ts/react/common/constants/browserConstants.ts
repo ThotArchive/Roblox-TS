@@ -2,6 +2,9 @@
 export const homePageContainerId = 'place-list';
 export const homePageContainer = (): HTMLElement | null =>
   document.getElementById(homePageContainerId);
+export const placesListContainerId = 'places-list-web-app';
+export const placesListContainer = (): HTMLElement | null =>
+  document.getElementById(placesListContainerId);
 export const navigationContainerId = 'navigation-container';
 export const navigationContainer = (): HTMLElement | null =>
   document.getElementById(navigationContainerId);

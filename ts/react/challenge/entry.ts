@@ -1,3 +1,4 @@
+import { instrumentTimestamp } from '@rbx/buffered-telemetry';
 import Roblox from 'Roblox';
 import * as Captcha from './captcha';
 import * as DeviceIntegrity from './deviceIntegrity';
@@ -37,3 +38,8 @@ Object.assign(Roblox, {
 
 // Side-effect of loading the prelude asynchronously.
 Generic.loadPreludeIfMissing();
+
+// TODO: Remove this once we have enough telemetry to debug indexed DB client issues.
+// This is flagged from within the [library]().
+// eslint-disable-next-line no-void
+void instrumentTimestamp();

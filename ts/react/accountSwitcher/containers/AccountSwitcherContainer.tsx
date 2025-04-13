@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-style-guide';
 import { withTranslations, WithTranslationsProps } from 'react-utilities';
-import { AccountSwitcherService, EnvironmentUrls } from 'Roblox';
+import { AccountSwitcherService, EnvironmentUrls, Endpoints } from 'Roblox';
 import { authenticatedUser } from 'header-scripts';
 import { TUserData } from '../../common/types/userTypes';
 import { TLoggedInUsers, TSwitchParams } from '../../common/types/accountSwitcherTypes';
@@ -102,6 +102,7 @@ export const AccountSwitcherContainer = ({
       };
       try {
         // if the target account is invalid, the call to `switchAccount()` will replace the blob with a new one that does not contain invalid target account
+        sendAccountSwitchEvent(getContextForLogging(), accountSelectorUserId.toString());
         const switchResponse = await switchAccount(switchParam);
         storeAccountSwitcherBlob(switchResponse.encrypted_users_data_blob);
         if (switchResponse) {
@@ -109,7 +110,6 @@ export const AccountSwitcherContainer = ({
             renderSwitchAccountErrorConfirmationModal();
             return;
           }
-          sendAccountSwitchEvent(getContextForLogging(), accountSelectorUserId.toString());
           onAccountSwitched(accountSelectorUserId);
         }
       } catch {
@@ -136,7 +136,7 @@ export const AccountSwitcherContainer = ({
         );
       }
       deleteAccountSwitcherBlob();
-      window.location.href = EnvironmentUrls.websiteUrl;
+      window.location.href = Endpoints.getAbsoluteUrl('/');
     }
   };
 

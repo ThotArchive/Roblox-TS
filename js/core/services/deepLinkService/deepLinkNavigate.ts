@@ -42,6 +42,7 @@ import AvatarItemDetailsStatus from './enums/AvatarItemDetailsStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import ContentPostStatus from './enums/ContentPostStatus';
 import ExperienceEventStatus from './enums/ExperienceEventStatus';
+import ExperienceAffiliateDeepLinkFallbackType from './enums/ExperienceAffiliateDeepLinkFallbackType';
 
 export type ZendeskDeepLinkParams = {
   articleId?: string;
@@ -401,8 +402,18 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
                 resolveLinkEvent.params
               );
 
-              const referralUrl = `${window.location.protocol}/${window.location.hostname}${window.location.pathname}?type=${ShareLinksType.EXPERIENCE_AFFILIATE}&code=${params.code}`;
-              window.location.href = `/?referralUrl=${encodeURIComponent(referralUrl)}`;
+              // There is no universeId, check if it was resolved to fallback to profile
+              if (
+                data?.fallbackType === ExperienceAffiliateDeepLinkFallbackType.PROFILE &&
+                data.fallbackId
+              ) {
+                // Redirect to the profile page
+                window.location.href = `${UrlPart.Users}/${data.fallbackId}${UrlPart.Profile}`;
+              } else {
+                const referralUrl = `${window.location.protocol}/${window.location.hostname}${window.location.pathname}?type=${ShareLinksType.EXPERIENCE_AFFILIATE}&code=${params.code}`;
+                window.location.href = `/?referralUrl=${encodeURIComponent(referralUrl)}`;
+              }
+
               return true;
             }
 

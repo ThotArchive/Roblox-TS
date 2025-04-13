@@ -4,14 +4,17 @@ import { Modal } from 'react-style-guide';
 import { useSelector } from 'react-redux';
 import {
   resetAccessManagementStore,
+  selectAccessManagement,
   selectCurrentStage,
   selectFeatureAccess,
   selectShowUpsell,
   selectVerificationStageRecourse,
+  selectPrologueStatus,
   setRedirectLink,
   setStage,
   fetchFeatureAccess,
-  setAmpFeatureCheckData
+  setAmpFeatureCheckData,
+  setPrologueUsed
 } from './accessManagementSlice';
 import { useAppDispatch } from '../store';
 import { ModalEvent, AccessManagementUpsellEventParams } from './constants/viewConstants';
@@ -36,6 +39,8 @@ function AccessManagementContainer({
   const currentStage = useSelector(selectCurrentStage);
   const featureAccess = useSelector(selectFeatureAccess);
   const showUpsellModal = useSelector(selectShowUpsell);
+  const isPrologueUsed = useSelector(selectPrologueStatus);
+  const { loading } = useSelector(selectAccessManagement);
   const verificationStageRecourse = useSelector(selectVerificationStageRecourse);
   const [onHidecallback, setOnHideCallback] = useState<(access: Access) => string>(
     (access: Access) => access
@@ -86,6 +91,7 @@ function AccessManagementContainer({
       usePrologueWithExp = false;
     }
     if (usePrologueWithExp) {
+      dispatch(setPrologueUsed(true));
       dispatch(setStage(UpsellStage.Prologue));
     } else {
       dispatch(setStage(UpsellStage.Verification));
@@ -109,8 +115,8 @@ function AccessManagementContainer({
 
   // Loop call FeatureCheck to check new access status
   function onHide() {
-    dispatch(resetAccessManagementStore());
     onHidecallback(featureAccess.data.access);
+    dispatch(resetAccessManagementStore());
   }
 
   // Close right away without calling featureCheck again
@@ -126,9 +132,22 @@ function AccessManagementContainer({
       switch (verificationStageRecourse.action) {
         case Recourse.AddedEmail:
           return <EmailVerificationContainer translate={translate} onHide={onHide} />;
-
+        case Recourse.AgeEstimation:
+          return (
+            <IDVerificationContainer
+              translate={translate}
+              onHidecallback={onHideFunction}
+              ageEstimation
+            />
+          );
         case Recourse.GovernmentId:
-          return <IDVerificationContainer translate={translate} onHidecallback={onHideFunction} />;
+          return (
+            <IDVerificationContainer
+              translate={translate}
+              onHidecallback={onHideFunction}
+              ageEstimation={false}
+            />
+          );
         case Recourse.ParentConsentRequest:
         case Recourse.ParentLinkRequest: {
           return (
@@ -138,6 +157,7 @@ function AccessManagementContainer({
               onHidecallback={onHideFunction}
               value={recourseParameters}
               expChildModalType={expChildModalType}
+              isPrologueUsed={isPrologueUsed}
             />
           );
         }
@@ -153,29 +173,33 @@ function AccessManagementContainer({
     displayContainer = getVerificationContainer();
   }, [verificationStageRecourse]);
 
-  switch (currentStage) {
-    case UpsellStage.Prologue:
-      if (featureAccess.data != null) {
-        displayContainer = (
-          <Prologue
-            translate={translate}
-            onHide={onHideFunction}
-            recourseParameters={recourseParameters}
-          />
-        );
-      }
-      break;
-    case UpsellStage.Verification:
-      if (featureAccess.data != null) {
-        displayContainer = getVerificationContainer();
-      }
-      break;
-    case UpsellStage.Epilogue:
-      displayContainer = <Epilogue translate={translate} />;
-      break;
-    default:
-      displayContainer = <LoadingPage />;
-      break;
+  if (loading) {
+    displayContainer = <LoadingPage />;
+  } else {
+    switch (currentStage) {
+      case UpsellStage.Prologue:
+        if (featureAccess.data != null) {
+          displayContainer = (
+            <Prologue
+              translate={translate}
+              onHide={onHideFunction}
+              recourseParameters={recourseParameters}
+            />
+          );
+        }
+        break;
+      case UpsellStage.Verification:
+        if (featureAccess.data != null) {
+          displayContainer = getVerificationContainer();
+        }
+        break;
+      case UpsellStage.Epilogue:
+        displayContainer = <Epilogue translate={translate} />;
+        break;
+      default:
+        displayContainer = <LoadingPage />;
+        break;
+    }
   }
 
   return (

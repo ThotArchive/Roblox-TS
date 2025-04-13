@@ -3,10 +3,12 @@
 // the types for the public interface separate in order to avoid compilation
 // errors arising from the strict mode mismatch.
 
+import { ParseChallengeSpecificProperties as NewParseChallengeSpecificProperties } from '@rbx/generic-challenge-types';
 import * as Captcha from '../../captcha/interface';
-import * as ForceActionRedirect from '../../forceActionRedirect/interface';
 import * as DeviceIntegrity from '../../deviceIntegrity/interface';
 import * as EmailVerification from '../../emailVerification/interface';
+import * as ForceActionRedirect from '../../forceActionRedirect/interface';
+import * as PhoneVerification from '../../phoneVerification/interface';
 import * as PrivateAccessToken from '../../privateAccessToken/interface';
 import * as ProofOfSpace from '../../proofOfSpace/interface';
 import * as ProofOfWork from '../../proofOfWork/interface';
@@ -14,7 +16,6 @@ import * as Reauthentication from '../../reauthentication/interface';
 import * as Rostile from '../../rostile/interface';
 import * as SecurityQuestions from '../../securityQuestions/interface';
 import * as TwoStepVerification from '../../twoStepVerification/interface';
-import * as PhoneVerification from '../../phoneVerification/interface';
 import ChallengeType from './challengeType';
 import * as Metadata from './metadata/interface';
 
@@ -177,6 +178,13 @@ export type ChallengeBaseProperties = {
   onChallengeCompleted: OnChallengeCompletedCallback;
   onChallengeInvalidated: OnChallengeInvalidatedCallback;
   onChallengeDisplayed?: OnChallengeDisplayedCallback;
+  // New thunks registered by the grasshopper package. This uses the old type because all
+  // references refer to the legacy base properties, which without extensive refactoring will
+  // fail all derived-type discriminants.
+  newRenderChallenge?: RenderChallenge;
+  // This uses the new parse challenge interface because the new interface exposes zero
+  // derived types (everthing is just `string`).
+  newParseChallenge?: NewParseChallengeSpecificProperties;
 } & (ChallengeParametersWithModal | ChallengeParametersWithNoModal);
 
 /**
@@ -322,4 +330,11 @@ export declare const interceptChallenge: <T>(parameters: {
   challengeId: string;
   challengeTypeRaw: string;
   challengeMetadataJsonBase64: string;
+  // New thunks registered by the grasshopper package. This uses the old type because all
+  // references refer to the legacy base properties, which without extensive refactoring will
+  // fail all derived-type discriminants.
+  newRenderChallenge?: RenderChallenge;
+  // This uses the new parse challenge interface because the new interface exposes zero
+  // derived types (everthing is just `string`).
+  newParseChallenge?: NewParseChallengeSpecificProperties;
 }) => Promise<T>;

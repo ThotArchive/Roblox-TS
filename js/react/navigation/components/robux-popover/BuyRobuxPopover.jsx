@@ -12,6 +12,7 @@ import layoutConstants from '../../constants/layoutConstants';
 import PopupDisclaimer from './PopupDisclaimer';
 import LeaveRobloxPopupDisclaimer from './LeaveRobloxPopupDisclaimer';
 import navigationService from '../../services/navigationService';
+import RobuxBadgeType from '../../constants/robuxBadgeConstants';
 
 function BuyRobuxPopover({
   creditAmount,
@@ -22,7 +23,7 @@ function BuyRobuxPopover({
   isExperimentCallDone,
   isGetCurrencyCallDone,
   openConvertCreditModal,
-  showRobuxBadge,
+  robuxBadgeType,
   robuxAmount,
   robuxError,
   translate
@@ -104,11 +105,9 @@ function BuyRobuxPopover({
           creditDisplayConfig === layoutConstants.creditDisplayConfigVariants.hideCreditAndRobux
       })}>
       <PopupDisclaimer
-        {...{
-          isShopModalOpen,
-          closeShopModal,
-          onModalContinue
-        }}
+        isShopModalOpen={isShopModalOpen}
+        closeShopModal={closeShopModal}
+        onModalContinue={onModalContinue}
       />
       {isEligibleForVng && (
         <LeaveRobloxPopupDisclaimer
@@ -125,18 +124,20 @@ function BuyRobuxPopover({
           button={
             <button type='button' className='btn-navigation-nav-robux-md'>
               <BuyRobuxIcon
-                {...{
-                  robuxAmount,
-                  isGetCurrencyCallDone,
-                  robuxError,
-                  creditDisplayConfig,
-                  showRobuxBadge
-                }}
+                robuxAmount={robuxAmount}
+                isGetCurrencyCallDone={isGetCurrencyCallDone}
+                robuxError={robuxError}
+                creditDisplayConfig={creditDisplayConfig}
+                robuxBadgeType={robuxBadgeType}
               />
               {/* Wallet credit balance only shown on showCreditAndRobux variant */}
               {creditDisplayConfig ===
                 layoutConstants.creditDisplayConfigVariants.showCreditAndRobux && (
-                <CreditIcon {...{ creditAmount, currencyCode, creditError }} />
+                <CreditIcon
+                  creditAmount={creditAmount}
+                  currencyCode={currencyCode}
+                  creditError={creditError}
+                />
               )}
             </button>
           }
@@ -145,20 +146,18 @@ function BuyRobuxPopover({
           <div className={navigationUtil.getThemeClass()}>
             <ul id='buy-robux-popover-menu' className='dropdown-menu'>
               <RobuxMenu
-                {...{
-                  isEligibleForVng,
-                  translate,
-                  robuxAmount,
-                  robuxError,
-                  creditAmount,
-                  currencyCode,
-                  creditError,
-                  creditDisplayConfig,
-                  openConvertCreditModal,
-                  onBuyGiftCardClick,
-                  onBuyRobuxExternalClick,
-                  showRobuxBadge
-                }}
+                isEligibleForVng={isEligibleForVng}
+                translate={translate}
+                robuxAmount={robuxAmount}
+                robuxError={robuxError}
+                creditAmount={creditAmount}
+                currencyCode={currencyCode}
+                creditError={creditError}
+                creditDisplayConfig={creditDisplayConfig}
+                openConvertCreditModal={openConvertCreditModal}
+                onBuyGiftCardClick={onBuyGiftCardClick}
+                onBuyRobuxExternalClick={onBuyRobuxExternalClick}
+                robuxBadgeType={robuxBadgeType}
               />
             </ul>
           </div>
@@ -177,7 +176,7 @@ BuyRobuxPopover.defaultProps = {
   creditDisplayConfig: layoutConstants.creditDisplayConfigVariants.control,
   isExperimentCallDone: false,
   isEligibleForVng: false,
-  showRobuxBadge: false
+  robuxBadgeType: null
 };
 
 BuyRobuxPopover.propTypes = {
@@ -192,7 +191,7 @@ BuyRobuxPopover.propTypes = {
   isExperimentCallDone: PropTypes.bool,
   openConvertCreditModal: PropTypes.func.isRequired,
   isEligibleForVng: PropTypes.bool,
-  showRobuxBadge: PropTypes.bool
+  robuxBadgeType: PropTypes.oneOf(Object.values(RobuxBadgeType))
 };
 
 export default BuyRobuxPopover;

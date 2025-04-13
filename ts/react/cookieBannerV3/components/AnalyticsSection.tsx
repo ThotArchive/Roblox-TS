@@ -16,7 +16,7 @@ const AnalyticsSection = ({
   const GASectionCssClass = classNames({ hidden: !isNonEssentialCookieListVisible });
 
   const GACompanyCollectList = consentToolConstants.GACompanyCollectionList.map(data => (
-    <div className='google-analytics-company-info-sec'>
+    <div className='google-analytics-company-info-sec' key={data.label}>
       <p className='font-caption-header text-emphasis'>{translate(data.label)}</p>
       <p className='font-caption-body text'>{translate(data.content)}</p>
     </div>

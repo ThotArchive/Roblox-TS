@@ -76,12 +76,10 @@ function chatController(
     );
   };
 
-  const getOpenConversationIds = function () {
+  const getOpenConversations = function () {
     return $scope.preSetChatLibrary.dialogIdList
-      .filter(
-        dialogId => dialogId !== chatUtility.newGroup.layoutId && $scope.chatUserDict[dialogId]
-      )
-      .map(dialogId => $scope.chatUserDict[dialogId].id);
+      .filter(dialogId => dialogId !== chatUtility.newGroup.layoutId && $scope.chatUserDict[dialogId])
+      .map(dialogId => $scope.chatUserDict[dialogId]);
   };
 
   const dialogsFitWindow = function () {
@@ -381,7 +379,7 @@ function chatController(
       });
       $scope.maybeCloseNewGroupDialog();
 
-      applyChatModerationStatuses(getOpenConversationIds());
+      applyChatModerationStatuses(getOpenConversations());
     }
   };
 
@@ -1218,8 +1216,15 @@ function chatController(
   // if conversationId is given, returns the later of the conversation-level timeout and the user-level timeout
   // if conversationId is not given, returns the user-level timeout
   const getPrimaryTimeout = function (conversationId) {
+    const conversation = $scope.chatUserDict[$scope.chatLibrary.conversationsDict[conversationId]?.layoutId];
+    if (conversation?.moderationType === chatUtility.moderationType.TRUSTED_COMMS) {
+      // timeouts only apply to moderated conversations
+      return undefined;
+    }
+
     const userTimeout = $scope.chatTimeouts['user'];
     const conversationTimeout = conversationId ? $scope.chatTimeouts[conversationId] : null;
+
     if (userTimeout && conversationTimeout) {
       return userTimeout.endTime > conversationTimeout.endTime ? userTimeout : conversationTimeout;
     }
@@ -1529,7 +1534,7 @@ function chatController(
           } else if (!oldIsChatEnabled && newIsChatEnabled) {
             $scope.handleSignalRSuccess(true);
             $scope.initializeRealTimeSubscriptionsForChat();
-            applyChatModerationStatuses(getOpenConversationIds());
+            applyChatModerationStatuses(getOpenConversations());
           }
 
           $scope.maybeCloseNewGroupDialog();
@@ -2267,15 +2272,25 @@ function chatController(
       );
     }
 
-    applyChatModerationStatuses(conversation ? [conversation.id] : undefined);
+    applyChatModerationStatuses(conversation ? [conversation] : []);
   };
 
-  const applyChatModerationStatuses = async function (conversationIds) {
-    if (!$scope.chatLibrary.useChatTimeouts) {
+  const applyChatModerationStatuses = async function (conversations) {
+    if (!$scope.chatLibrary.useChatTimeouts || !conversations) {
+      return;
+    }
+    
+    const moderatedConversations = conversations.filter(conversation => conversation.moderationType !== chatUtility.moderationType.TRUSTED_COMMS);
+    // If no conversations are moderated, no need to fetch chat moderation statuses
+    if (moderatedConversations.length === 0) {
       return;
     }
 
-    const response = await chatService.getChatModerationStatuses(conversationIds ?? []);
+    const moderatedChannelConversationIds = moderatedConversations
+      .filter(conversation => conversation.source === 'channels')
+      .map(conversation => conversation.id);
+
+    const response = await chatService.getChatModerationStatuses(moderatedChannelConversationIds);
     var userTimeoutRange = response['user_timeout_range'];
     var conversationTimeoutRanges = response['conversation_timeout_ranges'];
     if (userTimeoutRange) {

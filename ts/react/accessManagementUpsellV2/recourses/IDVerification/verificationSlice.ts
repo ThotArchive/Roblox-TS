@@ -67,20 +67,23 @@ const IDVinitialState: IDVerificationState = {
 export interface VerificationState {
   verified: boolean;
   IDVerificationState: IDVerificationState;
+  loading: boolean;
 }
 
 const initialState: VerificationState = {
   verified: null,
-  IDVerificationState: IDVinitialState
+  IDVerificationState: IDVinitialState,
+  loading: null
 };
 
 export const selectIDVState = (state: RootState) => state.verification.IDVerificationState;
+export const selectLoading = (state: RootState) => state.verification.loading;
 
 export const startIDVerification = createAsyncThunk(
   'verification/startIDVerification',
-  async (_, thunkAPI) => {
+  async (ageEstimation: boolean, thunkAPI) => {
     try {
-      const response = (await startPersonaIdVerification()) as VendorVerificationData;
+      const response = (await startPersonaIdVerification(ageEstimation)) as VendorVerificationData;
       response.qrCode = fetchQRCode(response.verificationLink);
       return response;
     } catch (error) {
@@ -120,6 +123,9 @@ export const verificationSlice = createSlice({
     },
     setIDVPage: (state, action: PayloadAction<IDVPage>) => {
       state.IDVerificationState.page = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     }
   },
   extraReducers: builder => {
@@ -242,7 +248,8 @@ export const {
   resetVerificationStore,
   setVerified,
   setIDVerificationState,
-  setIDVPage
+  setIDVPage,
+  setLoading
 } = verificationSlice.actions;
 
 export default verificationSlice.reducer;

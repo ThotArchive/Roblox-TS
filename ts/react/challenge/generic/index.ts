@@ -1,4 +1,6 @@
 import fpjs from '@fingerprintjs/fingerprintjs';
+import { ParseChallengeSpecificProperties as NewParseChallengeSpecificProperties } from '@rbx/generic-challenge-types';
+import * as Option from 'fp-ts/Option';
 import Roblox from 'Roblox';
 import * as z from 'zod';
 import { RequestServiceDefault } from '../../../common/request';
@@ -145,6 +147,53 @@ export const renderChallenge: RenderChallenge = async ({
     // No challenges remain.
     if (result.value.challengeType === '') {
       oldOnChallengeCompleted(data);
+      return;
+    }
+
+    // When the next challenge is one that's implemented purely in the new grasshopper package,
+    // delegate to the new grasshopper-supplied thunk (from core-scripts).
+    if (!Object.values(ChallengeType).includes(result.value.challengeType as ChallengeType)) {
+      if (
+        !challengeBaseProperties.newRenderChallenge ||
+        !challengeBaseProperties.newParseChallenge
+      ) {
+        // eslint-disable-next-line no-console
+        console.warn('[old middleware] new challenge type found but no new fallback registered!');
+        challengeBaseProperties.onChallengeInvalidated({
+          challengeType: result.value.challengeType as ChallengeType,
+          errorCode: Generic.ErrorCodeGeneric.UNKNOWN,
+          errorMessage: 'Subsequent challenges failed!'
+        });
+        return;
+      }
+
+      const maybeChallengeSpecificProperties = challengeBaseProperties.newParseChallenge(
+        result.value.challengeId,
+        result.value.challengeType,
+        result.value.challengeMetadata
+      );
+      if (Option.isNone(maybeChallengeSpecificProperties)) {
+        challengeBaseProperties.onChallengeInvalidated({
+          challengeType: result.value.challengeType as ChallengeType,
+          errorCode: Generic.ErrorCodeGeneric.UNKNOWN,
+          errorMessage: 'New middleware failed to parse subsequent challenges'
+        });
+        return;
+      }
+      // We are tricking the type-checker here because the challenge-specific properties are derived
+      // types from the new middleware's supported challenge types. While derived types are artificially
+      // the same shape, the type-checker discriminates using the base type (`enum ChallengeType`) from the legacy middleware,
+      // which results in a bunch of compilation errors that can't be fixed without a massive refactor.
+      //
+      // Vincent can share a direct diff if necessary but the preliminary "incomplete" diff is more
+      // than 3000 lines, vs. just this single unsafe cast.
+      const nextChallengeSpecificProperties = (maybeChallengeSpecificProperties.value as unknown) as ChallengeSpecificProperties;
+
+      // eslint-disable-next-line no-void
+      void challengeBaseProperties.newRenderChallenge({
+        challengeBaseProperties,
+        challengeSpecificProperties: nextChallengeSpecificProperties
+      });
       return;
     }
 
@@ -627,6 +676,8 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
   challengeId: string;
   challengeTypeRaw: string;
   challengeMetadataJsonBase64: string;
+  newRenderChallenge?: RenderChallenge;
+  newParseChallenge?: NewParseChallengeSpecificProperties;
 }): Promise<T> =>
   new Promise((resolve, reject) => {
     const {
@@ -634,7 +685,9 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
       containerId,
       challengeId,
       challengeTypeRaw,
-      challengeMetadataJsonBase64
+      challengeMetadataJsonBase64,
+      newRenderChallenge,
+      newParseChallenge
     } = parameters;
     let challengeMetadataJson: string;
     try {
@@ -732,7 +785,9 @@ export const interceptChallenge: InterceptChallenge = <T>(parameters: {
                 challengeType: challengeSpecificProperties.challengeType
               }
             })
-          )
+          ),
+        newRenderChallenge,
+        newParseChallenge
       },
       challengeSpecificProperties
     }).then(success => {

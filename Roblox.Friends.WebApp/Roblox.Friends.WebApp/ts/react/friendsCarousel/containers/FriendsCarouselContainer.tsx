@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { EventContext } from '@rbx/unified-logging';
 import { WithTranslationsProps, withTranslations } from 'react-utilities';
-import { AccessManagementUpsellV2Service } from 'Roblox';
 import friendsService from '../services/friendsService';
 import chatService from '../services/chatService';
 import { translationConfig } from '../translation.config';
@@ -9,6 +8,10 @@ import { TGetFriendsCountResponse, TFriend, TGetChatSettings } from '../types/fr
 import FriendsCarouselHeader from '../components/FriendsCarouselHeader';
 import FriendsList from '../components/FriendsList';
 import FriendCarouselNames from '../constants/friendCarouselNames';
+import {
+  mustHideConnectionsDueToAMP,
+  isBlockingViewer
+} from '../../../../js/react/friends/util/osaUtil';
 
 const allSettled = (promises: Promise<any>[]) => {
   return Promise.all(
@@ -25,28 +28,10 @@ const mustHideConnectionsCheck = async (profileUserId: number, isMyProfile: bool
   if (isMyProfile) {
     return false;
   }
-  const ampFeatureCheckData = [
-    {
-      name: 'vieweeUserId',
-      type: 'UserId',
-      value: profileUserId.toString()
-    }
-  ];
-  const ampRecourseData = {
-    mustHideConnections: true
-  };
-  let mustHide = ampRecourseData.mustHideConnections;
-  try {
-    mustHide = await AccessManagementUpsellV2Service.startAccessManagementUpsell({
-      featureName: 'MustHideConnections',
-      ampFeatureCheckData,
-      isAsyncCall: false,
-      usePrologue: true,
-      ampRecourseData
-    });
-  } catch (e) {
-    return ampRecourseData.mustHideConnections;
+  if (await isBlockingViewer(profileUserId)) {
+    return true;
   }
+  const mustHide: boolean = await mustHideConnectionsDueToAMP(profileUserId);
   return mustHide;
 };
 

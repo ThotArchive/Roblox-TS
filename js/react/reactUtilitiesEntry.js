@@ -12,6 +12,8 @@ import makeActionCreator from './redux/makeActionCreator';
 import withComponentStatus from './componentStatus/withComponentStatus';
 import withTranslations from './intl/withTranslations';
 import useTranslation from './intl/hooks/useTranslation';
+import useTheme from './hooks/useTheme';
+import useTokens from './hooks/useTokens';
 
 // roblox core react utilities
 window.ReactUtilities = {
@@ -25,5 +27,7 @@ window.ReactUtilities = {
   useLocalStorage,
   useOnClickOutside,
   usePrevious,
-  useWindowActiveState
+  useWindowActiveState,
+  useTheme,
+  useTokens
 };

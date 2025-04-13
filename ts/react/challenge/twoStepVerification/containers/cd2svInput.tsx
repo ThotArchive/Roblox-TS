@@ -99,7 +99,7 @@ const CD2SVInput: React.FC<Props> = ({
         challengeId,
         actionType
       });
-      setModalTitleText(resources.Heading.LoginError);
+      setModalTitleText(resources.Label.TwoStepVerification);
       setModalDescription(resources.Description.LoginExpired);
       setShowChangeMediaType(false);
       setShowRetryButton(false);
@@ -109,7 +109,7 @@ const CD2SVInput: React.FC<Props> = ({
     setNumRetryAttempted(numRetryAttempted + 1);
     setRequestInFlight(true);
     setRequestError(null);
-    setModalTitleText(resources.Label.NewLogin);
+    setModalTitleText(resources.Label.TwoStepVerification);
     setModalDescription(resources.Label.ApproveWithDevice);
     const result = await requestService.twoStepVerification.retryCrossDevice(userId, {
       challengeId,
@@ -203,7 +203,7 @@ const CD2SVInput: React.FC<Props> = ({
               ]
             );
             if (result.error === TwoStepVerification.TwoStepVerificationError.CHALLENGE_DENIED) {
-              setModalTitleText(resources.Heading.LoginDenied);
+              setModalTitleText(resources.Label.TwoStepVerification);
               setModalDescription(resources.Description.LoginDenied);
               setShowChangeMediaType(false);
               setShowRetryButton(false);
@@ -214,7 +214,7 @@ const CD2SVInput: React.FC<Props> = ({
               result.error ===
               TwoStepVerification.TwoStepVerificationError.CROSS_DEVICE_DIALOG_EXPIRED
             ) {
-              setModalTitleText(resources.Heading.LoginError);
+              setModalTitleText(resources.Label.TwoStepVerification);
               setModalDescription(resources.Description.LoginExpired);
               setShowChangeMediaType(false);
               setShowRetryButton(false);

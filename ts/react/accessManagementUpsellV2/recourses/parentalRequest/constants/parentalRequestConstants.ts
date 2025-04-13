@@ -97,7 +97,8 @@ const parentalRequestConstants = {
       submit: 'Submit',
       ok: 'OK',
       requestSent: 'Request Sent'
-    }
+    },
+    vpc: 'Vpc'
   },
   settingName: {
     enablePurchases: 'enablePurchases'

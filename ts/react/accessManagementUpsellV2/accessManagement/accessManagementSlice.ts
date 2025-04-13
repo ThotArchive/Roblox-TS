@@ -27,6 +27,7 @@ export interface UpsellState {
   showUpsell: boolean;
   redirectLink: string | null;
   loading: boolean;
+  prologueUsed?: boolean;
 }
 
 const initialState: UpsellState = {
@@ -37,7 +38,8 @@ const initialState: UpsellState = {
   featureAccess: initialAccessState,
   showUpsell: false,
   redirectLink: null,
-  loading: false
+  loading: false,
+  prologueUsed: false
 };
 
 export const fetchFeatureAccess = createAsyncThunk(
@@ -93,6 +95,12 @@ export const accessManagementSlice = createSlice({
     },
     setVerificationStageRecourse: (state, action: PayloadAction<RecourseResponse>) => {
       state.verificationStageRecourse = action.payload;
+    },
+    setPrologueUsed: (state, action: PayloadAction<boolean>) => {
+      state.prologueUsed = action.payload;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     }
   },
   extraReducers: builder => {
@@ -102,7 +110,6 @@ export const accessManagementSlice = createSlice({
       })
       .addCase(fetchFeatureAccess.fulfilled, (state, action) => {
         const ampResponse = action.payload as AmpResponse;
-
         state.featureAccess = {
           ...state.featureAccess,
           loading: false,
@@ -133,7 +140,8 @@ export const {
   setRedirectLink,
   setVerificationStageRecourse,
   showUpsell,
-  setStage
+  setStage,
+  setPrologueUsed
 } = accessManagementSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
@@ -148,5 +156,6 @@ export const selectFeatureAccess = (state: RootState) => state.accessManagement.
 export const selectCurrentStage = (state: RootState) => state.accessManagement.stage;
 export const selectVerificationStageRecourse = (state: RootState) =>
   state.accessManagement.verificationStageRecourse;
+export const selectPrologueStatus = (state: RootState) => state.accessManagement.prologueUsed;
 
 export default accessManagementSlice.reducer;

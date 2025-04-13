@@ -11,8 +11,7 @@ const authApiUrl = EnvironmentUrls.authApi ?? URL_NOT_FOUND;
 export enum PasswordsError {
   FLOODED = 2,
   INVALID_PASSWORD = 7,
-  INVALID_CURRENT_PASSWORD = 8,
-  PIN_LOCKED = 9
+  INVALID_CURRENT_PASSWORD = 8
 }
 
 export type ChangeForCurrentUserReturnType = void;

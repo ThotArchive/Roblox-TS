@@ -6,9 +6,9 @@ import {
 } from '../constants/urlConstants';
 import { VerificationErrorCode } from '../../../enums';
 
-export const startPersonaIdVerification = () => {
+export const startPersonaIdVerification = (ageEstimation: boolean) => {
   const urlConfig = startPersonaIdVerificationUrlConfig();
-  const params = { generateLink: true };
+  const params = { generateLink: true, ageEstimation };
   return httpService
     .post(urlConfig, params)
     .then(({ data }) => {

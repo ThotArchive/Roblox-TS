@@ -5,10 +5,10 @@ import validateTranslationConfig from '../validateTranslationConfig';
 
 const createTranslationContext = (translationConfig: TranslationConfig): TTranslationContext => {
   const validatedConfig = validateTranslationConfig(translationConfig) as TranslationConfig;
-  const { feature, common } = validatedConfig;
+  const { feature, common, features } = validatedConfig;
   const intl = new Intl() as RobloxIntl;
   const translationProvider = new TranslationResourceProvider(intl);
-  const translationResources = [...common, feature]
+  const translationResources = [...common, feature, ...(features ?? [])]
     .filter(namespace => !!namespace)
     .map(namespace => translationProvider.getTranslationResource(namespace));
   const languageResources = translationProvider.mergeTranslationResources(...translationResources);

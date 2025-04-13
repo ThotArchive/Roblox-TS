@@ -1,113 +1,144 @@
-import { Trie } from "@wry/trie";
-import { StrongCache } from "@wry/caches";
-import { Entry } from "./entry.js";
-import { parentEntrySlot } from "./context.js";
-// These helper functions are important for making optimism work with
-// asynchronous code. In order to register parent-child dependencies,
-// optimism needs to know about any currently active parent computations.
-// In ordinary synchronous code, the parent context is implicit in the
-// execution stack, but asynchronous code requires some extra guidance in
-// order to propagate context from one async task segment to the next.
-export { bindContext, noContext, nonReactive, setTimeout, asyncFromGen, Slot, } from "./context.js";
-// A lighter-weight dependency, similar to OptimisticWrapperFunction, except
-// with only one argument, no makeCacheKey, no wrapped function to recompute,
-// and no result value. Useful for representing dependency leaves in the graph
-// of computation. Subscriptions are supported.
-export { dep } from "./dep.js";
-// The defaultMakeCacheKey function is remarkably powerful, because it gives
-// a unique object for any shallow-identical list of arguments. If you need
-// to implement a custom makeCacheKey function, you may find it helpful to
-// delegate the final work to defaultMakeCacheKey, which is why we export it
-// here. However, you may want to avoid defaultMakeCacheKey if your runtime
-// does not support WeakMap, or you have the ability to return a string key.
-// In those cases, just write your own custom makeCacheKey functions.
-let defaultKeyTrie;
-export function defaultMakeCacheKey(...args) {
-    const trie = defaultKeyTrie || (defaultKeyTrie = new Trie(typeof WeakMap === "function"));
-    return trie.lookupArray(args);
-}
-// If you're paranoid about memory leaks, or you want to avoid using WeakMap
-// under the hood, but you still need the behavior of defaultMakeCacheKey,
-// import this constructor to create your own tries.
-export { Trie as KeyTrie };
-;
-const caches = new Set();
-export function wrap(originalFunction, { max = Math.pow(2, 16), keyArgs, makeCacheKey = defaultMakeCacheKey, normalizeResult, subscribe, cache: cacheOption = StrongCache, } = Object.create(null)) {
-    const cache = typeof cacheOption === "function"
-        ? new cacheOption(max, entry => entry.dispose())
-        : cacheOption;
-    const optimistic = function () {
-        const key = makeCacheKey.apply(null, keyArgs ? keyArgs.apply(null, arguments) : arguments);
-        if (key === void 0) {
-            return originalFunction.apply(null, arguments);
-        }
-        let entry = cache.get(key);
-        if (!entry) {
-            cache.set(key, entry = new Entry(originalFunction));
-            entry.normalizeResult = normalizeResult;
-            entry.subscribe = subscribe;
-            // Give the Entry the ability to trigger cache.delete(key), even though
-            // the Entry itself does not know about key or cache.
-            entry.forget = () => cache.delete(key);
-        }
-        const value = entry.recompute(Array.prototype.slice.call(arguments));
-        // Move this entry to the front of the least-recently used queue,
-        // since we just finished computing its value.
-        cache.set(key, entry);
-        caches.add(cache);
-        // Clean up any excess entries in the cache, but only if there is no
-        // active parent entry, meaning we're not in the middle of a larger
-        // computation that might be flummoxed by the cleaning.
-        if (!parentEntrySlot.hasValue()) {
-            caches.forEach(cache => cache.clean());
-            caches.clear();
-        }
-        return value;
+import "@rbx/core-types";
+
+// Do not import anything here without considering if you need to update the rspack.config.js
+
+const getDomainInfo = (hostname: string) => {
+  const metaTag = document.querySelector<HTMLElement>('meta[name="environment-meta"]');
+  if (metaTag?.dataset.domain) {
+    return {
+      production: metaTag.dataset.isTestingSite === "false",
+      // `split` can return a empty array only if separator is "".
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      domainName: metaTag.dataset.domain.split(".")[0]!,
+      rootDomain: metaTag.dataset.domain,
     };
-    Object.defineProperty(optimistic, "size", {
-        get: () => cache.size,
-        configurable: false,
-        enumerable: false,
-    });
-    Object.freeze(optimistic.options = {
-        max,
-        keyArgs,
-        makeCacheKey,
-        normalizeResult,
-        subscribe,
-        cache,
-    });
-    function dirtyKey(key) {
-        const entry = key && cache.get(key);
-        if (entry) {
-            entry.setDirty();
-        }
+  }
+
+  if (import.meta.env.DEV && hostname === "localhost") {
+    return {
+      production: false,
+      domainName: "sitetest3",
+      rootDomain: "sitetest3.robloxlabs.com",
+    };
+  }
+
+  const [tld, domain, subdomain] = hostname.split(".").reverse();
+
+  if (tld != null && domain != null) {
+    const root = `${domain}.${tld}`;
+    if (root === "roblox.com" || root === "simulprod.com" || root === "rblx.org") {
+      return {
+        production: true,
+        domainName: "roblox",
+        rootDomain: "roblox.com",
+      };
     }
-    optimistic.dirtyKey = dirtyKey;
-    optimistic.dirty = function dirty() {
-        dirtyKey(makeCacheKey.apply(null, arguments));
-    };
-    function peekKey(key) {
-        const entry = key && cache.get(key);
-        if (entry) {
-            return entry.peek();
-        }
+
+    if (subdomain?.startsWith("sitetest")) {
+      return {
+        production: false,
+        domainName: subdomain,
+        rootDomain: `${subdomain}.robloxlabs.com`,
+      };
     }
-    optimistic.peekKey = peekKey;
-    optimistic.peek = function peek() {
-        return peekKey(makeCacheKey.apply(null, arguments));
-    };
-    function forgetKey(key) {
-        return key ? cache.delete(key) : false;
-    }
-    optimistic.forgetKey = forgetKey;
-    optimistic.forget = function forget() {
-        return forgetKey(makeCacheKey.apply(null, arguments));
-    };
-    optimistic.makeCacheKey = makeCacheKey;
-    optimistic.getKey = keyArgs ? function getKey() {
-        return makeCacheKey.apply(null, keyArgs.apply(null, arguments));
-    } : makeCacheKey;
-    return Object.freeze(optimistic);
-}
-//# sourceMappingURL=index.js.map
+  }
+
+  throw new Error(`Unknown environment for ${hostname}`);
+};
+
+const { production, domainName, rootDomain } = getDomainInfo(window.location.hostname);
+
+const environmentUrls = {
+  // Internal URLs
+  abtestingApiSite: `https://abtesting.${rootDomain}`,
+  accountInformationApi: `https://accountinformation.${rootDomain}`,
+  accountSettingsApi: `https://accountsettings.${rootDomain}`,
+  adConfigurationApi: `https://adconfiguration.${rootDomain}`,
+  adsApi: `https://ads.${rootDomain}`,
+  advertiseApi: `https://advertise.${rootDomain}`,
+  apiGatewayUrl: `https://apis.${rootDomain}`,
+  apiProxyUrl: `https://api.${rootDomain}`,
+  assetDeliveryApi: `https://assetdelivery.${rootDomain}`,
+  authApi: `https://auth.${rootDomain}`,
+  avatarApi: `https://avatar.${rootDomain}`,
+  badgesApi: `https://badges.${rootDomain}`,
+  billingApi: `https://billing.${rootDomain}`,
+  captchaApi: `https://captcha.${rootDomain}`,
+  catalogApi: `https://catalog.${rootDomain}`,
+  chargebackWizardApi: `https://apis.${rootDomain}/chargeback-wizard`,
+  chatApi: `https://apis.${rootDomain}/platform-chat-api`,
+  chatModerationApi: `https://chatmoderation.${rootDomain}`,
+  contactsApi: `https://contacts.${rootDomain}`,
+  contactsServiceApi: `https://apis.${rootDomain}/contacts-api`,
+  contentStoreApi: `https://contentstore.${rootDomain}`,
+  developApi: `https://develop.${rootDomain}`,
+  domain: rootDomain,
+  economyApi: `https://economy.${rootDomain}`,
+  economycreatorstatsApi: `https://economycreatorstats.${rootDomain}`,
+  engagementPayoutsApi: `https://engagementpayouts.${rootDomain}`,
+  followingsApi: `https://followings.${rootDomain}`,
+  friendsApi: `https://friends.${rootDomain}`,
+  gameInternationalizationApi: `https://gameinternationalization.${rootDomain}`,
+  gamesApi: `https://games.${rootDomain}`,
+  gameJoinApi: `https://gamejoin.${rootDomain}`,
+  gameUpdateNotificationsApi: `https://apis.${rootDomain}/game-update-notifications`,
+  groupsApi: `https://groups.${rootDomain}`,
+  groupsModerationApi: `https://groupsmoderation.${rootDomain}`,
+  helpSite: `https://en.help.${rootDomain}`,
+  inventoryApi: `https://inventory.${rootDomain}`,
+  itemConfigurationApi: `https://itemconfiguration.${rootDomain}`,
+  legacyChatApi: `https://chat.${rootDomain}`,
+  localeApi: `https://locale.${rootDomain}`,
+  localizationTablesApi: `https://localizationtables.${rootDomain}`,
+  matchmakingApi: `https://apis.${rootDomain}/matchmaking-api`,
+  metricsApi: `https://metrics.${rootDomain}`,
+  midasApi: `https://midas.${rootDomain}`,
+  notificationApi: `https://notifications.${rootDomain}`,
+  passProductPurchasingApi: `https://apis.${rootDomain}/pass-product-purchasing`,
+  bundlesProductPurchasingApi: `https://apis.${rootDomain}/bundles-product-purchasing`,
+  premiumFeaturesApi: `https://premiumfeatures.${rootDomain}`,
+  presenceApi: `https://presence.${rootDomain}`,
+  privateMessagesApi: `https://privatemessages.${rootDomain}`,
+  publishApi: `https://publish.${rootDomain}`,
+  restrictedHoursServiceApi: `https://apis.${rootDomain}/restricted-hours-service`,
+  screenTimeApi: "https://apis.rcs.roblox.com/screen-time-api",
+  shareApi: `https://share.${rootDomain}`,
+  shareLinksApi: `https://apis.${rootDomain}/sharelinks`,
+  showcasesApi: `https://apis.${rootDomain}/showcases-api`,
+  thumbnailsApi: `https://thumbnails.${rootDomain}`,
+  tradesApi: `https://trades.${rootDomain}`,
+  translationRolesApi: `https://translationroles.${rootDomain}`,
+  twoStepVerificationApi: `https://twostepverification.${rootDomain}`,
+  universalAppConfigurationApi: `https://apis.${rootDomain}/universal-app-configuration`,
+  userAgreementsServiceApi: `https://apis.${rootDomain}/user-agreements`,
+  userModerationApi: `https://usermoderation.${rootDomain}`,
+  usersApi: `https://users.${rootDomain}`,
+  userSettingsApi: `https://apis.${rootDomain}/user-settings-api`,
+  voiceApi: `https://voice.${rootDomain}`,
+  websiteUrl: `https://www.${rootDomain}`,
+
+  // Environment-specific URLs
+  apiGatewayCdnUrl: production ? "https://apis.rbxcdn.com" : `https://apis.${rootDomain}`,
+  eduAuthenticationApi: production
+    ? "https://auth.rblx.org"
+    : `https://auth.${domainName}.rblx.org`,
+  eduWebsiteUrl: production ? "https://www.rblx.org" : `https://www.${domainName}.rblx.org`,
+  guildedBaseUrl: production ? "https://guilded.gg" : "https://tarobi-dev-test.com",
+  vngGamesShopUrl: production
+    ? "https://shop.vnggames.com/vn/game/roblox"
+    : "https://sbx-shop.vnggames.com/vn/game/roblox",
+
+  // External URLs
+  amazonStoreLink: "https://www.amazon.com/Roblox-Corporation/dp/B00NUF4YOA",
+  // Not sure why this is URL encoded
+  amazonWebStoreLink:
+    "https%3a%2f%2fwww.amazon.com%2froblox%3f%26_encoding%3dUTF8%26tag%3dr05d13-20%26linkCode%3dur2%26linkId%3d5562fc29c05b45562a86358c198356eb%26camp%3d1789%26creative%3d9325",
+  appProtocolUrl: "robloxmobile://",
+  appStoreLink: "https://itunes.apple.com/us/app/roblox-mobile/id431946152",
+  googlePlayStoreLink: "https://play.google.com/store/apps/details?id=com.roblox.client&amp;hl=en",
+  iosAppStoreLink: "https://itunes.apple.com/us/app/roblox-mobile/id431946152",
+  windowsStoreLink: "https://www.microsoft.com/en-us/store/games/roblox/9nblgggzm6wm",
+  xboxStoreLink: "https://www.microsoft.com/en-us/p/roblox/bq1tn1t79v9k",
+};
+
+export default environmentUrls;

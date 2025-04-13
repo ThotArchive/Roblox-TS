@@ -9,6 +9,7 @@ import AvatarItemDetailsStatus from './enums/AvatarItemDetailsStatus';
 import ExperienceAffiliateStatus from './enums/ExperienceAffiliateStatus';
 import ContentPostStatus from './enums/ContentPostStatus';
 import ExperienceEventStatus from './enums/ExperienceEventStatus';
+import ExperienceAffiliateDeepLinkFallbackType from './enums/ExperienceAffiliateDeepLinkFallbackType';
 
 enum ShareLinksType {
   AVATAR_ITEM_DETAILS = 'AvatarItemDetails',
@@ -74,6 +75,8 @@ type ExperienceAffiliateData = {
   status: ExperienceAffiliateStatus;
   universeId: number;
   joinData?: ExperienceJoinData;
+  fallbackType?: ExperienceAffiliateDeepLinkFallbackType;
+  fallbackId?: number;
 };
 
 type ContentPostData = {

@@ -2,6 +2,10 @@ import cookieUtils from './cookieUtils';
 import cookieConstants from '../constants/cookieConstants';
 
 const setUserConsent = (acceptCookieNames: string[], nonEssentialCookieList: string[]): void => {
+  const currentConsentCookie = cookieUtils.getCookie(cookieConstants.consentCookieName);
+  if (currentConsentCookie && currentConsentCookie.length > 0) {
+    cookieUtils.deleteCookie(cookieConstants.consentCookieName);
+  }
   let consentCookieConfig = '';
   nonEssentialCookieList.forEach((cookie, index) => {
     if (acceptCookieNames.indexOf(cookie) !== -1) {
@@ -21,4 +25,17 @@ const setUserConsent = (acceptCookieNames: string[], nonEssentialCookieList: str
   );
 };
 
-export default { setUserConsent };
+const isAnalyticsCookieAccepted = (): boolean => {
+  const consentCookie = cookieUtils.getCookie(cookieConstants.consentCookieName);
+  if (!consentCookie || consentCookie === '') {
+    return false;
+  }
+  const analyticsCookies = consentCookie.split('&');
+  const acceptedAnalyticsCookie = analyticsCookies.find(cookie => {
+    const value = cookie.split('=')[1];
+    return value === 'true';
+  });
+  return !!acceptedAnalyticsCookie;
+};
+
+export default { setUserConsent, isAnalyticsCookieAccepted };

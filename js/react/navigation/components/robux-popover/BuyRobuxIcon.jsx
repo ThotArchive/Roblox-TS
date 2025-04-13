@@ -4,13 +4,14 @@ import { Tooltip } from 'react-style-guide';
 import { abbreviateNumber } from 'core-utilities';
 import ClassNames from 'classnames';
 import layoutConstant from '../../constants/layoutConstants';
+import RobuxBadgeType from '../../constants/robuxBadgeConstants';
 
 function BuyRobuxIcon({
   robuxAmount,
   isGetCurrencyCallDone,
   robuxError,
   creditDisplayConfig,
-  showRobuxBadge
+  robuxBadgeType
 }) {
   const robuxAmountValue = robuxError
     ? layoutConstant.robuxOnEconomySystemOutage
@@ -18,7 +19,7 @@ function BuyRobuxIcon({
 
   // Robux value not shown for experiment variant hideRobuxAndCredit
   const robuxBadgeClass = ClassNames('notification-red robux-badge', {
-    hidden: !showRobuxBadge
+    hidden: !robuxBadgeType
   });
   const icon = (
     <Fragment>
@@ -52,7 +53,7 @@ function BuyRobuxIcon({
 BuyRobuxIcon.defaultProps = {
   robuxAmount: 0,
   robuxError: '',
-  showRobuxBadge: false
+  robuxBadgeType: null
 };
 
 BuyRobuxIcon.propTypes = {
@@ -60,7 +61,7 @@ BuyRobuxIcon.propTypes = {
   robuxError: PropTypes.string,
   isGetCurrencyCallDone: PropTypes.bool.isRequired,
   creditDisplayConfig: PropTypes.string.isRequired,
-  showRobuxBadge: PropTypes.bool
+  robuxBadgeType: PropTypes.oneOf(Object.values(RobuxBadgeType))
 };
 
 export default BuyRobuxIcon;

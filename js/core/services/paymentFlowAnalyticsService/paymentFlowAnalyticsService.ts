@@ -73,11 +73,14 @@ export class PaymentFlowAnalyticsService {
   private startPaymentFlowOrThrow(triggerContext: TRIGGERING_CONTEXT) {
     if (!this.purchaseFlowUuid) {
       // No existing flow Uuid, starting a new flow
-      this.purchaseFlowUuid =
-        PaymentFlowAnalyticsService.getUrlAnalyticId() ?? uuidService.generateRandomUuid();
+      const urlAnalyticId = PaymentFlowAnalyticsService.getUrlAnalyticId();
+      this.purchaseFlowUuid = urlAnalyticId ?? uuidService.generateRandomUuid();
       this.triggerContext = triggerContext;
       this.writePaymentFlowContextIntoCookie();
-      this.sendUserPurchaseStatusEvent(triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_STARTED);
+
+      if (!urlAnalyticId) {
+        this.sendUserPurchaseStatusEvent(triggerContext, PURCHASE_STATUS.PAYMENT_FLOW_STARTED);
+      }
       fireEvent(COUNTER_EVENTS.NEW_FLOW_INITIATED_PREFIX + this.triggerContext);
     }
   }
