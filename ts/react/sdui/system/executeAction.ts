@@ -1,11 +1,12 @@
 import logSduiError, { SduiErrorNames } from '../utils/logSduiError';
 import reportActionAnalytics from './reportActionAnalytics';
 import SduiActionHandlerRegistry, { TSduiActionConfig } from './SduiActionHandlerRegistry';
-import { TAnalyticsContext } from './SduiTypes';
+import { TAnalyticsContext, TSduiContext } from './SduiTypes';
 
 export const executeAction = (
   actionConfig: TSduiActionConfig,
-  analyticsContext: TAnalyticsContext
+  analyticsContext: TAnalyticsContext,
+  sduiContext: TSduiContext
 ): void => {
   const handler = SduiActionHandlerRegistry[actionConfig.actionType];
 
@@ -19,7 +20,7 @@ export const executeAction = (
   }
 
   if (handler) {
-    handler(actionConfig, analyticsContext);
+    handler(actionConfig, analyticsContext, sduiContext);
   } else {
     logSduiError(
       SduiErrorNames.ExecuteActionInvalidActionType,

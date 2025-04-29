@@ -13,6 +13,7 @@ type TVerticalFeedProps = {
 const VerticalFeed = ({
   componentConfig,
   analyticsContext,
+  sduiContext,
   feedItems
 }: TVerticalFeedProps): JSX.Element => {
   if (!feedItems) {
@@ -35,6 +36,7 @@ const VerticalFeed = ({
             key={`${feedItemConfig.componentType}--${index}`}
             componentConfig={feedItemConfig}
             parentAnalyticsContext={analyticsContext}
+            sduiContext={sduiContext}
           />
         );
       })}

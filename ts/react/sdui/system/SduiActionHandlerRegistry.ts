@@ -1,5 +1,5 @@
 import openGameDetails from './actions/openGameDetails';
-import { TAnalyticsContext } from './SduiTypes';
+import { TAnalyticsContext, TSduiContext } from './SduiTypes';
 
 export enum SduiActionType {
   OpenGameDetails = 'OpenGameDetails',
@@ -13,7 +13,8 @@ export type TSduiActionConfig = {
 
 type TSduiActionHandler = (
   actionConfig?: TSduiActionConfig,
-  analyticsContext?: TAnalyticsContext
+  analyticsContext?: TAnalyticsContext,
+  sduiContext?: TSduiContext
 ) => void;
 
 export const SduiActionHandlerRegistry: Record<keyof typeof SduiActionType, TSduiActionHandler> = {

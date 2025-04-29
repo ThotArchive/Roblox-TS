@@ -11,6 +11,7 @@ const SduiResponsiveWrapper = ({
   wrappedComponent,
   componentConfig,
   parentAnalyticsContext,
+  sduiContext,
   localAnalyticsData
 }: TSduiResponsiveWrapperProps): JSX.Element => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -34,6 +35,7 @@ const SduiResponsiveWrapper = ({
   return React.createElement(wrappedComponent, {
     componentConfig,
     parentAnalyticsContext,
+    sduiContext,
     localAnalyticsData,
     responsivePropOverrides
   });

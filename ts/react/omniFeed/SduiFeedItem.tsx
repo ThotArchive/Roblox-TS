@@ -8,6 +8,7 @@ import logSduiError, { SduiErrorNames } from '../sdui/utils/logSduiError';
 import { usePageSession } from '../common/utils/PageSessionContext';
 import { PageContext } from '../common/types/pageContext';
 import { buildSessionAnalyticsData } from '../sdui/utils/analyticsParsingUtils';
+import useSduiContext from '../sdui/hooks/useSduiContext';
 
 type TSduiFeedItemProps = {
   sort: TOmniRecommendationSduiSort;
@@ -23,6 +24,8 @@ type TSduiFeedItemProps = {
  */
 const SduiFeedItem = ({ sort, sduiRoot, currentPage }: TSduiFeedItemProps): JSX.Element => {
   const pageSessionInfo = usePageSession();
+
+  const sduiContext = useSduiContext();
 
   const content = useMemo(() => {
     const sduiFeedItem = extractValidSduiFeedItem(sduiRoot, sort.feedItemKey);
@@ -42,21 +45,22 @@ const SduiFeedItem = ({ sort, sduiRoot, currentPage }: TSduiFeedItemProps): JSX.
           componentConfig={sduiFeedItem}
           parentAnalyticsContext={{}}
           localAnalyticsData={localAnalyticsData}
+          sduiContext={sduiContext}
         />
       </div>
     );
-  }, [sort, sduiRoot, pageSessionInfo, currentPage]);
+  }, [sort, sduiRoot, pageSessionInfo, currentPage, sduiContext]);
 
   const logErrorBoundaryError = useCallback(
     (errorMessage: string, callstack: string) => {
       logSduiError(
         SduiErrorNames.SduiFeedItemBoundaryError,
-        `Error rendering feed item for sort ${JSON.stringify(
-          sort
+        `Error rendering feed item for sort ${JSON.stringify(sort)} and sdui root ${JSON.stringify(
+          sduiRoot
         )} with error message ${errorMessage} and callstack ${callstack}`
       );
     },
-    [sort]
+    [sort, sduiRoot]
   );
 
   return (
