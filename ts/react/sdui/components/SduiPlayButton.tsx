@@ -34,7 +34,6 @@ type TSduiPlayButtonProps = {
 
 const SduiPlayButton = ({
   analyticsContext,
-  sduiContext,
   universeId,
   placeId,
   width,
@@ -52,8 +51,8 @@ const SduiPlayButton = ({
 
     // The actual game launch is handled by the PlayButton component
     // This executeAction call is for the action analytics only
-    executeAction(actionConfig, analyticsContext, sduiContext);
-  }, [analyticsContext, sduiContext]);
+    executeAction(actionConfig, analyticsContext);
+  }, [analyticsContext]);
 
   const playButtonEventProperties = useMemo<TPlayGameClicked>(() => {
     const commonReferralParams = buildCommonReferralParams(analyticsContext);

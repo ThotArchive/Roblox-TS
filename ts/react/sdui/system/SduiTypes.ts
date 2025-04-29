@@ -1,4 +1,3 @@
-import type { FoundationTokens } from 'react-utilities';
 import { TSduiActionConfig } from './SduiActionHandlerRegistry';
 import { SduiRegisteredComponents } from './SduiComponentRegistry';
 
@@ -49,32 +48,11 @@ export type TAnalyticsContext = {
   logAction?: (actionConfig: TSduiActionConfig, analyticsContext: TAnalyticsContext) => void;
 };
 
-export type TSduiContextDependencies = {
-  tokens: FoundationTokens;
-};
-
-export type TSduiContext = {
-  dependencies: TSduiContextDependencies;
-};
-
 // Expected props to be shared by all components after prop parsing
 export interface TSduiCommonProps {
   componentConfig: TServerDrivenComponentConfig;
 
   analyticsContext: TAnalyticsContext;
-
-  sduiContext: TSduiContext;
-}
-
-type TSduiPropParser = (
-  value: unknown,
-  analyticsContext: TAnalyticsContext,
-  sduiContext: TSduiContext
-) => unknown;
-
-// Recursive definition to support nested prop parsers
-export interface TSduiPropParserObject {
-  [key: string]: TSduiPropParser | TSduiPropParserObject;
 }
 
 // Prop parsing types
@@ -93,32 +71,3 @@ export type TAssetUrlData = {
   assetType: TUrlType | undefined;
   assetTarget: string;
 };
-
-interface TNestedFoundationToken {
-  [key: string]: TNestedFoundationToken | string | number | number[];
-}
-
-export type TFoundationToken = TNestedFoundationToken | string | number | number[];
-
-export type TTypographyToken = {
-  Font: string;
-  LetterSpacing: number;
-  FontFamily: string;
-  FontWeight: string;
-  FontSize: number;
-  LineHeight: number;
-};
-
-export type TUDim2 = {
-  xScale: number;
-  xOffset: number;
-  yScale: number;
-  yOffset: number;
-};
-
-export enum TAutomaticSize {
-  None = 'None',
-  X = 'X',
-  Y = 'Y',
-  XY = 'XY'
-}

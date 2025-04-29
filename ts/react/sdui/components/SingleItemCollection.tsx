@@ -41,7 +41,6 @@ type TSingleItemCollectionProps = {
 const SingleItemCollection = ({
   componentConfig,
   analyticsContext,
-  sduiContext,
   item,
   children
 }: TSingleItemCollectionProps): JSX.Element => {
@@ -186,11 +185,10 @@ const SingleItemCollection = ({
       <SduiComponent
         componentConfig={item}
         parentAnalyticsContext={collectionAnalyticsContext}
-        sduiContext={sduiContext}
         localAnalyticsData={localAnalyticsData}
       />
     );
-  }, [item, componentConfig, collectionAnalyticsContext, collectionAnalyticsDataRef, sduiContext]);
+  }, [item, componentConfig, collectionAnalyticsContext, collectionAnalyticsDataRef]);
 
   // Attach updated context with logAction and getCollectionData to arbitrary children
   const childrenWithAnalyticsContext = useMemo(() => {

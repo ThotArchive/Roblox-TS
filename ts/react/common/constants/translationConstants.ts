@@ -17,15 +17,9 @@ export const CommonGameSorts = {
 export const CommonUIFeatures = {
   LabelDiscover: 'Label.Discover',
   LabelCharts: 'Label.Charts',
-  LabelsHome: 'Label.sHome',
   ActionClose: 'Action.Close',
   ActionDropdownSelected: 'Action.DropdownSelected',
   ActionDropdownNotSelected: 'Action.DropdownNotSelected'
-};
-
-export const CommonUIMessages = {
-  ActionClose: 'Action.Close',
-  ResponseUnexpectedError: 'Response.UnexpectedError'
 };
 
 export const FeaturePlacesList = {
@@ -104,14 +98,6 @@ export const FeatureSocialShare = {
   DescriptionInviterNotHereError: 'Description.InviterNotHereError',
   LabelCancel: 'Label.Cancel',
   LabelPlay: 'Label.Play'
-};
-
-export const PlayerFeedbacksVoteForm = {
-  MessageMaxLengthCharacters: 'Message.MaxLengthCharacters',
-  MessageMinLengthCharacters: 'Message.MinLengthCharacters',
-  MessageReportAbuseInsteadLong: 'Message.ReportAbuseInsteadLong',
-  PromptBannerGiveFeedbackButton: 'PromptBanner.GiveFeedbackButton',
-  PromptBannerTitleOnly: 'PromptBanner.TitleOnly'
 };
 
 export default {
