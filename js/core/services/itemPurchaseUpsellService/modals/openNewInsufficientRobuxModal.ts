@@ -77,8 +77,7 @@ function autoPurchaseFlow(
   upsellProduct: UpsellProduct,
   intl: RobloxIntlInstance,
   translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance,
-  userVariant = 0
+  intlProvider: RobloxTranslationResourceProviderInstance
 ) {
   const modalStartTime = Date.now();
   const termsOfUseTag = `<a class='text-link-secondary terms-of-use-link' target='_blank' href='${urlService.getUrlWithLocale(
@@ -107,40 +106,11 @@ function autoPurchaseFlow(
       divTagFooterEnd: '</div>'
     });
   const titleText = translationResource.get(LANG_KEYS.insufficientRobuxHeadingNew, {});
-  const robuxFooterAmount = upsellProduct.robux_amount_before_bonus
-    ? formattingRobux(
-        upsellProduct.robux_amount - upsellProduct.robux_amount_before_bonus,
-        true,
-        false,
-        true
-      ).toString()
-    : formattingRobux(upsellProduct.robux_amount, true, false, true).toString();
-  const footerText = (() => {
-    if (userVariant === 0) {
-      return '';
-    }
-    if (userVariant === 1) {
-      return translationResource.get(LANG_KEYS.insufficientRobuxModalBannerv1, {
-        robux: robuxFooterAmount
-      });
-    }
-    if (userVariant === 2) {
-      //
-      return translationResource.get(LANG_KEYS.insufficientRobuxModalBannerv2, {
-        robux: robuxFooterAmount
-      });
-    }
-    return '';
-  })();
-
-  const allowHtmlContentInFooter = userVariant !== 0;
 
   Dialog.open({
     titleText,
     bodyContent: dialogBodyNew,
-    footerText: allowHtmlContentInFooter
-      ? `<div class='modal-robux-upsell'><div class='modal-footer-text'>${footerText}</div></div>`
-      : ``,
+    footerText: '',
     declineText: translationResource.get(LANG_KEYS.cancelAction, {}),
     acceptText: translationResource.get(LANG_KEYS.buyRobuxAndItemAction, {}),
     acceptColor: 'btn-primary-md',
@@ -204,7 +174,7 @@ function autoPurchaseFlow(
       );
     },
     allowHtmlContentInBody: true,
-    allowHtmlContentInFooter, // If userVariant anything but 0 we display the footer
+    allowHtmlContentInFooter: false,
     fieldValidationRequired: true,
     dismissable: true,
     xToCancel: true
@@ -218,8 +188,7 @@ export default function openNewInsufficientRobuxModal(
   upsellProduct: UpsellProduct,
   intl: RobloxIntlInstance,
   translationResource: RobloxTranslationResource,
-  intlProvider: RobloxTranslationResourceProviderInstance,
-  userVariant: number
+  intlProvider: RobloxTranslationResourceProviderInstance
 ): void {
   const robuxItemPrice = formattingRobux(itemDetail.expectedItemPrice);
   const avatarPreview = `<div class='item-card-container item-preview'>
@@ -247,7 +216,6 @@ export default function openNewInsufficientRobuxModal(
     upsellProduct,
     intl,
     translationResource,
-    intlProvider,
-    userVariant
+    intlProvider
   );
 }

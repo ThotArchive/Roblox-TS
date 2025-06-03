@@ -33,14 +33,14 @@ const miscSearchLink = [
   },
   {
     url: getAbsoluteUrl('/develop/library?CatalogContext=2&Category=6&Keyword='),
-    label: 'Label.CreatorMarketplace',
+    label: 'Label.CreatorStore',
     pageSort: ['develop'],
     icon: 'icon-menu-library'
   }
 ];
 
 export default {
-  creatorMarketplaceUrl: `https://create.${EnvironmentUrls.domain}/marketplace/models?keyword=`,
+  creatorStoreUrl: `https://create.${EnvironmentUrls.domain}/store/models?keyword=`,
   scrollListItems: {
     home: {
       url: getAbsoluteUrl('/home'),
@@ -162,7 +162,7 @@ export default {
     },
     {
       url: getAbsoluteUrl('/develop/library?CatalogContext=2&Category=6&Keyword='),
-      label: 'Label.CreatorMarketplace',
+      label: 'Label.CreatorStore',
       pageSort: ['develop']
     }
   ],

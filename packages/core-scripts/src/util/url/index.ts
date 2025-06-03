@@ -1,6 +1,6 @@
+import { Brand } from "@rbx/core-types";
 import queryString, { ParsedQuery } from "query-string";
 import * as endpoints from "../../endpoints";
-import { Brand } from "../../types";
 
 export const parseUrlAndQueryString = queryString.parseUrl;
 

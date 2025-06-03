@@ -69,8 +69,9 @@ export class ThumbnailRequester<QueueItem> {
     thumbnailRequesterKey: string,
     metaData?: MetaData
   ): BatchRequestProcessor<QueueItem, ThumbnailDataItem> {
-    if (thumbnailRequesterKey in this.thumbnailRequesters) {
-      return this.thumbnailRequesters[thumbnailRequesterKey];
+    const thumbnailRequester = this.thumbnailRequesters[thumbnailRequesterKey];
+    if (thumbnailRequester) {
+      return thumbnailRequester;
     }
     const processor = this.batchRequestFactory.createRequestProcessor(
       thumbnailRequestProcessor,

@@ -1,0 +1,1 @@
+module.exports = "https://images.rbxcdn.com/cd61247b93abe1751dd351fa6c253ba1-install-app-qr-code.png";

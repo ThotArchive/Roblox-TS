@@ -29,7 +29,8 @@ export const EVENT_CONSTANTS = {
     codeSubmitted: 'codeSubmitted',
     codeVerificationFailed: 'codeVerificationFailed',
     codeVerified: 'codeVerified',
-    noEnabledMethodsReturned: 'noEnabledMethodsReturned'
+    noEnabledMethodsReturned: 'noEnabledMethodsReturned',
+    tryToSwitchMediaType: 'switchMediaType'
   }
 } as const;
 

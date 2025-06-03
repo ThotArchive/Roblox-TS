@@ -1,5 +1,5 @@
 import { EnvironmentUrls } from 'Roblox';
-import UrlConfig from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/http/interfaces/UrlConfig';
+import { UrlConfig } from 'core-utilities';
 
 const URL_NOT_FOUND = 'URL_NOT_FOUND';
 const apiGatewayUrl = EnvironmentUrls.apiGatewayUrl ?? URL_NOT_FOUND;
@@ -84,6 +84,7 @@ export type Metric =
         // eslint-disable-next-line camelcase
         version: string;
       };
+      identifier: string;
     }
   | {
       name: MetricName.SolveTimeCaptcha;

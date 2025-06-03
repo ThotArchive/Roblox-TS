@@ -8,7 +8,7 @@ import GamePlayEvents from './gamePlayEvents';
 import GamePlayEventsHandlers from './gamePlayEventsHandlers';
 import PrerollPlayer from './prerollPlayer';
 import VideoPreRollDFP from './videoPreRollDFP';
-import ProtocolHandlerClientInterface from './protocolHandlerClientInterface';
+import ProtocolHandlerClientInterface from './react/protocolHandlerClientInterface';
 import PlayButton from '../ts/react/playButton/playButtonEntry';
 import '../css/gameLaunch/gameLaunch.scss';
 

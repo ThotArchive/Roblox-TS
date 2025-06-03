@@ -1,3 +1,4 @@
+import "../global";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import { DeepLink, DeepLinkParams, PathPart } from "./deepLinkConstants";
 import deepLinkNavigate from "./deepLinkNavigate";

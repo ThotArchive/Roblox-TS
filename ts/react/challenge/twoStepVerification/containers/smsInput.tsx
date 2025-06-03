@@ -64,7 +64,7 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
     setRequestInFlight(true);
     setRequestError(null);
 
-    eventService.sendCodeSubmittedEvent(activeMediaType);
+    eventService.sendCodeSubmittedEvent(activeMediaType, actionType);
 
     const result = await requestService.twoStepVerification.verifySmsCode(userId, {
       challengeId,
@@ -74,6 +74,7 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
     if (result.isError) {
       eventService.sendCodeVerificationFailedEvent(
         activeMediaType,
+        actionType,
         TwoStepVerification.TwoStepVerificationError[
           result.error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
         ]
@@ -94,7 +95,7 @@ const SmsInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, childr
       return;
     }
 
-    eventService.sendCodeVerifiedEvent(activeMediaType);
+    eventService.sendCodeVerifiedEvent(activeMediaType, actionType);
     metricsService.fireVerifiedEvent(activeMediaType);
 
     dispatch({

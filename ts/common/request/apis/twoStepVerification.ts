@@ -547,3 +547,17 @@ export const retractCrossDevice = (
     ),
     TwoStepVerification.TwoStepVerificationError
   );
+
+export const verifyPasswordCode = (
+  userId: string,
+  verificationParameters: ChallengeIdAndActionType & TwoStepVerification.Code
+): Promise<
+  Result<
+    TwoStepVerification.VerifyPasswordReturnType,
+    TwoStepVerification.TwoStepVerificationError | null
+  >
+> =>
+  toResult(
+    httpService.post(TwoStepVerification.VERIFY_PASSWORD_CONFIG(userId), verificationParameters),
+    TwoStepVerification.TwoStepVerificationError
+  );

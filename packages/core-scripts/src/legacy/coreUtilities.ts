@@ -86,3 +86,4 @@ export const urlService = {
 export const uuidService = {
   generateRandomUuid: coreUuidService.generateRandomUuid,
 };
+export type { AxiosPromise } from "axios";

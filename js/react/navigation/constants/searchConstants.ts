@@ -45,7 +45,5 @@ export default {
   isAutocompleteSuggestionsIXPTestEnabled: (): boolean =>
     parseInt(getNavigationContainer()?.dataset.numberOfAutocompleteSuggestions, 10) > 0,
   numberOfAutocompleteSuggestions: (): number =>
-    parseInt(getNavigationContainer()?.dataset.numberOfAutocompleteSuggestions, 10) || 0,
-  isRedirectLibraryToCreatorMarketplaceEnabled: (): boolean =>
-    getNavigationContainer()?.dataset.isRedirectLibraryToCreatorMarketplaceEnabled === 'True'
+    parseInt(getNavigationContainer()?.dataset.numberOfAutocompleteSuggestions, 10) || 0
 };

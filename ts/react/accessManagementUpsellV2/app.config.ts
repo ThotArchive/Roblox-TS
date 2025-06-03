@@ -10,6 +10,16 @@ export const emailUpsellTranslationConfig = {
   feature: 'Feature.VerificationUpsell'
 };
 
+export const updateSettingsTranslationConfig = {
+  common: ['CommonUI.Controls'],
+  feature: 'Amp.AccountSettingsUpsell'
+};
+
+export const legallySensitiveContentTranslationConfig = {
+  common: ['CommonUI.Controls'],
+  feature: 'Amp.AccountSettingsUpsell'
+};
+
 export const parentalRequestTranslationConfig = {
   common: ['CommonUI.Controls', 'CommonUI.Features', 'Amp.Upsell'],
   feature: 'Feature.Parents'

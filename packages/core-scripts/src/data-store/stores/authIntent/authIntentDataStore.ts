@@ -1,3 +1,4 @@
+import "../../../global";
 import { getQueryParam } from "../../../util/url";
 import localStorage from "../../../local-storage";
 
@@ -47,7 +48,6 @@ const addGameIdToUnClaimedAuthIntent = (gameId: string): void => {
   try {
     setAuthIntentData(authIntent);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error("Error setting AuthIntent data:", e);
   }
 };

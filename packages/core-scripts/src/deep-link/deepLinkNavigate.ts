@@ -1,3 +1,4 @@
+import "../global";
 import {
   buildDeepLinkLaunchGameEvent,
   buildResolveLinkEvent,
@@ -688,6 +689,14 @@ const deepLinkNavigate = (target: DeepLink): Promise<boolean> => {
         // roblox://navigation/group?groupId=<groupId>
         urlTarget = `${UrlPart.Groups}/${params.groupId}`;
       }
+    }
+  } else if (navigateSubPath === PathPart.SecurityAlert) {
+    // roblox://navigation/security_alert?payload={payload}&username={username}
+    // Navigate to security alert page
+    if (params.payload && params.username) {
+      urlTarget = `${UrlPart.SecurityAlert}?payload=${params.payload}&username=${params.username}`;
+    } else {
+      urlTarget = `${UrlPart.SecurityAlert}?payload=null&username=`;
     }
   }
 

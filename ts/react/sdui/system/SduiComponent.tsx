@@ -12,7 +12,6 @@ import SduiResponsiveWrapper from './SduiResponsiveWrapper';
 const SduiComponent = ({
   componentConfig,
   parentAnalyticsContext,
-  sduiContext,
   localAnalyticsData
 }: TSduiComponentProps): JSX.Element => {
   const toRender = useMemo(() => {
@@ -37,7 +36,6 @@ const SduiComponent = ({
           wrappedComponent={componentToRender}
           componentConfig={componentConfig}
           parentAnalyticsContext={parentAnalyticsContext}
-          sduiContext={sduiContext}
           localAnalyticsData={localAnalyticsData}
         />
       );
@@ -46,10 +44,9 @@ const SduiComponent = ({
     return React.createElement(componentToRender, {
       componentConfig,
       parentAnalyticsContext,
-      sduiContext,
       localAnalyticsData
     });
-  }, [componentConfig, parentAnalyticsContext, sduiContext, localAnalyticsData]);
+  }, [componentConfig, parentAnalyticsContext, localAnalyticsData]);
 
   return toRender;
 };

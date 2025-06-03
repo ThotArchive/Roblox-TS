@@ -8,8 +8,7 @@ import {
   TGetProfilesResponse,
   TFriend,
   TPresence,
-  TOnlineFriendType,
-  TGetNewFriendRequestsCountResponse
+  TOnlineFriendType
 } from '../types/friendsCarouselTypes';
 
 const getFriendsCount = async (userId: number): Promise<TGetFriendsCountResponse> => {
@@ -114,19 +113,7 @@ const getFriends = async (userId: number, isOwnUser: boolean): Promise<TFriend[]
   return friends;
 };
 
-const getNewFriendRequestsCount = async (): Promise<number> => {
-  const urlConfig = {
-    url: `${EnvironmentUrls.friendsApi}/v1/my/new-friend-requests/count`,
-    retryable: true,
-    withCredentials: true
-  };
-
-  const { data }: { data: TGetNewFriendRequestsCountResponse } = await httpService.get(urlConfig);
-  return data.count;
-};
-
 export default {
   getFriendsCount,
-  getFriends,
-  getNewFriendRequestsCount
+  getFriends
 };

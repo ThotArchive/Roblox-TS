@@ -1,3 +1,4 @@
+import { TFeatureSpecificData } from 'Roblox';
 import { Access } from '../../enums';
 import { ExtraParameter } from '../../types/AmpTypes';
 
@@ -12,6 +13,7 @@ export type AccessManagementUpsellEventParams = {
   isAsyncCall: boolean;
   usePrologue: boolean;
   ampRecourseData: any;
+  featureSpecificData: TFeatureSpecificData;
   closeCallback: (access: Access) => string;
 };
 

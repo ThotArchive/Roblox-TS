@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { authenticatedUser } from 'header-scripts';
 import { withTranslations } from 'react-utilities';
+import { Button } from 'react-style-guide';
 import batchLoadItemDetails from '../factories/batchLoadItemDetails';
 import itemDetailsService from '../services/itemDetailsService';
 import { BatchBuyItemsButton } from './BatchBuyItems';
@@ -17,7 +18,9 @@ function PriceContainer({
   onTransactionComplete,
   productSurface,
   displayPriceOnButton,
-  translate
+  translate,
+  variant,
+  size
 }) {
   const [currentUserBalance, setCurrentUserBalance] = useState(undefined);
 
@@ -53,6 +56,8 @@ function PriceContainer({
       productSurface={productSurface}
       displayPriceOnButton={displayPriceOnButton}
       translate={translate}
+      variant={variant}
+      size={size}
     />
   );
 }
@@ -67,7 +72,9 @@ PriceContainer.propTypes = {
   systemFeedbackService: PropTypes.func.isRequired,
   productSurface: PropTypes.string,
   displayPriceOnButton: PropTypes.bool,
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
+  variant: PropTypes.string,
+  size: PropTypes.string
 };
 
 PriceContainer.defaultProps = {
@@ -76,7 +83,9 @@ PriceContainer.defaultProps = {
   onCancel: () => {},
   onTransactionComplete: result => {},
   productSurface: 'SHOPPING_CART_WEB',
-  displayPriceOnButton: false
+  displayPriceOnButton: false,
+  variant: Button.variants.growth,
+  size: Button.sizes.large
 };
 
 export default withTranslations(PriceContainer, translationConfig.purchasingResources);

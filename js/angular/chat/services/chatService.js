@@ -135,6 +135,11 @@ function chatService(
         retryable: false,
         withCredentials: true
       };
+      this.apiSets.recordModalSequenceResponseApi = {
+        url: `${chatDomain}/v1/record-modal-sequence-response`,
+        retryable: true,
+        withCredentials: true
+      };
       this.apiSets.uiPerformanceTrackingApi = {
         url: `${EnvironmentUrls.metricsApi}/v1/performance/send-measurement`,
         retryable: false,
@@ -235,8 +240,7 @@ function chatService(
           });
     },
 
-    getMessages(conversationId, cursor, pageSize) {
-
+    getMessages(conversationId, cursor) {
       // this prevents failed calls for placeholder conversations
       if (!conversationId) {
         return new Promise((resolve) => {
@@ -248,8 +252,7 @@ function chatService(
 
       const params = {
         conversation_id: conversationId,
-        cursor,
-        pageSize
+        cursor
       };
 
       return httpService.httpGet(this.apiSets.getMessagesApi, params);
@@ -365,6 +368,18 @@ function chatService(
         conversation_id: conversationId
       };
       return httpService.httpPost(this.apiSets.updateUserTypingStatusApi, data);
+    },
+
+    recordModalSequenceResponse({ conversationId, friendId, modalSequence, modalVariant, modalId, actionType }) {
+      const data = {
+        conversation_id: conversationId,
+        friend_id: friendId,
+        modal_sequence: modalSequence,
+        modal_variant: modalVariant,
+        modal_id: modalId,
+        action_type: actionType
+      };
+      return httpService.httpPost(this.apiSets.recordModalSequenceResponseApi, data);
     },
 
     sendPerformanceData(measureName, value) {

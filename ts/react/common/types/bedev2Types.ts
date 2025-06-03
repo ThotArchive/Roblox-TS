@@ -324,6 +324,7 @@ export enum TSurveyIcon {
 }
 
 export type TGuacAppPolicyBehaviorResponse = {
+  shouldShowVpcPlayButtonUpsells: boolean;
   EnableAggregateLikesFavoritesCount: boolean;
 };
 

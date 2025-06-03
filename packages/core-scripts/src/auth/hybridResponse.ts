@@ -1,3 +1,5 @@
+import "../global";
+
 const { Hybrid } = window.Roblox;
 
 const LOG_PREFIX = "Hybrid Response Service: ";

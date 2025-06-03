@@ -23,7 +23,8 @@ function Thumbnail2dContainer({
   format,
   altName,
   onLoad,
-  getThumbnail
+  getThumbnail,
+  version
 }) {
   const [startTime, setStartTime] = useState(new Date().getTime());
   const [thumbnailStatus, setImageStatus] = useState(null);
@@ -53,13 +54,12 @@ function Thumbnail2dContainer({
   const onLoadWithPerformanceMetrics = useCallback(() => {
     if (performanceData) {
       const duration = new Date().getTime() - startTime;
-      const { retryAttempts, version } = performanceData;
+      const { retryAttempts } = performanceData;
       // log load success with retry
       metricsService
         .logMeasurement('ThumbnailLoadDurationWebapp', {
           Status: 'Success',
           ThumbnailType: `${type}_2d`,
-          Version: version,
           Value: duration.toString()
         })
         // eslint-disable-next-line no-console
@@ -69,8 +69,7 @@ function Thumbnail2dContainer({
         // load success without retry
         metricsService
           .logMeasurement('ThumbnailNoRetrySuccessWebapp', {
-            ThumbnailType: `${type}_2d`,
-            Version: version
+            ThumbnailType: `${type}_2d`
           })
           // eslint-disable-next-line no-console
           .catch(console.debug);
@@ -79,7 +78,6 @@ function Thumbnail2dContainer({
         metricsService
           .logMeasurement('ThumbnailRetryWebapp', {
             ThumbnailType: `${type}_2d`,
-            Version: version,
             Value: retryAttempts.toString()
           })
           // eslint-disable-next-line no-console
@@ -109,7 +107,7 @@ function Thumbnail2dContainer({
     requestThumbnail
       .then(data => {
         const {
-          thumbnail: { state, imageUrl, version },
+          thumbnail: { state, imageUrl },
           performance
         } = data;
         if (!isUnmounted) {
@@ -117,7 +115,7 @@ function Thumbnail2dContainer({
           setImageUrl(imageUrl);
           setShimmerClass('');
           if (performance) {
-            setPerformanceData({ version, ...performance });
+            setPerformanceData({ ...performance });
           }
         }
       })
@@ -133,7 +131,7 @@ function Thumbnail2dContainer({
       isUnmounted = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, targetId, token, size, imgClassName, getThumbnail]);
+  }, [type, targetId, token, size, imgClassName, getThumbnail, version]);
 
   return (
     <Thumbnail
@@ -157,7 +155,8 @@ Thumbnail2dContainer.defaultProps = {
   format: 'webp',
   altName: '',
   onLoad: () => {},
-  getThumbnail: null
+  getThumbnail: null,
+  version: ''
 };
 
 Thumbnail2dContainer.propTypes = {
@@ -170,7 +169,8 @@ Thumbnail2dContainer.propTypes = {
   containerClass: PropTypes.string,
   altName: PropTypes.string,
   onLoad: PropTypes.func,
-  getThumbnail: PropTypes.func
+  getThumbnail: PropTypes.func,
+  version: PropTypes.string
 };
 
 export default Thumbnail2dContainer;

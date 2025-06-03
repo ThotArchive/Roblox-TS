@@ -1,6 +1,5 @@
 import { fido2Util, hybridResponseService } from 'core-roblox-utilities';
 import { DeviceMeta } from 'Roblox';
-import { FeatureTarget } from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/services/hybridResponseService';
 import { Result } from '../../result';
 import { toResultCustomRequest } from '../common';
 import * as fido2 from '../types/fido2';
@@ -11,7 +10,7 @@ const parseFido2ErrorCode = (error: unknown): number | null => {
 };
 
 export const getNativeResponse = (
-  feature: FeatureTarget,
+  feature: Parameters<typeof hybridResponseService.getNativeResponse>[0],
   parameters: Record<string, unknown>,
   timeoutMilliseconds: number
 ): Promise<Result<fido2.GetNativeResponseReturnType, fido2.Fido2Error | null>> =>

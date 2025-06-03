@@ -30,7 +30,9 @@ export function BatchBuyItems({
   productSurface,
   displayPriceOnButton,
   systemFeedbackService,
-  translate
+  translate,
+  variant = Button.variants.growth,
+  size = Button.sizes.large
 }) {
   let shouldDisplayBuyButton = false;
   let price = 0;
@@ -74,8 +76,8 @@ export function BatchBuyItems({
       <div className='sign-in'>
         <Button
           className='action-button batch-buy-purchase-button sign-in-button'
-          variant={Button.variants.growth}
-          size={Button.sizes.large}
+          variant={variant}
+          size={size}
           onClick={() => {
             window.location = getLoginUrl();
           }}>
@@ -94,8 +96,8 @@ export function BatchBuyItems({
       <div className='loading'>
         <Button
           className='action-button batch-buy-purchase-button'
-          variant={Button.variants.growth}
-          size={Button.sizes.large}
+          variant={variant}
+          size={size}
           isDisabled>
           <Loading />
         </Button>
@@ -107,8 +109,8 @@ export function BatchBuyItems({
     return (
       <Button
         className='action-button batch-buy-purchase-button'
-        variant={Button.variants.growth}
-        size={Button.sizes.large}
+        variant={variant}
+        size={size}
         isDisabled>
         {displayPriceOnButton ? (
           <div className='purchase-price'>
@@ -242,11 +244,11 @@ export function BatchBuyItems({
 
   return (
     <React.Fragment>
-      <div>
+      <div className='batch-buy-purchase-button-container'>
         <Button
           className='action-button batch-buy-purchase-button'
-          variant={Button.variants.growth}
-          size={Button.sizes.large}
+          variant={variant}
+          size={size}
           onClick={handleButtonClick}
           isDisabled={!shouldDisplayBuyButton}>
           {innerButton}
@@ -308,7 +310,14 @@ BatchBuyItems.propTypes = {
   productSurface: PropTypes.string.isRequired,
   displayPriceOnButton: PropTypes.bool.isRequired,
   systemFeedbackService: PropTypes.func.isRequired,
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
+  variant: PropTypes.string,
+  size: PropTypes.string
+};
+
+BatchBuyItems.defaultProps = {
+  variant: Button.variants.growth,
+  size: Button.sizes.large
 };
 
 // eslint-disable-next-line import/prefer-default-export

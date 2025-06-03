@@ -26,7 +26,7 @@ function detailsController($scope, $log, chatService, chatUtility) {
     const conversationId = $scope.dialogData.id;
     if (
       conversationId &&
-      $scope.dialogData.source === 'channels' &&
+      $scope.dialogData.source === chatUtility.conversationSource.CHANNELS &&
       $scope.dialogLayout?.details?.isEnabled
     ) {
       chatService

@@ -35,7 +35,7 @@ const generateState = (
   }
 };
 
-const getContext = (requestType: RequestType, details?: Record<string, unknown>) => {
+const getContext = (requestType: RequestType, details: Record<string, unknown>) => {
   let context;
   switch (requestType) {
     case RequestType.LiftPunishment: {
@@ -90,7 +90,7 @@ export const sendClickRequestBroadcastConfirmEvent = ({
   extraState,
   details
 }: TEventParams): void => {
-  const context = getContext(requestType);
+  const context = getContext(requestType, details);
   sendEventWithSilentError(events.eventName.authButtonClick, context.parentalEntry, {
     btn: events.btn.continue,
     associatedText: events.text.ok,
@@ -102,7 +102,7 @@ export const sendParentEmailSubmitEvent = ({
   sessionId,
   details
 }: TEventParams): void => {
-  const context = getContext(requestType);
+  const context = getContext(requestType, details);
 
   sendEventWithSilentError(events.eventName.authButtonClick, context.parentalEntry, {
     btn: events.btn.submit,
@@ -112,7 +112,7 @@ export const sendParentEmailSubmitEvent = ({
 };
 
 export const sendInteractParentEmailFormEvent = ({ requestType, details }: TEventParams): void => {
-  const context = getContext(requestType);
+  const context = getContext(requestType, details);
   sendEventWithSilentError(events.eventName.authFormInteraction, context.parentalEntry, {
     field: events.field.email,
     associatedText: events.text.enterParentEmail,

@@ -1,3 +1,4 @@
+import "../global";
 import * as E from "fp-ts/Either";
 import { UrlConfig } from "../http/types";
 import { hbaMeta } from "./hba";

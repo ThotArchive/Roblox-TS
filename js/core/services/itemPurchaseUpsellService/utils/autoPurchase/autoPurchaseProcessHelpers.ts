@@ -108,10 +108,9 @@ async function validateAndGetDataObject(
   try {
     // It is a known issue that Item-Hydration service returns incorrect productId for collectible items which is propogated to the cookie.
     // For Collectible Items, we need to use productId from the itemDetailDataElementMap
-    const productId =
-      cookieData.collectibleItemId == null
-        ? cookieData.productId
-        : itemDetailDataElementMap?.productId;
+    const productId = !cookieData.collectibleItemId
+      ? cookieData.productId
+      : itemDetailDataElementMap?.productId;
 
     productInfo = await getProductIdWrapper(itemPath, productId);
   } catch (e) {

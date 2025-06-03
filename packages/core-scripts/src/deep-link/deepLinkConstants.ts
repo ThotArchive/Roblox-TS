@@ -22,6 +22,7 @@ export enum PathPart {
   SpendingSettings = "spending_settings",
   Group = "group",
   ExternalWebUrl = "external_web_link",
+  SecurityAlert = "security_alert",
 }
 
 export enum ItemType {
@@ -69,6 +70,7 @@ export const UrlPart = {
   AppLauncher: "roblox://navigation",
   ContentPost: "/content_posts",
   Avatar: "/my/avatar",
+  SecurityAlert: "/security-feedback",
 };
 
 export const buildResolveLinkEvent = (

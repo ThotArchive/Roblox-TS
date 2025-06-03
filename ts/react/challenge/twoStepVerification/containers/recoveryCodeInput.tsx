@@ -66,7 +66,7 @@ const RecoveryCodeInput: React.FC<Props> = ({
     setRequestInFlight(true);
     setRequestError(null);
 
-    eventService.sendCodeSubmittedEvent(activeMediaType);
+    eventService.sendCodeSubmittedEvent(activeMediaType, actionType);
 
     const result = await requestService.twoStepVerification.verifyRecoveryCode(userId, {
       challengeId,
@@ -76,6 +76,7 @@ const RecoveryCodeInput: React.FC<Props> = ({
     if (result.isError) {
       eventService.sendCodeVerificationFailedEvent(
         activeMediaType,
+        actionType,
         TwoStepVerification.TwoStepVerificationError[
           result.error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
         ]
@@ -96,7 +97,7 @@ const RecoveryCodeInput: React.FC<Props> = ({
       return;
     }
 
-    eventService.sendCodeVerifiedEvent(activeMediaType);
+    eventService.sendCodeVerifiedEvent(activeMediaType, actionType);
     metricsService.fireVerifiedEvent(activeMediaType);
 
     dispatch({

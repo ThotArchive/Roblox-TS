@@ -68,7 +68,6 @@ export const getCryptoKeyPair = async (
       };
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn("get value from indexedDB error: ", e);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -99,7 +98,6 @@ export const putCryptoKeyPair = async (
     // eslint-disable-next-line @typescript-eslint/return-await
     return new Promise<void>((resolve, reject) => {
       request.onerror = () => {
-        // eslint-disable-next-line no-console
         console.error(`indexeddb request error`);
         // TODO: old, migrated code
         // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors, prefer-promise-reject-errors
@@ -128,7 +126,6 @@ export const putCryptoKeyPair = async (
             resolve();
           };
         } catch {
-          // eslint-disable-next-line no-console
           console.error(`indexeddb transaction error`);
           // TODO: old, migrated code
           // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors, prefer-promise-reject-errors
@@ -137,7 +134,6 @@ export const putCryptoKeyPair = async (
       };
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn("updating indexedDB error: ", e);
   }
 };
@@ -197,7 +193,6 @@ export const deleteCryptoKeyPair = async (
       };
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn("delete crypto record error: ", e);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -224,7 +219,6 @@ export const deleteCryptoDB = async (): Promise<void> => {
       };
     });
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn("delete crypto db error: ", e);
     // TODO: old, migrated code
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

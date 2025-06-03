@@ -218,9 +218,7 @@ const WideGameTile = React.forwardRef(
     const showPlayButton = (): boolean => {
       if (
         wideTileType === TComponentType.GridTile &&
-        // HACK: This is a temporary fix to disable the play button on grid tiles by default
-        // More info here: https://roblox.atlassian.net/browse/CLIGROW-2386.
-        playButtonStyle !== TPlayButtonStyle.Enabled
+        playButtonStyle === TPlayButtonStyle.Disabled
       ) {
         return false;
       }

@@ -10,9 +10,8 @@ import {
 } from 'roblox-thumbnails';
 import { GamesAutocompleteSuggestionEntryType } from '../services/searchService';
 import links from '../constants/linkConstants';
-import searchConstants from '../constants/searchConstants';
 
-const { gameSearchLink, avatarSearchLink, creatorMarketplaceUrl } = links;
+const { gameSearchLink, avatarSearchLink, creatorStoreUrl } = links;
 
 export function AutocompleteSearchLink({ translate, selected, suggestion, onClick }) {
   const listClass = ClassNames('navbar-search-option rbx-clickable-li', {
@@ -124,11 +123,7 @@ AvatarAutocompleteSearchLink.propTypes = {
 
 export function SearchLink({ translate, selected, searchInput, suggestion, onClick }) {
   const { url, label, icon } = suggestion;
-  const { isRedirectLibraryToCreatorMarketplaceEnabled } = searchConstants;
-  const flaggedUrl =
-    isRedirectLibraryToCreatorMarketplaceEnabled() && label === 'Label.CreatorMarketplace'
-      ? creatorMarketplaceUrl
-      : url;
+  const flaggedUrl = label === 'Label.CreatorStore' ? creatorStoreUrl : url;
 
   const listClass = ClassNames('navbar-search-option rbx-clickable-li', {
     'new-selected': selected

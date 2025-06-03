@@ -1,4 +1,4 @@
-import privacyChoicesIcon from '../../../../images/privacyChoices.png';
+import privacyChoicesIcon from '../../../../images/privacyChoices.webp';
 
 export const linksList = [
   {

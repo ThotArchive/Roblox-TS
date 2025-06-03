@@ -116,6 +116,10 @@ const unlockPlayIntentConstants = {
   fiatPurchaseUpsellName: 'FiatPurchase'
 };
 
+const FeatureExperienceDetails = {
+  PlayButtonMessageAgreeToNotice: 'PlayButtonMessage.AgreeToNotice'
+};
+
 export default {
   playButtonErrorStatusTranslationMap,
   playButtonTextTranslationMap,
@@ -125,5 +129,6 @@ export default {
   avatarChatUpsellLayer,
   avatarChatUpsellLayerU13,
   playButtonLayer,
-  unlockPlayIntentConstants
+  unlockPlayIntentConstants,
+  FeatureExperienceDetails
 };

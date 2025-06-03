@@ -421,17 +421,16 @@ function messageService(
         const latestPreviewableMessage = messages.find(message => message.is_previewable);
         if (latestPreviewableMessage) {
           // if the latest previewable message is after than the current preview message, update
-          if (!previewMessage || latestPreviewableMessage.created_at > previewMessage.created_at) {
+          if (!previewMessage || latestPreviewableMessage.created_at >= previewMessage.created_at) {
             previewMessage = latestPreviewableMessage;
           }
         }
       }
 
-      // if we have determined a preview message and either
-      // - the conversation doesn't have an assigned preview message already, or
-      // - the determined preview message differs from the conversation's current assigned preview message
+      // if we have determined a preview message that differs from
+      // the conversation's current assigned preview message,
       // build and assign the new preview message
-      if (previewMessage && (!conversation.previewMessage || previewMessage.id !== conversation.previewMessage.id)) {
+      if (previewMessage && previewMessage !== conversation.previewMessage) {
         conversation.previewMessage = this.buildPreviewMessage(previewMessage);
       }
     },

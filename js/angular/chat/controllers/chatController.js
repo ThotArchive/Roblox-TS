@@ -2003,6 +2003,7 @@ function chatController(
         existingConversation.moderationType = unreadConversation.moderationType;
         existingConversation.participantPendingStatus = unreadConversation.participantPendingStatus;
         existingConversation.userPendingStatus = unreadConversation.userPendingStatus;
+        existingConversation.osaAcknowledgementStatus = unreadConversation.osaAcknowledgementStatus;
         $scope.getUserInfoForConversation(existingConversation);
         if (shouldPopDialog) {
           notifyUser(existingConversation);
@@ -2096,7 +2097,7 @@ function chatController(
   $scope.buildChatUserListByConversations = function (conversations, addToFront) {
     const conversationIds = [];
     conversations.forEach(function (conversation) {
-      if (conversation.source === 'friends') {
+      if (conversation.source === chatUtility.conversationSource.FRIENDS) {
         if (!conversation || !conversation.participants) {
           return;
         }
@@ -2282,7 +2283,7 @@ function chatController(
     }
 
     const moderatedChannelConversationIds = moderatedConversations
-      .filter(conversation => conversation.source === 'channels')
+      .filter(conversation => conversation.source === chatUtility.conversationSource.CHANNELS)
       .map(conversation => conversation.id);
 
     const response = await chatService.getChatModerationStatuses(moderatedChannelConversationIds);
@@ -2530,7 +2531,7 @@ function chatController(
       const friendsConversationIds = [];
       angular.forEach(webConversations, function (conversation) {
         const { id: conversationId, source, participant_user_ids: participantIds } = conversation;
-        if (source === 'friends') {
+        if (source === chatUtility.conversationSource.FRIENDS) {
           if (participantIds) {
             for (const participantId of participantIds) {
               if (participantId !== $scope.chatLibrary.userId) {

@@ -1,3 +1,4 @@
+import "../global";
 import { uuidService } from "@rbx/core";
 import { sendEventWithTarget, sendGamePlayEvent } from "../event-stream";
 

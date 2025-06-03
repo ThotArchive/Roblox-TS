@@ -73,7 +73,7 @@ const TwoStepVerification: React.FC = () => {
       type: TwoStepVerificationActionType.HIDE_MODAL_CHALLENGE
     });
 
-    eventService.sendChallengeAbandonedEvent(activeMediaType);
+    eventService.sendChallengeAbandonedEvent(activeMediaType, actionType);
     metricsService.fireAbandonedEvent();
 
     // Attempt to retract dialog on cross device but ignore errors if they occur.
@@ -184,19 +184,22 @@ const TwoStepVerification: React.FC = () => {
       fido2SupportedViaBrowserApi = false;
     }
 
-    // If security keys are the primary media type, determine if we need to search for a native
-    // fallback API using hybrid calls. Only iOS and Android are supported as of now.
-    const isInIosOrAndroidApp =
+    // If security keys or passkeys are the primary media type, determine if we need to search for
+    // a native fallback API using hybrid calls. Only iOS and Android are supported as of now.
+    const platformCouldSupportSecurityKeys =
+      isInApp &&
       DeviceMeta &&
       (DeviceMeta().isIosApp ||
         (DeviceMeta().isAndroidApp && resultMetadata.value.isAndroidSecurityKeyEnabled));
+    const platformCouldSupportPasskeys =
+      isInApp && DeviceMeta && (DeviceMeta().isIosApp || DeviceMeta().isAndroidApp);
     let fido2SupportedViaHybridApi = false;
     if (
-      primaryMediaType === MediaType.SecurityKey &&
-      isInApp &&
-      isInIosOrAndroidApp &&
-      resultMetadata.value.isSecurityKeyOnAllPlatformsEnabled
+      (primaryMediaType === MediaType.SecurityKey && platformCouldSupportSecurityKeys) ||
+      (primaryMediaType === MediaType.Passkey && platformCouldSupportPasskeys)
     ) {
+      // This checks if the native implementation of security keys or passkeys exists/
+      // Currently only returns true for a subset of iOS devices.
       const isAvailable = await hybridResponseService.getNativeResponse(
         hybridResponseService.FeatureTarget.CREDENTIALS_PROTOCOL_AVAILABLE,
         {},
@@ -224,12 +227,7 @@ const TwoStepVerification: React.FC = () => {
       if (newEnabledMediaTypes.includes(MediaType.Passkey)) {
         newEnabledMediaTypes.splice(newEnabledMediaTypes.indexOf(MediaType.Passkey), 1);
       }
-      if (newEnabledMediaTypes.length === 0) {
-        eventService.sendNoEnabledMethodsReturnedEvent(
-          primaryMediaType,
-          resultUserConfiguration.value.methods.length
-        );
-      } else {
+      if (newEnabledMediaTypes.length > 0) {
         primaryMethodChanged = true;
         // eslint-disable-next-line prefer-destructuring
         primaryMediaType = newEnabledMediaTypes[0];
@@ -238,12 +236,31 @@ const TwoStepVerification: React.FC = () => {
 
     history.replace(mediaTypeToPath(primaryMediaType));
     if (primaryMediaType === MediaType.Email) {
+      if (primaryMethodChanged) {
+        eventService.sendEmailResendRequestedEvent();
+        const emailResult = await requestService.twoStepVerification.sendEmailCode(userId, {
+          challengeId,
+          actionType
+        });
+        if (emailResult.isError) {
+          if (
+            emailResult?.error === TwoStepVerificationError.INVALID_USER_ID ||
+            emailResult?.error === TwoStepVerificationError.INVALID_CHALLENGE_ID
+          ) {
+            dispatch({
+              type: TwoStepVerificationActionType.SET_CHALLENGE_INVALIDATED,
+              errorCode: mapTwoStepVerificationErrorToChallengeErrorCode(emailResult.error)
+            });
+          }
+        }
+      }
       setHasSentEmailCode(!primaryMethodChanged);
     }
     // Track unexpected event where no valid 2SV methods are returned for a user with 2SV enabled.
     if (newEnabledMediaTypes.length === 0 || !primaryMediaType) {
       eventService.sendNoEnabledMethodsReturnedEvent(
         primaryMediaType,
+        actionType,
         resultUserConfiguration.value.methods.length
       );
     }
@@ -275,7 +292,7 @@ const TwoStepVerification: React.FC = () => {
       enabledMediaTypes: newEnabledMediaTypes
     });
 
-    eventService.sendUserConfigurationLoadedEvent(primaryMediaType);
+    eventService.sendUserConfigurationLoadedEvent(primaryMediaType, actionType);
   };
 
   // Effect to retrieve 2SV metadata and user configuration:
@@ -395,7 +412,11 @@ const TwoStepVerification: React.FC = () => {
     return renderMediaTypeWithChildren(
       <React.Fragment>
         {activeMediaType && enabledMediaTypes.length > 1 && showChangeMediaType && (
-          <SwitchMediaType requestInFlight={requestInFlight} />
+          <SwitchMediaType
+            requestInFlight={requestInFlight}
+            originalMediaType={activeMediaType}
+            actionType={actionType}
+          />
         )}
       </React.Fragment>
     );

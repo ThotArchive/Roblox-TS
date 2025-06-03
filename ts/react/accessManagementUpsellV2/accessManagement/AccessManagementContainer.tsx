@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TranslateFunction } from 'react-utilities';
 import { Modal } from 'react-style-guide';
 import { useSelector } from 'react-redux';
+import { TFeatureSpecificData } from 'Roblox';
 import {
   resetAccessManagementStore,
   selectAccessManagement,
@@ -28,6 +29,7 @@ import LoadingPage from './components/LoadingPage';
 import useExperiments from '../hooks/useExperiments';
 import vpcUpsellExperimentLayer from './constants/experimentConstants';
 import ExpNewChildModal from '../enums/ExpNewChildModal';
+import UpdateSettingsContainer from '../recourses/settings/UpdateSettingsContainer';
 
 function AccessManagementContainer({
   translate
@@ -46,6 +48,7 @@ function AccessManagementContainer({
     (access: Access) => access
   );
   const [recourseParameters, setRecourseParameters] = useState<Record<string, string> | null>({});
+  const [featureSpecificParams, setFeatureSpecificParams] = useState<TFeatureSpecificData | null>();
 
   const [asyncExit, setAsyncExit] = useState<boolean>(false);
 
@@ -63,6 +66,7 @@ function AccessManagementContainer({
       usePrologue,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       ampRecourseData,
+      featureSpecificData,
       closeCallback
     } = event.detail;
     setOnHideCallback(() => (access: Access): string => closeCallback(access));
@@ -81,6 +85,9 @@ function AccessManagementContainer({
     }
     if (ampRecourseData) {
       setRecourseParameters(ampRecourseData);
+    }
+    if (featureSpecificData) {
+      setFeatureSpecificParams(featureSpecificData);
     }
     // This experiment only applies to enable purchase
     let usePrologueWithExp = usePrologue;
@@ -158,6 +165,21 @@ function AccessManagementContainer({
               value={recourseParameters}
               expChildModalType={expChildModalType}
               isPrologueUsed={isPrologueUsed}
+            />
+          );
+        }
+        case Recourse.SettingsUpdate: {
+          return (
+            <UpdateSettingsContainer
+              translate={translate}
+              recourse={verificationStageRecourse}
+              updateSettingsModalProps={{
+                onHide: () => {
+                  onHideFunction();
+                  featureSpecificParams.onHide?.();
+                },
+                ...featureSpecificParams
+              }}
             />
           );
         }

@@ -1,6 +1,6 @@
 import Roblox from 'Roblox';
 import { EVENT_CONSTANTS } from '../app.config';
-import { MediaType } from '../interface';
+import { ActionType, MediaType } from '../interface';
 
 /**
  * A class encapsulating the events fired by this web app.
@@ -27,14 +27,18 @@ export class EventServiceDefault {
     );
   }
 
-  sendUserConfigurationLoadedEvent(mediaType: MediaType | null): void {
+  sendUserConfigurationLoadedEvent(
+    mediaType: MediaType | null,
+    actionType: ActionType | null
+  ): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.userConfigurationLoaded,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );
@@ -42,6 +46,7 @@ export class EventServiceDefault {
 
   sendNoEnabledMethodsReturnedEvent(
     primaryMediaType: MediaType | null,
+    actionType: ActionType | null,
     methodsReturned: number
   ): void {
     Roblox.EventStream.SendEventWithTarget(
@@ -51,33 +56,36 @@ export class EventServiceDefault {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
         primaryMediaType: primaryMediaType || '',
+        actionType: actionType || '',
         methodsReturned
       },
       Roblox.EventStream.TargetTypes.WWW
     );
   }
 
-  sendChallengeInvalidatedEvent(mediaType: MediaType | null): void {
+  sendChallengeInvalidatedEvent(mediaType: MediaType | null, actionType: ActionType | null): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeInvalidated,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );
   }
 
-  sendChallengeAbandonedEvent(mediaType: MediaType | null): void {
+  sendChallengeAbandonedEvent(mediaType: MediaType | null, actionType: ActionType | null): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.challengeAbandoned,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );
@@ -107,33 +115,39 @@ export class EventServiceDefault {
     );
   }
 
-  sendMediaTypeChangedEvent(mediaType: MediaType | null): void {
+  sendMediaTypeChangedEvent(mediaType: MediaType | null, actionType: ActionType | null): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.mediaTypeChanged,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );
   }
 
-  sendCodeSubmittedEvent(mediaType: MediaType | null): void {
+  sendCodeSubmittedEvent(mediaType: MediaType | null, actionType: ActionType | null): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.codeSubmitted,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );
   }
 
-  sendCodeVerificationFailedEvent(mediaType: MediaType | null, reason: string): void {
+  sendCodeVerificationFailedEvent(
+    mediaType: MediaType | null,
+    actionType: ActionType | null,
+    reason: string
+  ): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.codeVerificationFailed,
@@ -141,20 +155,39 @@ export class EventServiceDefault {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
         mediaType: mediaType || '',
+        actionType: actionType || '',
         reason
       },
       Roblox.EventStream.TargetTypes.WWW
     );
   }
 
-  sendCodeVerifiedEvent(mediaType: MediaType | null): void {
+  sendTryToSwitchMediaTypeEvent(
+    originalMediaType: MediaType | null,
+    actionType: ActionType | null
+  ): void {
+    Roblox.EventStream.SendEventWithTarget(
+      EVENT_CONSTANTS.eventName,
+      EVENT_CONSTANTS.context.tryToSwitchMediaType,
+      {
+        challengeId: this.challengeId,
+        targetUserId: this.targetUserId,
+        mediaType: originalMediaType || '',
+        actionType: actionType || ''
+      },
+      Roblox.EventStream.TargetTypes.WWW
+    );
+  }
+
+  sendCodeVerifiedEvent(mediaType: MediaType | null, actionType: ActionType | null): void {
     Roblox.EventStream.SendEventWithTarget(
       EVENT_CONSTANTS.eventName,
       EVENT_CONSTANTS.context.codeVerified,
       {
         challengeId: this.challengeId,
         targetUserId: this.targetUserId,
-        mediaType: mediaType || ''
+        mediaType: mediaType || '',
+        actionType: actionType || ''
       },
       Roblox.EventStream.TargetTypes.WWW
     );

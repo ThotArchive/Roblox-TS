@@ -37,16 +37,19 @@ const ThumbnailTypeMapping: ThumbnailTypeMapping = {
 
 function transformThumbnailType(
   type: ThumbnailTypes
-): RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum {
+): RobloxThumbnailsApisModelsThumbnailBatchRequestTypeEnum | undefined {
   return ThumbnailTypeMapping[type];
 }
 
 function getExpirationMsFromString(timeSpan: string): number {
-  const timeSpanFormat = timeSpan.split(':');
+  const [hours, minutes, seconds] = timeSpan.split(':');
+  if (hours === undefined || minutes === undefined || seconds === undefined) {
+    return NaN;
+  }
   return (
-    (parseInt(timeSpanFormat[0], 10) * 60 * 60 +
-      parseInt(timeSpanFormat[1], 10) * 60 +
-      parseInt(timeSpanFormat[2], 10)) *
+    (parseInt(hours, 10) * 60 * 60 +
+      parseInt(minutes, 10) * 60 +
+      parseInt(seconds, 10)) *
     1000
   );
 }

@@ -81,6 +81,10 @@ function dialogAttributes(languageResource) {
       oneToOneConversation: 'one_to_one',
       multiUserConversation: 'group'
     },
+    conversationSource: {
+      FRIENDS: 'friends',
+      CHANNELS: 'channels'
+    },
     dialogBannerTypes,
     dialogInitValue: {
       isUpdated: true,
@@ -190,6 +194,16 @@ function dialogAttributes(languageResource) {
     systemMessage: {
       isSystemMessage: true,
       isErrorMsg: false
+    },
+    modalSequence: {
+      CONVERSATION_INLINE_TOP_MODAL: 'conversation_inline_top_modal'
+    },
+    modalVariant: {
+      OSA_CONTEXT_CARD: 'osa_context_card'
+    },
+    modalActionType: {
+      RECORD_HAS_SEEN: 'record_has_seen',
+      RECORD_DONT_SHOW_AGAIN: 'record_dont_show_again'
     }
   };
 }

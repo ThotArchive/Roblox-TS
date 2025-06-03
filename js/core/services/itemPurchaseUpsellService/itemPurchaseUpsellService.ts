@@ -29,8 +29,7 @@ import {
   PERIODICAL_BALANCE_CHECK_RETRY_TIMES,
   PURCHASE_DIALOG_NAMESPACE,
   UPSELL_COUNTER_NAMES,
-  UPSELL_COUNTER_NO_TYPE_PARSED_PLACEHOLDER,
-  UPSELL_MODAL_EXPERIMENT_LAYER
+  UPSELL_COUNTER_NO_TYPE_PARSED_PLACEHOLDER
 } from './constants/upsellConstants';
 import fetchAvailableUpsellProduct from './utils/startItemUpsell/fetchAvailableUpsellProduct';
 import openNewInsufficientRobuxModal from './modals/openNewInsufficientRobuxModal';
@@ -49,13 +48,6 @@ import sendEvent from './utils/common/sendEvent';
 import openInsufficientRobuxExceedLargestPackageModal from './modals/openInsufficientRobuxExceedLargestPackageModal';
 import getShouldShowVng from './api/universalAppConfiguration';
 import openVngInsufficientRobuxModal from './modals/openVngInsufficientRobuxModal';
-
-interface ExperimentationData {
-  upsellModalControlAllowList: string[];
-  upsellModalvariant1AllowList: string[];
-  upsellModalvariant2AllowList: string[];
-  upsellModalVariant: number;
-}
 
 export default class ItemPurchaseUpsellService {
   private readonly intl: RobloxIntlInstance;
@@ -143,33 +135,6 @@ export default class ItemPurchaseUpsellService {
             itemDetail.buyButtonElementDataset
           );
 
-          let userVariant = 0; // default value
-
-          try {
-            const data = await ExperimentationService.getAllValuesForLayer(
-              UPSELL_MODAL_EXPERIMENT_LAYER
-            );
-            const { userId } = CurrentUser;
-            const experimentData = (data as unknown) as ExperimentationData;
-
-            if (experimentData && Object.keys(experimentData).length > 0) {
-              if (experimentData.upsellModalControlAllowList.includes(userId)) {
-                userVariant = 0;
-              } else if (experimentData.upsellModalvariant1AllowList.includes(userId)) {
-                userVariant = 1;
-              } else if (experimentData.upsellModalvariant2AllowList.includes(userId)) {
-                userVariant = 2;
-              } else {
-                userVariant = experimentData.upsellModalVariant;
-              }
-            }
-          } catch (e) {
-            reportCounter(
-              UPSELL_COUNTER_NAMES.UpsellExperimentRetrivalFailed,
-              itemDetail.buyButtonElementDataset?.assetType
-            );
-          }
-
           openNewInsufficientRobuxModal(
             errorObject,
             itemDetail,
@@ -177,8 +142,7 @@ export default class ItemPurchaseUpsellService {
             upsellProductResponse.data,
             this.intl,
             this.intlProvider.getTranslationResource(PURCHASE_DIALOG_NAMESPACE),
-            this.intlProvider,
-            userVariant
+            this.intlProvider
           );
           return Promise.resolve();
         }

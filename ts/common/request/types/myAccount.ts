@@ -2,7 +2,7 @@
  * My Account
  */
 
-import UrlConfig from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/http/interfaces/UrlConfig';
+import { UrlConfig } from 'core-utilities';
 
 const mySettingsUrl = '/my/settings/json';
 

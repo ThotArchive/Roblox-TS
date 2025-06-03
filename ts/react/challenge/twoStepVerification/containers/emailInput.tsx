@@ -64,7 +64,7 @@ const EmailInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, chil
     setRequestInFlight(true);
     setRequestError(null);
 
-    eventService.sendCodeSubmittedEvent(activeMediaType);
+    eventService.sendCodeSubmittedEvent(activeMediaType, actionType);
 
     const result = await requestService.twoStepVerification.verifyEmailCode(userId, {
       challengeId,
@@ -74,6 +74,7 @@ const EmailInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, chil
     if (result.isError) {
       eventService.sendCodeVerificationFailedEvent(
         activeMediaType,
+        actionType,
         TwoStepVerification.TwoStepVerificationError[
           result.error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
         ]
@@ -94,7 +95,7 @@ const EmailInput: React.FC<Props> = ({ requestInFlight, setRequestInFlight, chil
       return;
     }
 
-    eventService.sendCodeVerifiedEvent(activeMediaType);
+    eventService.sendCodeVerifiedEvent(activeMediaType, actionType);
     metricsService.fireVerifiedEvent(activeMediaType);
 
     dispatch({

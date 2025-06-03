@@ -1,3 +1,4 @@
+import "../global";
 import environmentUrls from "@rbx/environment-urls";
 // TODO: old, migrated code
 // eslint-disable-next-line @typescript-eslint/no-deprecated

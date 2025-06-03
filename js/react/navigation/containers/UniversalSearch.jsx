@@ -420,14 +420,10 @@ export function UniversalSearch({ translate, isUniverseSearchShown }) {
       resetAutocompleteSessionInfo();
       const suggestionUrl = searchUtil.getSuggestionUrl(suggestion, e);
       if (suggestionUrl) {
-        const { isRedirectLibraryToCreatorMarketplaceEnabled } = search;
         let redirectUrl = suggestionUrl;
-        if (
-          suggestion.label === 'Label.CreatorMarketplace' &&
-          isRedirectLibraryToCreatorMarketplaceEnabled()
-        ) {
-          const { creatorMarketplaceUrl } = linkConstants;
-          redirectUrl = creatorMarketplaceUrl;
+        if (suggestion.label === 'Label.CreatorStore') {
+          const { creatorStoreUrl } = linkConstants;
+          redirectUrl = creatorStoreUrl;
           if (e?.target?.value) {
             redirectUrl += encodeURIComponent(e.target.value);
           }

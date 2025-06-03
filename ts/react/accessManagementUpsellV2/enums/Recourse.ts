@@ -7,7 +7,8 @@ enum Recourse {
   AddedEmail = 'AddedEmail',
   ParentConsentRequest = 'ParentConsent',
   ParentLinkRequest = 'ParentLink',
-  AgeEstimation = 'AgeEstimation'
+  AgeEstimation = 'AgeEstimation',
+  SettingsUpdate = 'SettingsUpdate'
 }
 
 export default Recourse;

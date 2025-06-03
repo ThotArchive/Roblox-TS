@@ -2,9 +2,12 @@ import React from 'react';
 import { useHistory } from 'react-router';
 import { mediaTypeToPath } from '../hooks/useActiveMediaType';
 import useTwoStepVerificationContext from '../hooks/useTwoStepVerificationContext';
+import { ActionType, MediaType } from '../interface';
 
 type Props = {
   requestInFlight: boolean;
+  originalMediaType: MediaType;
+  actionType: ActionType;
   // eslint-disable-next-line react/require-default-props
   className?: string;
 };
@@ -12,13 +15,19 @@ type Props = {
 /**
  * A button to initiate switching the 2SV media type for the current challenge.
  */
-const SwitchMediaType: React.FC<Props> = ({ requestInFlight, className }: Props) => {
+const SwitchMediaType: React.FC<Props> = ({
+  requestInFlight,
+  originalMediaType,
+  actionType,
+  className
+}: Props) => {
   const {
-    state: { renderInline, resources }
+    state: { renderInline, eventService, resources }
   } = useTwoStepVerificationContext();
   const history = useHistory();
 
   const clearMediaType = () => {
+    eventService.sendTryToSwitchMediaTypeEvent(originalMediaType, actionType);
     history.push(mediaTypeToPath(null));
   };
 

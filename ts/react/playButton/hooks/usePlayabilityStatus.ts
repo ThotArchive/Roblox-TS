@@ -14,7 +14,7 @@ export const usePlayabilityStatus = (
     setPlayabilityStatus(undefined);
     try {
       const response = await playButtonService.getPlayabilityStatus([universeId]);
-      setPlayabilityStatus(response.playabilityStatus);
+      setPlayabilityStatus(response?.playabilityStatus);
     } catch (e) {
       setPlayabilityStatus(PlayabilityStatus.TemporarilyUnavailable);
     }

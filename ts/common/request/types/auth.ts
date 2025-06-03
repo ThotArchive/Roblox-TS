@@ -1,5 +1,5 @@
 import { EnvironmentUrls } from 'Roblox';
-import UrlConfig from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/http/interfaces/UrlConfig';
+import { UrlConfig } from 'core-utilities';
 import { Fido2Credential } from './twoStepVerification';
 
 const URL_NOT_FOUND = 'URL_NOT_FOUND';

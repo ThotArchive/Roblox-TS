@@ -29,7 +29,6 @@ const storeClientKeyPair = async (clientKeyPair: CryptoKeyPair): Promise<void> =
       hbaIndexedDBKeyName,
       clientKeyPair,
     ).catch(() => {
-      // eslint-disable-next-line no-console
       console.error("putting cryptoKeyPair error");
     });
   }
@@ -50,7 +49,6 @@ export const generateSecureAuthIntent = async (): Promise<SecureAuthIntent> => {
     // prerequisite: get serverNonce
     const serverNonce = await getServerNonce();
     if (!serverNonce) {
-      // eslint-disable-next-line no-console
       console.warn("No hba server nonce available.");
       sendSAIMissingEvent({ message: "NonceUnavailable" });
       // @ts-expect-error TODO: old, migrated code

@@ -14,7 +14,7 @@ import { TwoStepVerificationActionType } from '../store/action';
 
 const HELP_PAGE_URL = 'https://www.roblox.com/info/2sv';
 const DEBOUNCE_INTERVAL_MILLISECONDS = 3000;
-const POLLING_INTERVAL_MILLISECONDS = 1000;
+const POLLING_INTERVAL_MILLISECONDS = 3000;
 
 type Props = {
   requestInFlight: boolean;
@@ -74,7 +74,7 @@ const CD2SVInput: React.FC<Props> = ({
       type: TwoStepVerificationActionType.HIDE_MODAL_CHALLENGE
     });
 
-    eventService.sendChallengeAbandonedEvent(activeMediaType);
+    eventService.sendChallengeAbandonedEvent(activeMediaType, actionType);
     metricsService.fireAbandonedEvent();
 
     if (onModalChallengeAbandoned !== null) {
@@ -119,6 +119,7 @@ const CD2SVInput: React.FC<Props> = ({
     if (result.isError) {
       eventService.sendCodeVerificationFailedEvent(
         activeMediaType,
+        actionType,
         TwoStepVerification.TwoStepVerificationError[
           result.error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
         ]
@@ -198,6 +199,7 @@ const CD2SVInput: React.FC<Props> = ({
           if (result.isError) {
             eventService.sendCodeVerificationFailedEvent(
               activeMediaType,
+              actionType,
               TwoStepVerification.TwoStepVerificationError[
                 result.error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
               ]
@@ -234,7 +236,7 @@ const CD2SVInput: React.FC<Props> = ({
             }
             setRequestError(mapTwoStepVerificationErrorToResource(resources, result.error));
           } else if (result.value.verificationToken) {
-            eventService.sendCodeVerifiedEvent(activeMediaType);
+            eventService.sendCodeVerifiedEvent(activeMediaType, actionType);
             metricsService.fireVerifiedEvent(activeMediaType);
             dispatch({
               type: TwoStepVerificationActionType.SET_CHALLENGE_COMPLETED,

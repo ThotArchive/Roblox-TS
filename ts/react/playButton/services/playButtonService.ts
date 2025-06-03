@@ -17,14 +17,14 @@ import {
 
 const { gamesDataStore } = dataStores;
 
-const getProductDetails = async (placeId: string[]): Promise<TGetProductDetails> => {
+const getProductDetails = async (placeId: string[]): Promise<TGetProductDetails | undefined> => {
   const { data = [] } = (await gamesDataStore.getPlaceDetails(placeId)) as AxiosResponse<
     TGetProductDetails[]
   >;
   return data[0];
 };
 
-const getProductInfo = async (universeIds: string[]): Promise<TGetProductInfo> => {
+const getProductInfo = async (universeIds: string[]): Promise<TGetProductInfo | undefined> => {
   const {
     data: { data = [] }
   } = (await gamesDataStore.getProductInfo(universeIds)) as AxiosResponse<{
@@ -33,7 +33,9 @@ const getProductInfo = async (universeIds: string[]): Promise<TGetProductInfo> =
   return data[0];
 };
 
-const getPlayabilityStatus = async (universeIds: string[]): Promise<TGetPlayabilityStatus> => {
+const getPlayabilityStatus = async (
+  universeIds: string[]
+): Promise<TGetPlayabilityStatus | undefined> => {
   const { data = [] } = (await gamesDataStore.getPlayabilityStatus(universeIds)) as AxiosResponse<
     TGetPlayabilityStatus[]
   >;

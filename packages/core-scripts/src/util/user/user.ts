@@ -1,3 +1,4 @@
+import "../../global";
 import { get, buildBatchPromises } from "../../http";
 import localStorageService from "../../local-storage";
 import { friendsDict as friendsDictKey } from "../../local-storage/keys";

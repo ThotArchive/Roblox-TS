@@ -64,6 +64,7 @@ const SecurityKeyInput: React.FC<Props> = ({
     if (sendEvent) {
       eventService.sendCodeVerificationFailedEvent(
         activeMediaType,
+        actionType,
         TwoStepVerification.TwoStepVerificationError[
           error || TwoStepVerification.TwoStepVerificationError.UNKNOWN
         ]
@@ -179,7 +180,7 @@ const SecurityKeyInput: React.FC<Props> = ({
       return;
     }
 
-    eventService.sendCodeVerifiedEvent(activeMediaType);
+    eventService.sendCodeVerifiedEvent(activeMediaType, actionType);
     metricsService.fireVerifiedEvent(activeMediaType);
 
     dispatch({

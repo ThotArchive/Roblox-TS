@@ -3,7 +3,7 @@
  */
 
 import { EnvironmentUrls } from 'Roblox';
-import UrlConfig from '../../../../../../Roblox.CoreScripts.WebApp/Roblox.CoreScripts.WebApp/js/core/http/interfaces/UrlConfig';
+import { UrlConfig } from 'core-utilities';
 
 const URL_NOT_FOUND = 'URL_NOT_FOUND';
 
@@ -494,3 +494,16 @@ export const RETRACT_CROSS_DEVICE_PROMPT_CONFIG: (userId: string) => UrlConfig =
 });
 
 export type RetractCrossDeviceReturnType = {};
+
+export type VerifyPasswordReturnType = {
+  verificationToken: string;
+};
+
+/**
+ * Request Type: `POST`.
+ */
+export const VERIFY_PASSWORD_CONFIG: (userId: string) => UrlConfig = userId => ({
+  withCredentials: true,
+  url: `${twoStepVerificationApiUrl}/v1/users/${userId}/challenges/password/verify`,
+  timeout: TwoStepVerificationTimeout
+});

@@ -7,15 +7,21 @@ const setUserConsent = (acceptCookieNames: string[], nonEssentialCookieList: str
     cookieUtils.deleteCookie(cookieConstants.consentCookieName);
   }
   let consentCookieConfig = '';
+  const cookiesToBeDeleted: string[] = [];
   nonEssentialCookieList.forEach((cookie, index) => {
     if (acceptCookieNames.indexOf(cookie) !== -1) {
       consentCookieConfig += `${cookie}=true&`;
     } else {
       consentCookieConfig += `${cookie}=false&`;
+      cookiesToBeDeleted.push(cookie);
     }
     if (index === nonEssentialCookieList.length - 1) {
       consentCookieConfig = consentCookieConfig.slice(0, -1);
     }
+  });
+
+  cookiesToBeDeleted.forEach(cookie => {
+    cookieUtils.deleteCookie(cookie);
   });
 
   cookieUtils.setCookie(

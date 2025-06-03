@@ -4,7 +4,7 @@ import HeroUnitComponent from '../components/HeroUnit';
 import PlayButtonComponent from '../components/SduiPlayButton';
 import wrapComponentForSdui, { TSduiComponentProps } from './wrapComponentForSdui';
 import SduiParsers from './SduiParsers';
-import { TSduiPropParserObject } from './SduiTypes';
+import { TAnalyticsContext } from './SduiTypes';
 
 export enum SduiRegisteredComponents {
   SingleItemCollection = 'SingleItemCollection',
@@ -15,7 +15,9 @@ export enum SduiRegisteredComponents {
 
 type TSduiComponentInfo = {
   component: React.ComponentType<TSduiComponentProps>;
-  propParsers?: TSduiPropParserObject;
+  propParsers?: {
+    [propName: string]: (value: unknown, analyticsContext: TAnalyticsContext) => unknown;
+  };
 };
 
 // Maps component type to component and prop parsers

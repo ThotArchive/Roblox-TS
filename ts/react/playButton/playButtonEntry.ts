@@ -1,4 +1,5 @@
 import { DefaultPlayButton, PlayButton } from './components/PlayButton';
+import ContextualMessage from './components/ContextualMessage';
 import PurchaseButton from './components/PurchaseButtonContainer';
 import UnplayableError from './components/UnplayableError';
 import { PlayabilityStatus } from './constants/playButtonConstants';
@@ -14,5 +15,6 @@ export default {
   DefaultPlayButton,
   PlayButton,
   PurchaseButton,
-  Error: UnplayableError
+  Error: UnplayableError,
+  ContextualMessage
 };

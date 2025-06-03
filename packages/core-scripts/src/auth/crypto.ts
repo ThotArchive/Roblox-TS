@@ -13,6 +13,10 @@ const SIGNATURE_ALGORITHM_SPEC = {
   hash: { name: "SHA-256" },
 };
 
+// FNV-1a 32-bit hash constants
+const FNV_PRIME = 0x01000193;
+const FNV_OFFSET_BASIS = 0x811c9dc5;
+
 /**
  * Converts the passed string to an array buffer.
  *
@@ -87,21 +91,7 @@ export const exportPublicKeyAsSpki = async (publicKey: CryptoKey): Promise<strin
   return arrayBufferToBase64String(publicKeyArrayBuffer);
 };
 
-// TextEncoder is not supported for IE. https://caniuse.com/textencoder
-const textEncode = (str: string): Uint8Array => {
-  // TODO: old, migrated code
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (window.TextEncoder) {
-    return new TextEncoder().encode(str);
-  }
-  const utf8 = decodeURIComponent(encodeURIComponent(str));
-  const result = new Uint8Array(utf8.length);
-  for (let i = 0; i < utf8.length; i += 1) {
-    // BUG: `charCodeAt` returns a u16, but `result` is a u8 array.
-    result[i] = utf8.charCodeAt(i);
-  }
-  return result;
-};
+export const textEncode = (str: string): Uint8Array => new TextEncoder().encode(str);
 
 /**
  * hash string with sha256 and return the hashed base64 string.
@@ -113,4 +103,34 @@ export const hashStringWithSha256 = async (str: string): Promise<string> => {
   const msgUnit8 = textEncode(str);
   const hashBuffer = await crypto.subtle.digest(SIGNATURE_ALGORITHM_SPEC.hash.name, msgUnit8);
   return arrayBufferToBase64String(hashBuffer);
+};
+
+/**
+ * Hash string with FNV-1a 32-bit hash function and return the 32-bit FNV-1a hash value.
+ *
+ * @param {string} str
+ * @returns {string} The 32-bit FNV-1a hash of the input string in hex value.
+ */
+export const hashStringWithFnv1a32 = (str: string): string => {
+  const bytes = textEncode(str); // Convert string to UTF-8 bytes
+
+  let hash = FNV_OFFSET_BASIS;
+  for (const byte of bytes) {
+    // eslint-disable-next-line no-bitwise
+    hash ^= byte; // Process each byte
+
+    // eslint-disable-next-line no-bitwise
+    hash = Math.imul(hash, FNV_PRIME); // Use Math.imul for 32-bit multiplication
+  }
+
+  // Convert to hexadecimal and ensure lowercase
+  // eslint-disable-next-line no-bitwise
+  let hex = (hash >>> 0).toString(16).toLowerCase();
+
+  // Manually prepend zeros to ensure the string is 8 characters long
+  while (hex.length < 8) {
+    hex = `0${hex}`;
+  }
+
+  return hex;
 };

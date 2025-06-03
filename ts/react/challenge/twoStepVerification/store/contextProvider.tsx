@@ -142,7 +142,7 @@ export const TwoStepVerificationContextProvider = ({
       return;
     }
 
-    eventService.sendChallengeInvalidatedEvent(activeMediaType);
+    eventService.sendChallengeInvalidatedEvent(activeMediaType, actionType);
     metricsService.fireInvalidatedEvent();
 
     // eslint-disable-next-line prefer-destructuring
@@ -165,7 +165,7 @@ export const TwoStepVerificationContextProvider = ({
 
   useEffect(() => {
     if (activeMediaType !== null) {
-      eventService.sendMediaTypeChangedEvent(activeMediaType);
+      eventService.sendMediaTypeChangedEvent(activeMediaType, actionType);
     }
   }, [eventService, activeMediaType]);
 

@@ -27,7 +27,8 @@ const resources = {
     chatAvatarHeadshot: 'chat-avatar-headshot',
     chatGameIcon: 'chat-game-icon',
     pendingStateTemplate: 'pending-state',
-    contactCardTemplate: 'contact-card'
+    contactCardTemplate: 'contact-card',
+    osaContextCardTemplate: 'osa-context-card'
   },
   eventStreamParams: {
     actions: {

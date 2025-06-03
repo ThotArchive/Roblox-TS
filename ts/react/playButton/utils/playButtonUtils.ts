@@ -106,7 +106,7 @@ export const launchGame = (
     );
   } else {
     // TODO(npatel, 2024-12-03): Modularize this code separately and add stricter type validation via zod.
-    let referredByPlayerId = '0';
+    let referredByPlayerId: string | undefined = '0';
     if (window.localStorage.getItem('ref_info') !== null) {
       const refInfo: { [key: string]: string } = (() => {
         const refInfoRaw = window.localStorage.getItem('ref_info');
@@ -220,7 +220,8 @@ export const handleShareLinkEventLogging = (placeId: string, universeId: string)
         placeId,
         universeId
       },
-      EventStream.TargetTypes.WWW
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      EventStream.TargetTypes.WWW as number
     );
   } catch (e) {
     // ignore

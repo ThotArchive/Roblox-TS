@@ -1,3 +1,4 @@
+import "../global";
 import { DeepLink, UrlPart } from "./deepLinkConstants";
 
 const deepLinkGameJoin = (target: DeepLink): Promise<boolean> => {

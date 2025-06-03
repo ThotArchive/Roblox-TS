@@ -1,3 +1,4 @@
+import "../global";
 import { uuidService } from "@rbx/core";
 import { getDeviceMeta } from "@rbx/core-scripts/meta/device";
 import environmentUrls from "@rbx/environment-urls";

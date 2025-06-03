@@ -19,6 +19,13 @@ function guacService($q, httpService, $log) {
         withCredentials: true
       });
     },
+    getAbuseReportRevampPolicies() {
+      return httpService.httpGet({
+        url: `${EnvironmentUrls.universalAppConfigurationApi}/v1/behaviors/abuse-reporting-revamp/content`,
+        retryable: true,
+        withCredentials: true
+      });
+    }
   };
 }
 

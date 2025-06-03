@@ -103,7 +103,15 @@ function chatUtility(
 
     conversationType: angular.copy(dialogAttributes.conversationType),
 
+    conversationSource: angular.copy(dialogAttributes.conversationSource),
+
     messageSenderType: angular.copy(dialogAttributes.messageSenderType),
+
+    modalSequence: angular.copy(dialogAttributes.modalSequence),
+
+    modalVariant: angular.copy(dialogAttributes.modalVariant),
+
+    modalActionType: angular.copy(dialogAttributes.modalActionType),
 
     notificationsName,
 

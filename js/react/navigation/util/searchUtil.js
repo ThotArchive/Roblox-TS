@@ -42,7 +42,7 @@ const getDefaultSearchType = suggestion => {
     case 'Label.sGroups': {
       return 'defaultGroups';
     }
-    case 'Label.CreatorMarketplace': {
+    case 'Label.CreatorStore': {
       return 'defaultLibrary';
     }
     case 'Label.Experience': {

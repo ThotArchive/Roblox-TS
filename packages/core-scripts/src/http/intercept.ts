@@ -240,13 +240,11 @@ axios.interceptors.response.use(
             newParseChallenge: parseChallengeSpecificProperties,
           });
         }
-        // eslint-disable-next-line no-console
         console.error(
           GENERIC_CHALLENGE_LOG_PREFIX,
           "Got challenge but challenge component not available",
         );
       } else if (anyChallengeHeaderFound) {
-        // eslint-disable-next-line no-console
         console.error(GENERIC_CHALLENGE_LOG_PREFIX, "Got only partial challenge headers");
       }
     }

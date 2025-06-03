@@ -12,7 +12,8 @@ export const startAccessManagementUpsell = async ({
   ampFeatureCheckData = [],
   isAsyncCall = true,
   usePrologue = false,
-  ampRecourseData = null
+  ampRecourseData = null,
+  featureSpecificData = null
 }: TAccessManagementUpsellParams): Promise<boolean> => {
   return new Promise(resolve => {
     const event = new CustomEvent(ModalEvent.StartAccessManagementUpsell, {
@@ -24,6 +25,7 @@ export const startAccessManagementUpsell = async ({
         usePrologue,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         ampRecourseData,
+        featureSpecificData,
         closeCallback: (access: Access) => {
           resolve(isFeatureAccessGranted(access));
         }

@@ -1,4 +1,4 @@
-import { AbuseReportDispatcher, Endpoints, EventStream } from 'Roblox';
+import { AbuseReportDispatcher, CurrentUser, Endpoints, EventStream } from 'Roblox';
 import angular from 'angular';
 import chatModule from '../chatModule';
 
@@ -43,6 +43,16 @@ function dialogController(
     promise.then(guacResult => {
       if (guacResult?.EnableKeystrokeCollection === true) {
         $scope.keystrokeCollectionEnabled = true;
+      }
+    });
+  };
+
+  $scope.abuseReportRevampEnabled = false;
+  $scope.isAbuseReportRevampEnabled = function () {
+    const promise = guacService.getAbuseReportRevampPolicies();
+    promise.then(guacResult => {
+      if (guacResult?.EnableChat === true) {
+        $scope.abuseReportRevampEnabled = true;
       }
     });
   };
@@ -362,7 +372,6 @@ function dialogController(
     }
   };
 
-  
   $scope.abuseReport = function (userId, isConfirmed) {
     $scope.dialogLayout.isAbuseReportConfirmationOn = true;
     // remember userId for the confirmation
@@ -370,6 +379,17 @@ function dialogController(
       $scope.dialogLayout.userIdForAbuseReport = userId;
     }
     if (isConfirmed && $scope.dialogLayout.userIdForAbuseReport) {
+      if ($scope.abuseReportRevampEnabled) {
+        const params = new URLSearchParams({
+          targetId: $scope.dialogData.id,
+          submitterId: CurrentUser.userId,
+          abuseVector: 'chat'
+        });
+        const url = `/report-abuse/?${params.toString()}`;
+        window.location.href = url;
+        return;
+      }
+
       const relativeUrl = $filter('formatString')(chatUtility.chatLayout.abuseReportUrl, {
         userId: $scope.dialogLayout.userIdForAbuseReport,
         location: escape(window.location),
@@ -685,6 +705,32 @@ function dialogController(
     }
   };
 
+  $scope.updateShouldShowOsaContextCard = function () {
+    // show the OSA context card if:
+    $scope.dialogLayout.shouldShowOsaContextCard =
+      // 1. the GUAC setting is enabled
+      $scope.chatLibrary.useOneToOneOsaContextCards === true &&
+      // 2. either
+      //    a. it's a friend placeholder
+      //    b. it's a channels conversation and there are no more messages to be loaded
+      (
+        $scope.dialogData.source === chatUtility.conversationSource.FRIENDS ||
+        (
+          !$scope.dialogParams.loadMoreMessages ||
+          (
+            $scope.dialogData.chatMessages &&
+            $scope.dialogData.chatMessages.length > 0 &&
+            $scope.dialogData.chatMessages.length < $scope.dialogParams.pageSizeOfGetMessages
+          )
+        )
+      ) &&
+      // 3. the OSA acknowledgement status is "unacknowledged" or "acknowledged"
+      (
+        $scope.dialogData.osaAcknowledgementStatus === dialogAttributes.osaAcknowledgementStatus.UNACKNOWLEDGED ||
+        $scope.dialogData.osaAcknowledgementStatus === dialogAttributes.osaAcknowledgementStatus.ACKNOWLEDGED
+      );
+  };
+
   // // ----------------------------------- CODE TO RUN --------------------------------
   $scope.dialogLayout.currentDialogScreen = 'default';
   $scope.dialogLayout.shouldShowContactCard = false;
@@ -701,6 +747,19 @@ function dialogController(
       updateCurrentDialogScreen();
     }
   );
+
+  $scope.$watchGroup(
+    [
+      'chatLibrary.useOneToOneOsaContextCards',
+      'dialogData.osaAcknowledgementStatus',
+      'dialogData.chatMessages',
+      'dialogParams.loadMoreMessages'
+    ],
+    function() {
+      $scope.updateShouldShowOsaContextCard();
+    }
+  );
+
   if (
     $scope.dialogData.dialogType !== chatUtility.dialogType.FRIEND &&
     !$scope.dialogData.isUserPending
@@ -719,7 +778,7 @@ function dialogController(
     messagesTask.then(function (response) {
         const data = response.messages;
         $scope.dialogLayout.isChatLoading = false;
-        if (data && data.length > 0) {
+        if (data) {
           $scope.dialogParams.getMessagesNextCursor = response.next_cursor;
           $scope.dialogData.chatMessages = [];
           $scope.dialogData.messagesDict = {};
@@ -772,6 +831,7 @@ function dialogController(
     $scope.getLimitLinkNameForMemberList();
     $scope.sendWebChatConversationRenderedEvent();
     $scope.isKeystrokeCollectionEnabled();
+    $scope.isAbuseReportRevampEnabled();
   };
 
   $scope.init();
